@@ -1,0 +1,25 @@
+.table
+{
+    width: 95%;
+    border-collapse: collapse;
+    margin: 0 auto;
+}
+.table th
+{
+    border: 1px solid #000;
+    padding: 5px;
+}
+.table td
+{
+    border: 1px solid #000;
+    padding: 5px;
+}
+.table td input
+{
+    border-style: none;
+    width: fit-content;
+}
+.table td input:focus
+{
+    outline: none;
+}
