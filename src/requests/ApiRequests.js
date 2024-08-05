@@ -14,11 +14,20 @@ const apiConfig = axios.create({
   
 export const uploadPeople = async (data) => {
   try {
-    const response = await apiConfig.post('/api/alfon', data);
+    const response = await apiConfig.post('/api/alfon/upload', data);
    
     return response;
   } catch (error) {
     console.log(error);
     
+  }
+};
+
+export const getPeople = async () => {
+  try {
+    const response = await apiConfig.get('/api/alfon');
+    return response;
+  } catch (error) {
+    console.log(error);
   }
 };
