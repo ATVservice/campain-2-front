@@ -1,0 +1,15 @@
+{
+    "מזהה אנש": "anashIdentifier",
+    "שם": "FullNameForLists",
+    "רחוב": "Address",
+    "עיר": "City",
+    "טל נייד": "MobilePhone",
+    "טל בית": "HomePhone",
+    "אחראי": "CommitteeResponsibility",
+    "קבוצה למסיבה": "PartyGroup",
+    "אופן התרמה": "DonationMethod",
+    "מספר קבוצה": "GroupNumber",
+    "סיווג": "Classification",
+    "פעיל": "isActive"
+  }
+  
