@@ -6,6 +6,7 @@ import Navbar from './features/Navbar';
 import AlfonPage from './pages/AlfonPage';
 import LoginPage from './pages/LoginPage';
 import MenuPage from './pages/MenuPage';
+import CommitmentPage from './pages/commitmentPage';
 
 const App = () => {
   return (
@@ -29,6 +30,7 @@ const App = () => {
               <Route path="/alfon" element={<AlfonPage />} />
               <Route path="/" element={<LoginPage />} />
               <Route path="/menu" element={<MenuPage />} />
+              <Route path="/commitment" element={<CommitmentPage />} />
               {/* Add other routes here if needed */}
             </Routes>
           </div>
