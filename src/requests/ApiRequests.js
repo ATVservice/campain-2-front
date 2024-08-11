@@ -48,6 +48,11 @@ export const uploadCommitment = async (data) => {
 export const getCommitment = async () => {
   try {
     const response = await apiConfig.get('/api/alfon');
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 export const getUserDetails = async (anashIdentifier) => {
   try {
@@ -64,7 +69,10 @@ export const upadateUserDetails = async (data) => {
     const response = await apiConfig.post(`/api/alfon/update-user-details`,data);
 
     return response;
-  } catch (error) {
+  } 
+  catch (error) {
     console.log(error);
   }
+}
+  
 
