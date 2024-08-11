@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import * as XLSX from 'xlsx';
 import CommitmentForm from '../components/ManualCommitmentForm';
-import { uploadCommitment } from '../requests/ApiRequests';
+import { uploadCommitment, getCommitment } from '../requests/ApiRequests';
+import styles from './alfonPage.module.css';
 
 function CommitmentPage() {
   const [uploadingData, setUploadingData] = useState([]);

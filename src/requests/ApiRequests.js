@@ -46,7 +46,7 @@ export const uploadCommitment = async (data) => {
 
 export const getCommitment = async () => {
   try {
-    const response = await apiConfig.get('/api/alfon');
+    const response = await apiConfig.get('/api/commitment');
     return response;
   } catch (error) {
     console.log(error);
