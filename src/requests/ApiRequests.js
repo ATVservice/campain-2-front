@@ -47,7 +47,7 @@ export const uploadCommitment = async (data) => {
 
 export const getCommitment = async () => {
   try {
-    const response = await apiConfig.get('/api/alfon');
+    const response = await apiConfig.get('/api/commitment');
     return response;
   } catch (error) {
     console.log(error);
@@ -58,6 +58,7 @@ export const getUserDetails = async (anashIdentifier) => {
   try {
     console.log(anashIdentifier);
     const response = await apiConfig.get(`/api/alfon/get-user-details/${anashIdentifier}`);
+
     return response;
   } catch (error) {
     console.log(error);
