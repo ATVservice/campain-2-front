@@ -7,21 +7,13 @@ import AlfonPage from './pages/AlfonPage';
 import LoginPage from './pages/LoginPage';
 import MenuPage from './pages/MenuPage';
 import CommitmentPage from './pages/commitmentPage';
+import UserDetailsPage from './pages/UserDetailsPage';
 
 const App = () => {
   return (
     <Router>
       <div 
-        style={{
-          backgroundImage: `url(${dollarsBackground})`,
-          backgroundSize: 'cover',
-          backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'center',
-          backgroundAttachment: 'fixed',
-          minHeight: '100vh',
-          height: '100vh', // Set the height of the container
-          overflow: 'hidden'
-        }}
+  
       >
         <div className="flex flex-col min-h-screen">
           <Navbar />
@@ -31,6 +23,7 @@ const App = () => {
               <Route path="/" element={<LoginPage />} />
               <Route path="/menu" element={<MenuPage />} />
               <Route path="/commitment" element={<CommitmentPage />} />
+              <Route path="/user-details/:anashIdentifier" element={<UserDetailsPage />} />
               {/* Add other routes here if needed */}
             </Routes>
           </div>

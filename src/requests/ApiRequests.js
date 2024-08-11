@@ -32,6 +32,7 @@ export const getPeople = async () => {
   }
 };
 
+
 export const uploadCommitment = async (data) => {
   try {
     const response = await apiConfig.post('/api/commitment/upload', data);
@@ -51,4 +52,25 @@ export const getCommitment = async () => {
   } catch (error) {
     console.log(error);
   }
+}
+
+export const getUserDetails = async (anashIdentifier) => {
+  try {
+    console.log(anashIdentifier);
+    const response = await apiConfig.get(`/api/alfon/get-user-details/${anashIdentifier}`);
+
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
 };
+export const upadateUserDetails = async (data) => {
+  try {
+    console.log('e',data);
+    const response = await apiConfig.post(`/api/alfon/update-user-details`,data);
+
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+}
