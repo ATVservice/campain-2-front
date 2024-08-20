@@ -44,7 +44,7 @@ function CommitmentForm({ onClose, onSubmit }) {
     };
 
     return (
-        <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-500 bg-opacity-75">
+        <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-500 bg-opacity-75  z-50">
             <div className="bg-white p-8 rounded-lg shadow-lg w-1/2">
                 <h2 className="text-2xl font-bold mb-4">Add Commitment</h2>
                 <form onSubmit={handleFormSubmit}>
