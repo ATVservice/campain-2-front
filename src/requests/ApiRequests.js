@@ -95,7 +95,52 @@ export const upadateUserDetails = async (data) => {
     const response = await apiConfig.post(`/api/alfon/update-user-details`,data);
 
     return response;
+  } 
+  catch (error) {
+    console.log(error);
+  }
+}
+export const deleteUser= async (anashIdentifier) => {
+  try {
+    console.log(anashIdentifier);
+    const response = await apiConfig.delete(`/api/alfon/delete-user/${anashIdentifier}`);
+    return response;
   } catch (error) {
     console.log(error);
   }
 }
+export const addCampain= async (data) => {
+  try {
+    const response = await apiConfig.post(`/api/campain/add-campain`,data);
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export const getCampains= async () => {
+  try {
+    const response = await apiConfig.get(`/api/campain/get-campains`);
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+}
+export const getCampainPeople= async (campainId) => {
+  try {
+    const response = await apiConfig.get(`/api/campain/get-campain-people/${campainId}`);
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+}
+export const addPersonToCampain= async (data) => {
+  try {
+    const response = await apiConfig.post(`/api/campain/add-person-to-campain`,data);
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+}
+  
+
