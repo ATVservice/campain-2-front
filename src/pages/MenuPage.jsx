@@ -11,7 +11,7 @@ const MenuPage = () => {
         אלפון
       </Link>
       <Link
-        to="/campaigns"
+        to="/campains"
         className="bg-blue-200 text-blue-900 text-center p-16 mx-2 rounded-lg shadow-md hover:bg-blue-300 transition-all w-full md:w-1/3 lg:w-1/4 text-2xl"
       >
         קמפיינים
