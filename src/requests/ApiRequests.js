@@ -19,7 +19,6 @@ export const uploadPeople = async (data) => {
     return response;
   } catch (error) {
     console.log(error);
-    
   }
 };
 
@@ -40,18 +39,23 @@ export const getAlfonChanges = async (data) => {
   }
 };
 
-
 export const uploadCommitment = async (data) => {
   try {
+    // לוג של הנתונים שנשלחים לשרת
+    console.log('Data being sent to server:', data);
+
     const response = await apiConfig.post('/api/commitment/upload', data);
-   
+    
+    // לוג לרספונס שהתקבל
+    console.log('Upload Commitment Response:', response);
+
     return response;
 
   } catch (error) {
-    console.log(error);
-    
+    console.log('Error uploading commitment:', error);
   }
 };
+
 
 export const getCommitment = async () => {
   try {
@@ -63,11 +67,9 @@ export const getCommitment = async () => {
 }
 
 export const uploadPayment = async (paymentData) => {
-  console.log(paymentData);
-  
   try {
     const response = await apiConfig.post('/api/payment/uploadPayment', paymentData);
-    //console.log(response);
+    console.log(response);
     
     return response;
   } catch (error) {
@@ -89,13 +91,33 @@ export const getUserDetails = async (anashIdentifier) => {
 
 export const getCommitmentDetails = async (_id) => {
   try {
-    console.log(_id);
     const response = await apiConfig.get(`/api/commitment/get-commitment/${_id}`);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const deleteCommitment = async (commitmentId) => {
+  try {
+    console.log(commitmentId);
+    const response = await apiConfig.delete(`/api/commitment/delete-commitment/${commitmentId}`);
     return response;
   } catch (error) {
     console.log(error);
   }
 };
+
+export const updateCommitmentDetails = async (commitmentId, updatedData) => {
+  try {
+    const response = await apiConfig.post(`/api/commitment/update-commitment-details/${commitmentId}`, updatedData);
+    return response;
+  } catch (error) {
+    console.error('Error updating commitment:', error);
+    throw error;
+  }
+};
+
 
 export const upadateUserDetails = async (data) => {
   try {
