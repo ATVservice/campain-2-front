@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { uploadCommitment } from '../requests/ApiRequests';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function CommitmentForm({ onClose, onSubmit }) {
     const [formData, setFormData] = useState({
@@ -28,25 +30,53 @@ function CommitmentForm({ onClose, onSubmit }) {
     const handleFormSubmit = async (e) => {
         e.preventDefault();
         try {
-            // Send the form data to the server
+            const calculatedPaymentsMade = formData.NumberOfPayments - formData.PaymentsRemaining;
+            const calculatedAmountRemaining = formData.CommitmentAmount - formData.AmountPaid;
+
+            // בדיקות תקינות
+            if (calculatedPaymentsMade !== formData.PaymentsMade) {
+                toast.error('מספר תשלומים שבוצעו אינו תואם את החישוב.');
+                return;
+            }
+
+            if (calculatedAmountRemaining !== formData.AmountRemaining) {
+                toast.error('סכום ההתחייבות שנשאר אינו תואם את החישוב.');
+                return;
+            }
+            // שליחת נתוני הטופס לשרת
             const response = await uploadCommitment(formData);
-            
+
             if (response && response.status === 200) {
-                console.log('Commitment saved successfully');
-                onSubmit(formData); // Optional: Call onSubmit callback if needed
-                onClose(); // Close the form after submission
+                const { successfulCommitments, failedCommitments } = response.data;
+
+                if (successfulCommitments.length > 0) {
+                    toast.success('ההתחייבות נוספה בהצלחה!');
+                    console.log('Commitment saved successfully');
+                    onSubmit(formData); // קריאה אופציונלית ל-callback onSubmit אם נדרש
+                    onClose(); // סגירת הטופס לאחר השמירה
+                }
+
+                if (failedCommitments.length > 0) {
+                    failedCommitments.forEach((failedCommitment) => {
+                        toast.error(`שגיאה: ${failedCommitment.reason}`);
+                        console.error(`Error: ${failedCommitment.reason}`);
+                    });
+                }
             } else {
+                toast.error('שגיאה בשמירת ההתחייבות.');
                 console.error('Failed to save commitment');
             }
         } catch (error) {
+            toast.error('שגיאה בשמירת ההתחייבות.');
             console.error('Error saving commitment:', error);
         }
     };
 
+
     return (
         <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-500 bg-opacity-75  z-50">
             <div className="bg-white p-8 rounded-lg shadow-lg w-1/2">
-                <h2 className="text-2xl font-bold mb-4">Add Commitment</h2>
+                <h2 className="text-2xl font-bold mb-4">הוסף התחייבות</h2>
                 <form onSubmit={handleFormSubmit}>
                     <div>
                         <label>מזהה אנש:</label>
@@ -94,7 +124,15 @@ function CommitmentForm({ onClose, onSubmit }) {
                     </div>
                     <div>
                         <label>אופן התשלום:</label>
-                        <input type="text" name="PaymentMethod" value={formData.PaymentMethod} onChange={handleChange} />
+                        <select name="PaymentMethod" value={formData.PaymentMethod} onChange={handleChange} required>
+                            <option value="">בחר אופן תשלום</option>
+                            <option value="מזומן">מזומן</option>
+                            <option value="שיק">שיק</option>
+                            <option value="אשראי">אשראי</option>
+                            <option value="הו&quot;ק אשראי">הו"ק אשראי</option>
+                            <option value="העברה בנקאית">העברה בנקאית</option>
+                            <option value="הו&quot;ק בנקאית">הו"ק בנקאית</option>
+                        </select>
                     </div>
                     <div>
                         <label>הערות:</label>
@@ -105,8 +143,8 @@ function CommitmentForm({ onClose, onSubmit }) {
                         <input type="text" name="ResponseToFundraiser" value={formData.ResponseToFundraiser} onChange={handleChange} />
                     </div>
                     <div className="flex justify-end">
-                        <button type="button" onClick={onClose} className="mr-4 px-4 py-2 bg-red-500 text-white rounded">Cancel</button>
-                        <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded">Save</button>
+                        <button type="button" onClick={onClose} className="mr-4 px-4 py-2 bg-red-500 text-white rounded">ביטול</button>
+                        <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded">שמור טופס</button>
                     </div>
                 </form>
 
