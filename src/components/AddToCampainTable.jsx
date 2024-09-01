@@ -81,36 +81,8 @@ function AddToCampainTable({rowData,onAddPersonToCampain,searchText}) {
             }
         }
     ];
-    const CustomHeader = (props) => {
-      return <div dangerouslySetInnerHTML={{ __html: props.displayName }} />;
-    };
-    
     
       const columns = [
-        {
-          headerName: 'פרטים מלאים',
-          field: 'userDetails',
-          editable: false,
-          cellRenderer: (params) =>
-            
-            {
-            const handleDetailsClick = () => {
-              const anashIdentifier = params.data.anashIdentifier; // Replace 'id' with the actual field name for the user ID
-              navigate(`/user-details/${anashIdentifier}`);
-            };
-      
-            return (
-              <button onClick={() => handleDetailsClick()}>
-                <CgDetailsMore style={{ fontSize: '20px' }} />
-              </button>
-            );  
-          },
-          width: 70,
-          headerComponent: CustomHeader,
-          headerComponentParams: {
-            displayName: 'פרטים<br>מלאים'
-          }
-        },
         
         { headerName: 'מזהה אנש', field: 'anashIdentifier', editable: false, sortable: true, filter: true,width: 120 },
         { headerName: 'שם', field: 'FirstName', editable: true, sortable: true, filter: true },
@@ -162,7 +134,29 @@ function AddToCampainTable({rowData,onAddPersonToCampain,searchText}) {
             
       };
           const pageSizeOptions = [2,4];
+          const onGridReady = (params) => {
+            setGridApi(params.api);
+        
+            // Log the filter model to check the current state
+            // console.log(params.api);
+        
+                // Apply default filter for the 'isActive' column
+                params.api.setFilterModel({
+                    isActive: {
+                        filterType: 'set',
+                        values: [true],
+                    },
+                });
+                params.api.onFilterChanged();
 
+        
+                // Log the filter model after setting it
+        
+                // Force refresh of grid to ensure filter is applied
+            
+        };
+      
+      
   
   return (
 
@@ -178,6 +172,7 @@ function AddToCampainTable({rowData,onAddPersonToCampain,searchText}) {
     enableRtl={true}
     quickFilterText={searchText} // Applying the search text to filter the grid
     suppressClickEdit={true}
+    onGridReady={onGridReady}
     defaultColDef={{
       filterParams: {
         filterOptions: hebrewFilterOptions,

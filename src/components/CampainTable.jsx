@@ -156,7 +156,26 @@ function CampainTable({rowData}) {
     };
     const pageSizeOptions = [20,50];
 
+    const onGridReady = (params) => {
+      setGridApi(params.api);
   
+      // Log the filter model to check the current state
+      // console.log(params.api);
+  
+          // Apply default filter for the 'isActive' column
+          params.api.setFilterModel({
+              isActive: {
+                  filterType: 'set',
+                  values: [true],
+              },
+          });
+  
+          // Log the filter model after setting it
+  
+          // Force refresh of grid to ensure filter is applied
+      
+  };
+
   return (
 
       <div className="ag-theme-alpine" style={gridStyle}>
@@ -169,6 +188,7 @@ function CampainTable({rowData}) {
     paginationPageSizeSelector={pageSizeOptions} // this property is not a valid AG Grid property
     domLayout="autoHeight" // Use autoHeight layout to adjust grid height automatically
     enableRtl={true}
+    onGridReady={onGridReady}
     // quickFilterText={searchText} 
     suppressClickEdit={true}
     defaultColDef={{
