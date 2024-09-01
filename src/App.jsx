@@ -12,8 +12,11 @@ import CommitmentDetailsPage from './pages/CommitmentDetailsPage';
 import CampainsPage from './pages/CampainsPage';
 import MemorialBoard from './pages/MemorialBoard';
 import CampainPage from './pages/CampainPage';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import AddPersonPage from './pages/AddPersonPage';
 // import AlfonChangesPage from './pages/AlfonChangesPage';
+
 
 
 const App = () => {
@@ -24,6 +27,7 @@ const App = () => {
       >
         <div className="flex flex-col min-h-screen">
           <Navbar />
+          <ToastContainer />
           <div className="flex-grow">
             <Routes>
               <Route path="/alfon" element={<AlfonPage />} />
