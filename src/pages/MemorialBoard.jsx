@@ -5,15 +5,25 @@ function MemorialBoard() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
-  const daysInMonth = generateDatesInMonth(year, month);
-  const firstDayOfWeek = new Date(year, month, 1).getDay();
+  let firstDayOfWeek = new Date(year, month, 1).getDay();
+  let hebrewMonths = getHebrewMonths(year, month);
+  const daysInMonth = generateHebrewDatesInMonth(year, month);
+  // const daysInMonth = generateDatesInMonth(year, month);
   const hebrewDays = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
   const changeDate = (change) => setCurrentDate(new Date(year, month + change, 1));
   const gregorianMonthYear = currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-  const hebrewMonths = getHebrewMonths(year, month);
   const hebrewYear = getHebrewYearString(currentDate);
   const hebrewMonthYear = `${hebrewMonths} ${hebrewYear}`;
   const [selectedDay, setSelectedDay] = useState(new Date());
+  // function selectedDateEqualGregDate(date) {
+  //   return selectedDay.getFullYear() === date.getFullYear() &&
+  //          selectedDay.getMonth() === date.getMonth() &&
+  //          selectedDay.getDate() === date.getDate();
+  // }
+  
+  const hebrewLetters = ["א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י", 
+    "יא", "יב", "יג", "יד", "טו", "טז", "יז", "יח", "יט", "כ", 
+    "כא", "כב", "כג", "כד", "כה", "כו", "כז", "כח", "כט", "ל"];
 
   function getHebrewDate(date) {
     const options = { calendar: 'hebrew', day: 'numeric', month: 'long' };
@@ -31,6 +41,7 @@ function MemorialBoard() {
 
   function getHebrewYearString(date) {
     const hebrewYear = new Intl.DateTimeFormat('he-IL', { calendar: 'hebrew', year: 'numeric' }).format(date);
+    // console.log(hebrewYear);
     const yearNumber = parseInt(hebrewYear);
     const letterValues = {
       'א': 1, 'ב': 2, 'ג': 3, 'ד': 4, 'ה': 5, 'ו': 6, 'ז': 7, 'ח': 8, 'ט': 9,
@@ -56,6 +67,7 @@ function MemorialBoard() {
     if (result.length > 1) {
       result = result.slice(0, -1) + '"' + result.slice(-1);
     }
+    console.log(result);
 
     return result;
   }
@@ -92,50 +104,113 @@ function MemorialBoard() {
            date.getDate() === today.getDate();
   }
   function handelSelectedDay(day) {
-    setSelectedDay(day);
-    console.log(getHebrewDate(day));
+    // console.log(new Date(day.gregorian).getDate());
+    
+    // console.log(day.gregorian.getDate());
+    setSelectedDay(new Date(day.gregorian));
+    // console.log(getHebrewDate(day));
   }
+  function generateHebrewDatesInMonth(year, month) {
+    const days = [];
+    
+    // Find the first day of the Hebrew month
+    let date = new Date(year, month, 1);
+    console.log(date);
+    let hebrewDate = new Intl.DateTimeFormat('he-IL-u-ca-hebrew', { day: 'numeric', month: 'short', year: 'numeric'}).format(date);
+    console.log(hebrewDate);
+    // Adjust to start at the first day of the Hebrew month
+    while (hebrewDate.split(' ')[0] !== "1") {
+      date.setDate(date.getDate() - 1);
+      hebrewDate = new Intl.DateTimeFormat('he-IL-u-ca-hebrew', { day: 'numeric', month: 'long', year: 'numeric'}).format(date);
+    }
+    // Loop through the entire Hebrew month
+    const currentMonthName = hebrewDate.split(' ')[1];
 
+
+    const hebrewDaysInWeek = {
+      "יום ראשון": 0,
+      "יום שני": 1,
+      "יום שלישי": 2,
+      "יום רביעי": 3,
+      "יום חמישי": 4,
+      "יום שישי": 5,
+      "שבת": 6
+    };
+        const key =  new Intl.DateTimeFormat('he-IL-u-ca-hebrew', { day: 'numeric', month: 'long',weekday: 'long'}).formatToParts(date)[0].value;
+        // console.log(key);
+    firstDayOfWeek = hebrewDaysInWeek[key];
+    hebrewMonths=   new Intl.DateTimeFormat('he-IL-u-ca-hebrew', { day: 'numeric', month: 'long',weekday: 'short'}).formatToParts(date)[4].value;
+// console.log(hebrewDaysInWeek[6]);
+    
+    while (true) {
+      // const temp = new Intl.DateTimeFormat('he-IL-u-ca-hebrew', { day: 'numeric', month: 'long',weekday: 'short'}).formatToParts(date);
+      // console.log(temp);
+      const [day, monthName] = hebrewDate.split(' ');
+      const formattedDate = new Date(date);
+  
+      date.setDate(date.getDate() + 1);
+      hebrewDate = new Intl.DateTimeFormat('he-IL-u-ca-hebrew', { day: 'numeric', month: 'long', year: 'numeric' }).format(date);
+      // console.log(temp);
+      
+      // Move to the next day
+      // Stop if the Hebrew month changes
+      if (monthName !== currentMonthName) {
+        break;
+      }
+      else
+      {
+        days.push({ gregorian: formattedDate, hebrewDay: day, hebrewMonth: monthName });
+
+      }
+    
+      // console.log(formattedDate.getDate());
+    }
+    console.log(days[0].gregorian)
+    return days;
+  }
+  
+  
 
   return (
-    <div dir='rtl' className='max-w-md mx-auto overflow-hidden'>
-      <div className='flex flex-col items-center justify-between bg-blue-500 text-white p-4'>
-        <div className='flex w-full justify-between items-center'>
-          <button onClick={() => changeDate(-1)} className='text-white hover:bg-blue-600 p-2 rounded-full'> 
-            <BiChevronRight size={20}/>
-          </button>
-          <div className='text-center'>
-            <h2 className='text-2xl font-bold'>{gregorianMonthYear}</h2>
-            <p className='text-sm'>{hebrewMonthYear}</p>
-          </div>
-          <button onClick={() => changeDate(1)} className='text-white hover:bg-blue-600 p-2 rounded-full'> 
-            <BiChevronLeft size={20}/>
-          </button>
-        </div>
+<div dir="rtl" className="max-w-4xl w-full mx-auto overflow-hidden rounded-lg border border-gray-300">
+  <div className="bg-blue-500 text-white p-4">
+    <div className="flex justify-between items-center">
+      <button onClick={() => changeDate(-1)} className="text-white hover:bg-blue-600 p-2 rounded-full">
+        <BiChevronRight size={24}/>
+      </button>
+      <div className="text-center">
+        {/* <h2 className="text-2xl font-bold">{gregorianMonthYear}</h2> */}
+        <h2 className="text-2xl font-bold">{hebrewMonthYear}</h2>
       </div>
-
-      <div className='grid grid-cols-7 gap-1 p-4 text-center'>
-        {hebrewDays.map(day => 
-          <div key={day} className='font-bold p-2'>{day}</div>)}
-
-        {Array.from({ length: firstDayOfWeek }).map((_, index) => 
-          <div key={`empty-${index}`} className='p-2'/>)}
-
-        {daysInMonth.map((day) => {
-          const hebrewDate = getHebrewDate(day);
-          return (
-            <div 
-              key={day}
-              className={`p-2 ${selectedDay.getDate() === day.getDate() ? 'bg-blue-500 text-white' : 'hover:bg-blue-200'} cursor-pointer`}
-              onClick={() => handelSelectedDay(day)}
-            >
-              <div>{day.getDate()}</div>
-              <div className='text-xs'>{hebrewDate.day} {hebrewDate.month}</div>
-            </div>
-          );
-        })}
-      </div>
+      <button onClick={() => changeDate(1)} className="text-white hover:bg-blue-600 p-2 rounded-full">
+        <BiChevronLeft size={24}/>
+      </button>
     </div>
+  </div>
+
+  <div className="p-2">
+    <div className="grid grid-cols-7 text-center border-collapse border border-gray-300">
+      {hebrewDays.map(day => 
+        <div key={day} className="font-bold p-2 bg-blue-200 border border-gray-300">{day}</div>)}
+
+      {Array.from({ length: firstDayOfWeek }).map((_, index) => 
+        <div key={`empty-${index}`} className="p-2 border border-gray-300 bg-white"/>)}
+
+      {daysInMonth.map((day) => {
+        return (
+          <div 
+            key={day.gregorian.getTime()}
+            className={`h-[80px] border border-gray-300 flex items-center justify-center cursor-pointer ${selectedDay?.getDate() === day.gregorian.getDate() ? 'bg-blue-500 text-white' : 'hover:bg-blue-200'}`}
+            onClick={() => handelSelectedDay(day)}
+          >
+            <div className="text-xl">{hebrewLetters[day.hebrewDay-1]}</div>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+</div>
+
   )
 }
 

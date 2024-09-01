@@ -14,6 +14,9 @@ import MemorialBoard from './pages/MemorialBoard';
 import CampainPage from './pages/CampainPage';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import AddPersonPage from './pages/AddPersonPage';
+// import AlfonChangesPage from './pages/AlfonChangesPage';
+
 
 
 const App = () => {
@@ -36,6 +39,8 @@ const App = () => {
               <Route path="/campains" element={<CampainsPage />} />
               <Route path="/memorial-Board" element={<MemorialBoard />} />
               <Route path="/campain/:campainId" element={<CampainPage />} />
+              <Route path="/add-person" element={<AddPersonPage />} />
+              {/* <Route path="/alfon-changes" element={<AlfonChangesPage />} /> */}
               {/* Add other routes here if needed */}
             </Routes>
           </div>

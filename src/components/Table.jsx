@@ -6,14 +6,20 @@ import { uploadPeople, getPeople,upadateUserDetails ,deleteUser} from '../reques
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
+import { AG_GRID_LOCALE_IL ,translations} from './Utils';
+import { FaRegEdit } from "react-icons/fa";
 
 
 function Table({rowData, setRowData}) {
+  // console.log(rowData)
 
     const navigate = useNavigate();
     const [originalRowData, setOriginalRowData] = useState({});
     const [searchText, setSearchText] = useState('');
+    const [gridApi, setGridApi] = useState(null);
+    const [isFilterApplied, setIsFilterApplied] = useState(false);
 
+    
     
     
     const onSearch = (event) => {
@@ -24,7 +30,7 @@ function Table({rowData, setRowData}) {
         'שם': 'FirstName',
         'משפחה': 'LastName',
         'כתובת': 'Address',
-        'מספר': 'adressNumber',
+        'מספר': 'addressNumber',
         'עיר': 'City',
         'טל נייד': 'MobilePhone',
         'טל בית': 'HomePhone',
@@ -43,7 +49,7 @@ function Table({rowData, setRowData}) {
         } else {
             return (
                 <div style={{ display: 'flex', gap: '15px' }}> 
-                    <button className="action-button edit border-2 p-1 w-[100px]" onClick={() => onActionClick('edit', props.api, props.node)}>ערוך שורה</button>
+                    <button className="action-button edit border-2 p-1 w-[100px]" onClick={() => onActionClick('edit', props.api, props.node)}>ערוך </button>
                     <button className="action-button delete border-2 p-1 w-[100px]" onClick={() => onActionClick('delete', props.api, props.node)}>מחק שורה</button>
                 </div>
             );
@@ -136,6 +142,8 @@ function Table({rowData, setRowData}) {
             }
         }
     ];
+
+
     const CustomHeader = (props) => {
       return <div dangerouslySetInnerHTML={{ __html: props.displayName }} />;
     };
@@ -171,7 +179,7 @@ function Table({rowData, setRowData}) {
         { headerName: 'שם', field: 'FirstName', editable: true, sortable: true, filter: true },
         { headerName: 'משפחה', field: 'LastName', editable: true, sortable: true, filter: true },
         { headerName: 'כתובת', field: 'Address', editable: true, sortable: true, filter: true },
-        { headerName: 'מספר', field: 'adressNumber', editable: true, sortable: true, filter: true,width: 100 },
+        { headerName: 'מספר', field: 'addressNumber', editable: true, sortable: true, filter: true,width: 100 },
         { headerName: 'עיר', field: 'City', editable: true, sortable: true, filter: true,width: 100 },
         {
           headerName: 'טל בית',
@@ -184,13 +192,23 @@ function Table({rowData, setRowData}) {
         {
           headerName: 'פעיל',
           field: 'isActive',
-          editable: true,
-          width: 80,
+          filter: true,
+          filterParams: {
+            defaultOption: 'true',
+          },
+          
+                       
+          
+          // editable: true,
+          
+          // width: 80,
           cellRenderer: (params) => {
             return (
               <input 
+              id={`isActive-${params.data.anashIdentifier}`} 
+
                 type="checkbox" 
-                checked={params.value} 
+                checked={params.value.toString() === 'true'} 
                 disabled 
                 style={{ 
                   width: '15px', 
@@ -233,11 +251,45 @@ function Table({rowData, setRowData}) {
         margin: '0 auto', // Center the grid
         width: '98vw', // Adjust based on your layout needs
     };
-    
+    const defaultColDef = {
+      filterParams: {
+        filterOptions: hebrewFilterOptions,
+        
+      }
+    };
+    const onGridReady = (params) => {
+      setGridApi(params.api);
   
+      // Log the filter model to check the current state
+      // console.log(params.api);
+  
+          // Apply default filter for the 'isActive' column
+          params.api.setFilterModel({
+              isActive: {
+                  filterType: 'set',
+                  values: [true],
+              },
+          });
+  
+          // Log the filter model after setting it
+  
+          // Force refresh of grid to ensure filter is applied
+          params.api.onFilterChanged();
+          params.api.refreshCells();
+          params.api.redrawRows();
+  
+          // Set the state to true so the filter is not applied again
+          setIsFilterApplied(true);
+  
+          // Log the final filter model to confirm
+      
+  };
+  
+    
   return (
     <div>
-              <input 
+      <input 
+      id="search"
         type="text" 
         placeholder="חיפוש..." 
         value={searchText} 
@@ -247,7 +299,7 @@ function Table({rowData, setRowData}) {
       />
 
       <div className="ag-theme-alpine" style={gridStyle}>
-        {rowData.length > 0 && (
+        
           <AgGridReact
 
             columnDefs={columns}
@@ -256,7 +308,6 @@ function Table({rowData, setRowData}) {
             paginationPageSize={50} // Increase the pagination page size as needed
             domLayout="normal" // Use normal layout to keep grid within the container height
             enableRtl={true}
-            // onGridReady={onGridReady}
             onRowEditingStarted={onRowEditingStarted}
             onRowEditingStopped={onRowEditingStopped}
             quickFilterText={searchText} // Applying the search text to filter the grid
@@ -264,13 +315,13 @@ function Table({rowData, setRowData}) {
 
             editType="fullRow"
             suppressClickEdit={true}
-            defaultColDef={{ filterParams: {
-              filterOptions: hebrewFilterOptions
-          }}
-      }
+            defaultColDef={defaultColDef} 
+            onGridReady={onGridReady}
+            localeText={translations}
+
             
           />
-        )}
+        
       </div>
 
     </div>
