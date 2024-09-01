@@ -31,6 +31,14 @@ export const getPeople = async () => {
     console.log(error);
   }
 };
+export const getAlfonChanges = async (data) => {
+  try {
+    const response = await apiConfig.post('/api/alfon/get-alfon-changes', data);
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 
 export const uploadCommitment = async (data) => {
@@ -134,9 +142,33 @@ export const getCampainPeople= async (campainId) => {
     console.log(error);
   }
 }
+export const getPeopleNotInCampain= async (campainId) => {
+  try {
+    const response = await apiConfig.get(`/api/campain/get-people-not-in-campain/${campainId}`);
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+}
 export const addPersonToCampain= async (data) => {
   try {
     const response = await apiConfig.post(`/api/campain/add-person-to-campain`,data);
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+}
+export const addPeopleToCampain= async (data) => {
+  try {
+    const response = await apiConfig.post(`/api/campain/add-people-to-campain`,data);
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+}
+export const addPerson= async (data) => {
+  try {
+    const response = await apiConfig.post(`/api/alfon/add-user`,data);
     return response;
   } catch (error) {
     console.log(error);
