@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getCommitmentDetails, deleteCommitment, updateCommitmentDetails, uploadPayment } from '../requests/ApiRequests';
+import { getCommitmentDetails, deleteCommitment, updateCommitmentDetails, uploadPayment, getCampains } from '../requests/ApiRequests';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Modal from 'react-modal';
@@ -151,6 +151,7 @@ function CommitmentDetailsPage() {
     const paymentAmount = parseFloat(paymentData.Amount);
     const remainingAmount = commitmentDetails.AmountRemaining;
     const paymentsRemaining = commitmentDetails.PaymentsRemaining;
+    const anashIdentifier = commitmentDetails.AnashIdentifier;
 
     // Validation before proceeding with payment
     if (paymentAmount <= 0) {
@@ -176,7 +177,11 @@ function CommitmentDetailsPage() {
 
       if (updateStatus) {
         // If the update was successful, proceed to upload the payment
-        const paymentDataWithId = { ...paymentData, CommitmentId: commitmentId };
+        const paymentDataWithId = {
+          ...paymentData,
+          CommitmentId: commitmentId,
+          AnashIdentifier: anashIdentifier // הוספת מזהה אנש לבקשת התשלום
+        };
         const response = await uploadPayment(paymentDataWithId);
 
         if (response && response.status === 200) {
@@ -196,7 +201,6 @@ function CommitmentDetailsPage() {
       console.error('Error saving payment:', error);
     }
   };
-
 
   const updateCommitmentAfterPayment = async (commitmentId, paymentAmount) => {
     try {
@@ -275,6 +279,20 @@ function CommitmentDetailsPage() {
       fetchCommitmentDetails();
     }
   }, [commitmentId]);
+
+  const [campaigns, setCampaigns] = useState([]);
+  useEffect(() => {
+    const fetchCampaigns = async () => {
+        try {
+            const response = await getCampains();
+            setCampaigns(response.data.data.campains); // הנחה שהמידע יושב במערך בשם data
+        } catch (error) {
+            toast.error('שגיאה בטעינת הקמפיינים');
+        }
+    };
+
+    fetchCampaigns();
+}, []);
 
 
   return (
@@ -397,13 +415,21 @@ function CommitmentDetailsPage() {
           </label>
           <label>
             אופן התשלום:
-            <input
-              type="text"
+            <select
               name="PaymentMethod"
               value={commitmentDetails.PaymentMethod || ''}
               onChange={handleChange}
               className="mt-1 block w-full p-2 border border-gray-300 rounded"
-            />
+              required
+            >
+              <option value="">בחר אופן תשלום</option>
+              <option value="מזומן">מזומן</option>
+              <option value="שיק">שיק</option>
+              <option value="אשראי">אשראי</option>
+              <option value="הו&quot;ק אשראי">הו"ק אשראי</option>
+              <option value="העברה בנקאית">העברה בנקאית</option>
+              <option value="הו&quot;ק בנקאית">הו"ק בנקאית</option>
+            </select>
           </label>
           <label>
             הערות:
@@ -444,6 +470,23 @@ function CommitmentDetailsPage() {
               onChange={handleChange}
               className="mt-1 block w-full p-2 border border-gray-300 rounded"
             />
+          </label>
+          <label>
+            קמפיין:
+            <select
+              name="CampainName"
+              value={commitmentDetails.CampainName || ''}
+              onChange={handleChange}
+              className="mt-1 block w-full p-2 border border-gray-300 rounded"
+              required
+            >
+              <option value="">בחר קמפיין</option>
+              {campaigns.map((campaign) => (
+                <option key={campaign._id} value={campaign.campainName}>
+                  {campaign.campainName}
+                </option>
+              ))}
+            </select>
           </label>
         </div>
         <button

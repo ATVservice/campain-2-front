@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { uploadPayment } from '../requests/ApiRequests';
+import { uploadPayment, getCampains } from '../requests/ApiRequests';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -7,37 +7,47 @@ function PaymentForm({ onClose, onSubmit, rowData, updateCommitmentAfterPayment,
     const [formData, setFormData] = useState({
         AnashIdentifier: '',
         PersonID: '',
-        CommitmentId: '',
         Amount: '',
         Date: '',
         PaymentMethod: '',
+        CampaignId: ''
     });
 
     const [commitmentDetails, setCommitmentDetails] = useState(null);
+    const [campaigns, setCampaigns] = useState([]);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        if (formData.CommitmentId) {
-            const fetchDetails = async () => {
-                setLoading(true);
+        const fetchCampaigns = async () => {
+            setLoading(true);
+            try {
+                const response = await getCampains();
+                setCampaigns(response.data.data.campains); // הנחה שהמידע יושב במערך בשם data
+                console.log(response.data.data.campains);
+                
+            } catch (error) {
+                toast.error('שגיאה בטעינת הקמפיינים');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCampaigns();
+    }, []);
+
+    useEffect(() => {
+        const fetchCommitmentDetails = async () => {
+            if (formData.CommitmentId) {
                 try {
                     const response = await getCommitmentDetails(formData.CommitmentId);
-                    console.log('Fetched commitment details:', response.data); // Log the fetched commitment details
-                    if (response.data) {
-                        setCommitmentDetails(response.data.commitmentDetails); // Adjusted to access commitmentDetails
-                    } else {
-                        toast.error('לא נמצאו פרטי התחייבות');
-                    }
+                    setCommitmentDetails(response.data.commitmentDetails);
                 } catch (error) {
-                    console.error('Error fetching commitment details:', error);
-                    toast.error('שגיאה בטעינת פרטי התחייבות');
-                } finally {
-                    setLoading(false);
+                    toast.error('שגיאה בטעינת פרטי ההתחייבות');
                 }
-            };
+            }
+        };
 
-            fetchDetails();
-        }
+        fetchCommitmentDetails();
     }, [formData.CommitmentId]);
 
     const handleChange = (e) => {
@@ -46,11 +56,8 @@ function PaymentForm({ onClose, onSubmit, rowData, updateCommitmentAfterPayment,
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
-    
-        if (!formData.CommitmentId) {
-            toast.error('ID התחייבות חסר או לא תקין');
-            return;
-        }
+        console.log(commitmentDetails);
+        
         const paymentAmount = parseFloat(formData.Amount);
         const remainingAmount = commitmentDetails.AmountRemaining;
         const paymentsRemaining = commitmentDetails.PaymentsRemaining;
@@ -74,6 +81,8 @@ function PaymentForm({ onClose, onSubmit, rowData, updateCommitmentAfterPayment,
         }
     
         try {
+            console.log(formData);
+            
             // Update the commitment first
             const updateStatus = await updateCommitmentAfterPayment(formData.CommitmentId, paymentAmount);
     
@@ -118,10 +127,6 @@ function PaymentForm({ onClose, onSubmit, rowData, updateCommitmentAfterPayment,
                         <input type="text" name="PersonID" value={formData.PersonID} onChange={handleChange} required />
                     </div>
                     <div>
-                        <label>מספר התחייבות:</label>
-                        <input type="text" name="CommitmentId" value={formData.CommitmentId} onChange={handleChange} required />
-                    </div>
-                    <div>
                         <label>סכום:</label>
                         <input type="number" step="0.01" name="Amount" value={formData.Amount} onChange={handleChange} required />
                     </div>
@@ -139,6 +144,17 @@ function PaymentForm({ onClose, onSubmit, rowData, updateCommitmentAfterPayment,
                             <option value="הו&quot;ק אשראי">הו"ק אשראי</option>
                             <option value="העברה בנקאית">העברה בנקאית</option>
                             <option value="הו&quot;ק בנקאית">הו"ק בנקאית</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>קמפיין:</label>
+                        <select name="CampaignId" value={formData.CampaignId} onChange={handleChange} required>
+                            <option value="">בחר קמפיין</option>
+                            {campaigns.map((campaign) => (
+                                <option key={campaign._id} value={campaign._id}>
+                                    {campaign.campainName}
+                                </option>
+                            ))}
                         </select>
                     </div>
                     <div className="flex justify-end">
