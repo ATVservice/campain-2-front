@@ -9,6 +9,7 @@ import { getCampains } from "../requests/ApiRequests";
 import { useNavigate } from "react-router-dom";
 
 function CampainsPage() {
+
   const navigate = useNavigate();
   const [campains, setCampains] = useState([]);
   const [campainData, setCampainData] = useState({
@@ -64,11 +65,11 @@ function CampainsPage() {
   
   return (
     <div className="p-4">
-      <div>
+      <div className="flex gap-4">
         {campains.map((campain) => (
           <button
           onClick={() => navigate(`/campain/${campain._id}`)}
-           className="p-1 border border-stone-950	 hover:bg-gray-300" key={campain._id}>{campain.CampaignName}</button>
+           className="p-1 border border-stone-950	 hover:bg-gray-300" key={campain._id}>{campain.campainName}</button>
         ))}
       </div>
       <button
