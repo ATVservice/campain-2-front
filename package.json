@@ -20,6 +20,7 @@
     "ag-grid-react": "^32.0.2",
     "axios": "^1.7.3",
     "date-fns": "^3.6.0",
+    "gematriya": "^2.0.0",
     "hebcal": "^2.3.2",
     "jewish-dates-core": "^2.0.12",
     "moment": "^2.30.1",
