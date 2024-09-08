@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { uploadCommitment } from '../requests/ApiRequests';
+import React, { useState, useEffect } from 'react';
+import { uploadCommitment, getCampains } from '../requests/ApiRequests';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -18,11 +18,24 @@ function CommitmentForm({ onClose, onSubmit }) {
         Fundraiser: '',
         PaymentMethod: '',
         Notes: '',
-        ResponseToFundraiser: ''
-        // Campaign: ''
+        ResponseToFundraiser: '',
+        CampainName: ''
     });
 
+    const [campaigns, setCampaigns] = useState([]);
 
+    useEffect(() => {
+        const fetchCampaigns = async () => {
+            try {
+                const response = await getCampains();
+                setCampaigns(response.data.data.campains); // הנחה שהמידע יושב במערך בשם data
+            } catch (error) {
+                toast.error('שגיאה בטעינת הקמפיינים');
+            }
+        };
+
+        fetchCampaigns();
+    }, []);
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
@@ -30,19 +43,19 @@ function CommitmentForm({ onClose, onSubmit }) {
     const handleFormSubmit = async (e) => {
         e.preventDefault();
         try {
-            const calculatedPaymentsMade = formData.NumberOfPayments - formData.PaymentsRemaining;
-            const calculatedAmountRemaining = formData.CommitmentAmount - formData.AmountPaid;
+            // const calculatedPaymentsMade = formData.NumberOfPayments - formData.PaymentsRemaining;
+            // const calculatedAmountRemaining = formData.CommitmentAmount - formData.AmountPaid;
 
-            // בדיקות תקינות
-            if (calculatedPaymentsMade !== formData.PaymentsMade) {
-                toast.error('מספר תשלומים שבוצעו אינו תואם את החישוב.');
-                return;
-            }
+            // // בדיקות תקינות
+            // if (calculatedPaymentsMade !== formData.PaymentsMade) {
+            //     toast.error('מספר תשלומים שבוצעו אינו תואם את החישוב.');
+            //     return;
+            // }
 
-            if (calculatedAmountRemaining !== formData.AmountRemaining) {
-                toast.error('סכום ההתחייבות שנשאר אינו תואם את החישוב.');
-                return;
-            }
+            // if (calculatedAmountRemaining !== formData.AmountRemaining) {
+            //     toast.error('סכום ההתחייבות שנשאר אינו תואם את החישוב.');
+            //     return;
+            // }
             // שליחת נתוני הטופס לשרת
             const response = await uploadCommitment(formData);
 
@@ -93,6 +106,17 @@ function CommitmentForm({ onClose, onSubmit }) {
                     <div>
                         <label>משפחה:</label>
                         <input type="text" name="LastName" value={formData.LastName} onChange={handleChange} />
+                    </div>
+                    <div>
+                        <label>קמפיין:</label>
+                        <select name="CampaignId" value={formData.CampaignId} onChange={handleChange} required>
+                            <option value="">בחר קמפיין</option>
+                            {campaigns.map((campaign) => (
+                                <option key={campaign._id} value={campaign._id}>
+                                    {campaign.campainName}
+                                </option>
+                            ))}
+                        </select>
                     </div>
                     <div>
                         <label>סכום התחייבות:</label>

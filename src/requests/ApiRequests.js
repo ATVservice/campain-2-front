@@ -41,16 +41,10 @@ export const getAlfonChanges = async (data) => {
 
 export const uploadCommitment = async (data) => {
   try {
-    // לוג של הנתונים שנשלחים לשרת
-    console.log('Data being sent to server:', data);
-
-    const response = await apiConfig.post('/api/commitment/upload', data);
+    console.log(data);
     
-    // לוג לרספונס שהתקבל
-    console.log('Upload Commitment Response:', response);
-
+    const response = await apiConfig.post('/api/commitment/upload', data);
     return response;
-
   } catch (error) {
     console.log('Error uploading commitment:', error);
   }
@@ -68,6 +62,8 @@ export const getCommitment = async () => {
 
 export const uploadPayment = async (paymentData) => {
   try {
+    console.log(paymentData);
+    
     const response = await apiConfig.post('/api/payment/uploadPayment', paymentData);
     console.log(response);
     

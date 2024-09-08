@@ -5,7 +5,7 @@ import * as XLSX from 'xlsx';
 import CommitmentForm from '../components/ManualCommitmentForm';
 import PaymentForm from '../components/ManualPaymentForm';
 import DetailModal from '../components/DetailModal';
-import { uploadCommitment, getCommitment, uploadPayment, updateCommitmentDetails, getCommitmentDetails } from '../requests/ApiRequests';
+import { uploadCommitment, getCommitment, uploadPayment, updateCommitmentDetails, getCommitmentDetails, getCampains } from '../requests/ApiRequests';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
@@ -43,7 +43,8 @@ function CommitmentPage() {
     'מספר התחייבות': 'CommitmentId',
     'סכום': 'Amount',
     'תאריך': 'Date',
-    // 'קמפיין': 'Campaign',
+    'קמפיין': 'CampainName'
+
   };
 
   function convertExcelDate(excelDate) {
@@ -277,7 +278,7 @@ function CommitmentPage() {
         // תרגום סיבות השגיאה לעברית
         let reasonInHebrew = '';
         const errorMessage = error.error?.message || error.message || '';
-        
+
         if (errorMessage.includes('Payment amount exceeds remaining amount')) {
           reasonInHebrew = 'סכום התשלום חורג מהיתרה הקיימת בהתחייבות.';
         } else if (errorMessage.includes('Commitment not found')) {
@@ -311,7 +312,7 @@ function CommitmentPage() {
     showFeedbackModal({ success: successData, failed: failedData });
   };
 
-const updateCommitmentAfterPayment = async (commitmentId, paymentAmount) => {
+  const updateCommitmentAfterPayment = async (commitmentId, paymentAmount) => {
     let commitment; // Declare the commitment variable outside the try block
     try {
       const response = await getCommitmentDetails(commitmentId);
@@ -335,7 +336,7 @@ const updateCommitmentAfterPayment = async (commitmentId, paymentAmount) => {
       }
       if (updatedPaymentsMade > commitment.NumberOfPayments) {
         throw new Error('מספר התשלומים בפועל לא יכול לעלות על מספר התשלומים הכולל');
-    }
+      }
 
       await updateCommitmentDetails(commitmentId, {
         AmountPaid: updatedAmountPaid,
@@ -426,51 +427,83 @@ const updateCommitmentAfterPayment = async (commitmentId, paymentAmount) => {
         return null;
       }
     }).filter(row => row !== null);
+    // בדיקת קיום הקמפיינים
+    const excelCampaignNames = Array.from(new Set(mappedData.map(data => data['CampainName'])));
+    console.log('Campaign names from Excel:', excelCampaignNames);
 
-    // הצגת שגיאות מהבדיקות המקומיות במודל
-    if (failedData.length > 0) {
-      showFeedbackModal({ success: [], failed: failedData });
-      return;
-    }
-
+    // בדיקת קיום הקמפיינים
     try {
-      const response = await uploadCommitment(mappedData);
-      console.log(response);
+      const response = await getCampains(); // קבלת כל הקמפיינים מהפונקציה
 
-      if (response && response.data) {
-        const { successfulCommitments = [], failedCommitments = [] } = response.data;
+      console.log('Campaigns response:', response); // הוספת לוג לבדיקת התשובה
 
-        // עיבוד נתוני ההצלחה
-        successData = successfulCommitments.map(commitment => ({
-          CommitmentId: commitment._id, // Assuming the ID field is '_id'
-          Amount: commitment.Amount || 0 // Assuming there's an 'Amount' field in commitment
-        }));
+      // גישה לשדה שמכיל את המערך
+      const campaigns = response.data.data.campains || []; // ניגש ל-campains מתוך הנתונים
 
-        // עיבוד נתוני הכישלון
-        failedData = failedCommitments.map(failed => ({
-          AnashIdentifier: failed.AnashIdentifier || 'N/A',
-          PersonID: failed.PersonID || 'N/A',
-          FirstName: failed.FirstName || 'N/A',
-          LastName: failed.LastName || 'N/A',
-          CommitmentId: failed._id || 'N/A', // If there's no ID, return 'N/A'
-          Amount: failed.Amount || 0,
-          reason: failed.reason || 'שגיאה לא ידועה'
-        }));
+      if (!Array.isArray(campaigns)) {
+        throw new Error('הנתונים מהשרת אינם במבנה של מערך.');
+      }
 
-        // הצגת המידע במודל
-        showFeedbackModal({ success: successData, failed: failedData });
-      } else {
-        console.error('Unexpected response structure:', response);
-        showFeedbackModal({ success: [], failed: mappedData.map(row => ({ ...row, reason: 'תגובה לא תקינה מהשרת' })) });
+      // לוג שמות הקמפיינים מהשרת
+      const existingCampaignNames = campaigns.map(campaign => campaign.campainName);
+      console.log('Campaign names from server:', existingCampaignNames);
+
+      const invalidCampaigns = mappedData.filter(data => !existingCampaignNames.includes(data['CampainName']));
+
+      if (invalidCampaigns.length > 0) {
+        failedData.push(...invalidCampaigns.map(data => ({
+          ...data,
+          reason: 'שם הקמפיין אינו קיים במערכת.',
+        })));
+      }
+
+      // הצגת שגיאות מהבדיקות המקומיות במודל
+      if (failedData.length > 0) {
+        showFeedbackModal({ success: [], failed: failedData });
+        return;
+      }
+
+      try {
+        console.log(mappedData);
+
+        const response = await uploadCommitment(mappedData);
+        console.log(response);
+
+        if (response && response.data) {
+          const { successfulCommitments = [], failedCommitments = [] } = response.data;
+
+          // עיבוד נתוני ההצלחה
+          successData = successfulCommitments.map(commitment => ({
+            CommitmentId: commitment._id, // Assuming the ID field is '_id'
+            Amount: commitment.Amount || 0 // Assuming there's an 'Amount' field in commitment
+          }));
+
+          // עיבוד נתוני הכישלון
+          failedData = failedCommitments.map(failed => ({
+            AnashIdentifier: failed.AnashIdentifier || 'N/A',
+            PersonID: failed.PersonID || 'N/A',
+            FirstName: failed.FirstName || 'N/A',
+            LastName: failed.LastName || 'N/A',
+            CommitmentId: failed._id || 'N/A', // If there's no ID, return 'N/A'
+            Amount: failed.Amount || 0,
+            reason: failed.reason || 'שגיאה לא ידועה'
+          }));
+
+          // הצגת המידע במודל
+          showFeedbackModal({ success: successData, failed: failedData });
+        } else {
+          console.error('Unexpected response structure:', response);
+          showFeedbackModal({ success: [], failed: mappedData.map(row => ({ ...row, reason: 'תגובה לא תקינה מהשרת' })) });
+        }
+      } catch (error) {
+        console.error('Error uploading commitments:', error);
+        showFeedbackModal({ success: [], failed: mappedData.map(row => ({ ...row, reason: 'העלאה נכשלה' })) });
       }
     } catch (error) {
-      console.error('Error uploading commitments:', error);
-      showFeedbackModal({ success: [], failed: mappedData.map(row => ({ ...row, reason: 'העלאה נכשלה' })) });
+      console.error('Error fetching campaigns:', error);
+      showFeedbackModal({ success: [], failed: mappedData.map(row => ({ ...row, reason: 'שגיאה בקבלת קמפיינים' })) });
     }
   };
-
-
-
 
   const handleRowClick = (rowData) => {
     setSelectedRowData(rowData);
