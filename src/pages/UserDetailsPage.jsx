@@ -8,7 +8,7 @@ import Modal from 'react-modal';
 Modal.setAppElement('#root'); // This is important for accessibility
 
 function UserDetailsPage() {
-  const { anashIdentifier } = useParams();
+  const { AnashIdentifier } = useParams();
   const [userDetails, setUserDetails] = useState({});
   const [editedData, setEditedData] = useState({});
   const navigate = useNavigate();
@@ -52,7 +52,7 @@ function UserDetailsPage() {
         if(Object.keys(editedData).length > 0){
             try {
               setIsLoading(true);
-                const userEditedData = {...editedData, anashIdentifier: userDetails.anashIdentifier};
+                const userEditedData = {...editedData, AnashIdentifier: userDetails.AnashIdentifier};
                 const response = await upadateUserDetails(userEditedData);
                 // console.log(response.data.data.updatedUserDetails);
                 setUserDetails(response.data.data.updatedUserDetails);
@@ -78,7 +78,7 @@ function UserDetailsPage() {
         console.log(isModalOpen);
         try {
           setIsLoading(true);
-          await deleteUser(userDetails.anashIdentifier);
+          await deleteUser(userDetails.AnashIdentifier);
           toast.success('המשתמש נמחק בהצלחה', {
             onClose: () => 
             {
@@ -99,7 +99,7 @@ function UserDetailsPage() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await getUserDetails(anashIdentifier);
+                const response = await getUserDetails(AnashIdentifier);
                 setUserDetails(response.data.data.userDetails);
                 console.log(response.data.data.userDetails);
             } catch (error) {
@@ -107,7 +107,7 @@ function UserDetailsPage() {
             }
         };
         fetchData();
-    }, [anashIdentifier]);
+    }, [AnashIdentifier]);
 
     return (
         <>
@@ -119,8 +119,8 @@ function UserDetailsPage() {
           מזהה אנש:
           <input
             type="text"
-            name="anashIdentifier"
-            value={userDetails.anashIdentifier || ''}
+            name="AnashIdentifier"
+            value={userDetails.AnashIdentifier || ''}
             onChange={handleChange}
             className="mt-1 block w-full p-2 border border-gray-300 rounded"
             readOnly
@@ -170,8 +170,8 @@ function UserDetailsPage() {
           מספר זהות:
           <input
             type="text"
-            name="IdentityNumber"
-            value={userDetails.IdentityNumber || ''}
+            name="PersonID"
+            value={userDetails.PersonID || ''}
             onChange={handleChange}
             className="mt-1 block w-full p-2 border border-gray-300 rounded"
           />
@@ -464,33 +464,4 @@ function UserDetailsPage() {
 }
 
 export default UserDetailsPage;
-  //     'מזהה אנש': 'anashIdentifier',
-//     'שם מלא': 'FullNameForLists',
-//     'שם': 'FirstName',
-//     'משפחה': 'LastName',
-//     'שם האב': 'FatherName',
-//     'מספר זהות': 'IdentityNumber',
-//     'כתובת': 'Address',
-//     'מספר': 'adressNumber',
-//     'קומה': 'floor',
-//     'מיקוד': 'zipCode',
-//     'עיר': 'City',
-//     'נייד 1 ': 'MobilePhone',
-//     'נייד בבית 1': 'MobileHomePhone',
-//     'בית 1': 'HomePhone',
-//     'דוא"ל': 'Email',
-//     'בית מדרש': 'BeitMidrash',
-//     'סיווג': 'Classification',
-//     'אופן התרמה': 'DonationMethod',
-//     'מתרים': 'fundRaiser',
-//     'למד בישיבה בשנים': 'StudiedInYeshivaYears',
-//     'שנה ישיג': 'yashagYear',
-//     'אחראי ועד': 'CommitteeResponsibility',
-//     'קבוצה למסיבה': 'PartyGroup',
-//     'מספר קבוצה': 'GroupNumber',
-//     'שם מזמין למסיבה': 'PartyInviterName',
-//     'פעיל לא פעיל': 'isActive',
-//     'שדה חופשי': 'FreeFieldsToFillAlone',
-//     'שדה חופשי 2': 'AnotherFreeFieldToFillAlone',
-//     'הערות אלפון': 'PhoneNotes',
-//   };
+  

@@ -16,7 +16,7 @@ function AddToCampainTable({rowData,onAddPersonToCampain,searchText}) {
     
     
     const hebrewToEnglishMapping = {
-        'מזהה אנש': 'anashIdentifier',
+        'מזהה אנש': 'AnashIdentifier',
         'שם': 'FirstName',
         'משפחה': 'LastName',
         'כתובת': 'Address',
@@ -39,10 +39,10 @@ function AddToCampainTable({rowData,onAddPersonToCampain,searchText}) {
     };
     
     const addToCampain = async (api, node) => {
-        const {anashIdentifier} = node.data
-        console.log(anashIdentifier)
+        const {AnashIdentifier} = node.data
+        console.log(AnashIdentifier)
 
-        onAddPersonToCampain(anashIdentifier);
+        onAddPersonToCampain(AnashIdentifier);
     };
   
       
@@ -84,7 +84,7 @@ function AddToCampainTable({rowData,onAddPersonToCampain,searchText}) {
     
       const columns = [
         
-        { headerName: 'מזהה אנש', field: 'anashIdentifier', editable: false, sortable: true, filter: true,width: 120 },
+        { headerName: 'מזהה אנש', field: 'AnashIdentifier', editable: false, sortable: true, filter: true,width: 120 },
         { headerName: 'שם', field: 'FirstName', editable: true, sortable: true, filter: true },
         { headerName: 'משפחה', field: 'LastName', editable: true, sortable: true, filter: true },
         { headerName: 'כתובת', field: 'Address', editable: true, sortable: true, filter: true ,width: 120 },

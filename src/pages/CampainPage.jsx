@@ -45,20 +45,20 @@ function CampainPage() {
     fetchPeopleNotInCampain();
    
   }, [])
-  async function onAddPersonToCampain(anashIdentifier) {
+  async function onAddPersonToCampain(AnashIdentifier) {
     setLoading(true);
     let removedPerson;
     try {
       setPeopleNotInCampain(prevPeopleNotInCampain => {
-        removedPerson = prevPeopleNotInCampain.find(person => person.anashIdentifier === anashIdentifier);
-        return prevPeopleNotInCampain.filter(person => person.anashIdentifier !== anashIdentifier);
+        removedPerson = prevPeopleNotInCampain.find(person => person.AnashIdentifier === AnashIdentifier);
+        return prevPeopleNotInCampain.filter(person => person.AnashIdentifier !== AnashIdentifier);
       });
       setPeopleInCampain(prevPeopleInCampain => [...prevPeopleInCampain, removedPerson]);
-      await addPersonToCampain({ campainId, anashIdentifier });
+      await addPersonToCampain({ campainId, AnashIdentifier });
     } catch (error) {
       console.error('Error adding person to campaign:', error);
       setPeopleNotInCampain(prevPeopleNotInCampain => [...prevPeopleNotInCampain, removedPerson]);
-      setPeopleInCampain(prevPeopleInCampain => prevPeopleInCampain.filter(person => person.anashIdentifier !== anashIdentifier));
+      setPeopleInCampain(prevPeopleInCampain => prevPeopleInCampain.filter(person => person.AnashIdentifier !== AnashIdentifier));
     } finally {
       setLoading(false);
     }

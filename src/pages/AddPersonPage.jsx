@@ -48,8 +48,8 @@ function AddPersonPage() {
           מזהה אנש:
           <input
             type="text"
-            name="anashIdentifier"
-            value={userDetails.anashIdentifier || ''}
+            name="AnashIdentifier"
+            value={userDetails.AnashIdentifier || ''}
             onChange={handleChange}
             className="mt-1 block w-full p-2 border border-gray-300 rounded"
           />
@@ -98,8 +98,8 @@ function AddPersonPage() {
           מספר זהות:
           <input
             type="text"
-            name="IdentityNumber"
-            value={userDetails.IdentityNumber || ''}
+            name="PersonID"
+            value={userDetails.PersonID || ''}
             onChange={handleChange}
             className="mt-1 block w-full p-2 border border-gray-300 rounded"
           />
