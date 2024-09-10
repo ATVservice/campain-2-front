@@ -1,12 +1,3 @@
-
-
-
-
-
-
-
-
-
 import { CgDetailsMore } from "react-icons/cg";
 import { useNavigate,useParams } from "react-router-dom";
 import React, { useState, useEffect,useRef } from 'react';
@@ -22,12 +13,12 @@ import Table from "../components/Table";
 import Spinner from "../components/Spinner";
 function AlfonPage() {
   const hebrewToEnglishMapping = {
-     'מזהה אנש': 'anashIdentifier',
+     'מזהה אנש': 'AnashIdentifier',
     'שם מלא': 'FullNameForLists',
     'שם': 'FirstName',
     'משפחה': 'LastName',
     'שם האב': 'FatherName',
-    'מספר זהות': 'IdentityNumber',
+    'מספר זהות': 'PersonID',
     'כתובת': 'Address',
     'מספר': 'addressNumber',
     'קומה': 'floor',
@@ -165,11 +156,11 @@ function AlfonPage() {
   const mergeAndOverride = (needsUpdate, updatedNeedsUpdate) => {
     console.log(updatedNeedsUpdate);
     
-    // Create a map of updatedDocs for quick lookup by anashIdentifier
-    const updatedDocsMap = new Map(updatedNeedsUpdate.map(doc => [doc.anashIdentifier, doc]));
+    // Create a map of updatedDocs for quick lookup by AnashIdentifier
+    const updatedDocsMap = new Map(updatedNeedsUpdate.map(doc => [doc.AnashIdentifier, doc]));
     
     const mergedNeedsUpdate = needsUpdate.reduce((acc, needsUpdateObj) => {
-      const updateObj = updatedDocsMap.get(needsUpdateObj.anashIdentifier);
+      const updateObj = updatedDocsMap.get(needsUpdateObj.AnashIdentifier);
       if (updateObj) {
         // Combine properties, with updateObj properties overriding needsUpdateObj
         acc.push({ ...needsUpdateObj, ...updateObj });

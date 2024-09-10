@@ -151,7 +151,7 @@ function CommitmentDetailsPage() {
     const paymentAmount = parseFloat(paymentData.Amount);
     const remainingAmount = commitmentDetails.AmountRemaining;
     const paymentsRemaining = commitmentDetails.PaymentsRemaining;
-    const anashIdentifier = commitmentDetails.AnashIdentifier;
+    const AnashIdentifier = commitmentDetails.AnashIdentifier;
 
     // Validation before proceeding with payment
     if (paymentAmount <= 0) {
@@ -180,7 +180,7 @@ function CommitmentDetailsPage() {
         const paymentDataWithId = {
           ...paymentData,
           CommitmentId: commitmentId,
-          AnashIdentifier: anashIdentifier // הוספת מזהה אנש לבקשת התשלום
+          AnashIdentifier: AnashIdentifier // הוספת מזהה אנש לבקשת התשלום
         };
         const response = await uploadPayment(paymentDataWithId);
 
@@ -482,8 +482,8 @@ function CommitmentDetailsPage() {
             >
               <option value="">בחר קמפיין</option>
               {campaigns.map((campaign) => (
-                <option key={campaign._id} value={campaign.campainName}>
-                  {campaign.campainName}
+                <option key={campaign._id} value={campaign.CampainName}>
+                  {campaign.CampainName}
                 </option>
               ))}
             </select>

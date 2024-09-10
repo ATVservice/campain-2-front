@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { uploadCommitment, getCampains } from '../requests/ApiRequests';
+import { uploadCommitment, getCampains, getUserDetails } from '../requests/ApiRequests';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -9,12 +9,12 @@ function CommitmentForm({ onClose, onSubmit }) {
         PersonID: '',
         FirstName: '',
         LastName: '',
-        CommitmentAmount: '',
-        AmountPaid: '',
-        AmountRemaining: '',
-        NumberOfPayments: '',
-        PaymentsMade: '',
-        PaymentsRemaining: '',
+        CommitmentAmount: 0,
+        AmountPaid: 0,
+        AmountRemaining: 0,
+        NumberOfPayments: 0,
+        PaymentsMade: 0,
+        PaymentsRemaining: 0,
         Fundraiser: '',
         PaymentMethod: '',
         Notes: '',
@@ -40,24 +40,92 @@ function CommitmentForm({ onClose, onSubmit }) {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    const handleBlur = async (e) => {
+        const AnashIdentifier = e.target.value;
+
+        if (AnashIdentifier) {
+            try {
+                // קריאה לפונקציה שמביאה את פרטי המשתמש על פי מזהה אנש
+                const response = await getUserDetails(AnashIdentifier);
+                console.log(response);
+
+                const { PersonID, FirstName, LastName } = response.data.data.userDetails;
+
+                // עדכון state עם הנתונים שהתקבלו
+                setFormData(prevData => ({
+                    ...prevData,
+                    PersonID: PersonID || '',   // עדכון שדה תעודת זהות
+                    FirstName: FirstName || '', // עדכון שדה שם פרטי
+                    LastName: LastName || ''    // עדכון שדה שם משפחה
+                }));
+            } catch (error) {
+                console.error('Error fetching user details:', error);
+                toast.error('שגיאה בקבלת פרטי משתמש');
+            }
+        }
+    };
+
     const handleFormSubmit = async (e) => {
         e.preventDefault();
+        let updatedFormData = { ...formData };
+
+        // בדיקות תקינות של שדות והוספת ערכי ברירת מחדל
+        updatedFormData.AmountPaid = updatedFormData.AmountPaid || 0;
+        updatedFormData.PaymentsMade = updatedFormData.PaymentsMade || 0;
+
+        if (updatedFormData.AmountRemaining == 0 ) {
+            updatedFormData.AmountRemaining = updatedFormData.CommitmentAmount;
+        }
+
+        if (updatedFormData.PaymentsRemaining == 0) {
+            updatedFormData.PaymentsRemaining = updatedFormData.NumberOfPayments;
+        }
+
+        // בדיקות תקינות מותאמות
+        if (updatedFormData.CommitmentAmount <= 0) {
+            toast.error('סכום ההתחייבות חייב להיות גדול מאפס.');
+            return;
+        }
+
+        if (updatedFormData.NumberOfPayments <= 0) {
+            toast.error('מספר התשלומים חייב להיות גדול מאפס.');
+            return;
+        }
+
+        if (updatedFormData.AmountRemaining < 0) {
+            toast.error('סכום שנותר לתשלומים אינו יכול להיות שלילי.');
+            return;
+        }
+
+        if (updatedFormData.PaymentsRemaining < 0) {
+            toast.error('מספר התשלומים שנותרו אינו יכול להיות שלילי.');
+            return;
+        }
+
+        if (updatedFormData.CommitmentAmount < updatedFormData.AmountPaid) {
+            toast.error('סכום התחייבות לא יכול להיות קטן מסכום ששולם.');
+            return;
+        }
+
+        if (updatedFormData.NumberOfPayments < updatedFormData.PaymentsMade) {
+            toast.error('מספר התשלומים לא יכול להיות קטן ממספר התשלומים שבוצעו.');
+            return;
+        }
+        console.log(updatedFormData);       
+        const isValideAmount = updatedFormData.CommitmentAmount - updatedFormData.AmountPaid == updatedFormData.AmountRemaining;
+        if (!isValideAmount) {
+            toast.error('פרטי סכום התחייבות אינם תקינים.');
+            return;
+        }
+
+        const isValidePayments = updatedFormData.NumberOfPayments - updatedFormData.PaymentsMade == updatedFormData.PaymentsRemaining;
+        if (!isValidePayments) {
+            toast.error('פרטי מספר התשלומים אינם תקינים.');
+            return;
+        }
         try {
-            // const calculatedPaymentsMade = formData.NumberOfPayments - formData.PaymentsRemaining;
-            // const calculatedAmountRemaining = formData.CommitmentAmount - formData.AmountPaid;
-
-            // // בדיקות תקינות
-            // if (calculatedPaymentsMade !== formData.PaymentsMade) {
-            //     toast.error('מספר תשלומים שבוצעו אינו תואם את החישוב.');
-            //     return;
-            // }
-
-            // if (calculatedAmountRemaining !== formData.AmountRemaining) {
-            //     toast.error('סכום ההתחייבות שנשאר אינו תואם את החישוב.');
-            //     return;
-            // }
             // שליחת נתוני הטופס לשרת
-            const response = await uploadCommitment(formData);
+            const response = await uploadCommitment(updatedFormData);
 
             if (response && response.status === 200) {
                 const { successfulCommitments, failedCommitments } = response.data;
@@ -93,54 +161,54 @@ function CommitmentForm({ onClose, onSubmit }) {
                 <form onSubmit={handleFormSubmit}>
                     <div>
                         <label>מזהה אנש:</label>
-                        <input type="text" name="AnashIdentifier" value={formData.AnashIdentifier} onChange={handleChange} required />
+                        <input type="text" name="AnashIdentifier" value={formData.AnashIdentifier} onChange={(e) => setFormData({ ...formData, AnashIdentifier: e.target.value })} onBlur={handleBlur} required />
                     </div>
                     <div>
                         <label>מספר זהות:</label>
-                        <input type="text" name="PersonID" value={formData.PersonID} onChange={handleChange} required />
+                        <input className="bg-gray-200 outline-none cursor-auto" type="text" name="PersonID" value={formData.PersonID} onChange={handleChange} readOnly />
                     </div>
                     <div>
                         <label>שם:</label>
-                        <input type="text" name="FirstName" value={formData.FirstName} onChange={handleChange} />
+                        <input className="bg-gray-200 outline-none cursor-auto" type="text" name="FirstName" value={formData.FirstName} onChange={handleChange} readOnly />
                     </div>
                     <div>
                         <label>משפחה:</label>
-                        <input type="text" name="LastName" value={formData.LastName} onChange={handleChange} />
+                        <input className="bg-gray-200 outline-none cursor-auto" type="text" name="LastName" value={formData.LastName} onChange={handleChange} readOnly />
                     </div>
                     <div>
                         <label>קמפיין:</label>
-                        <select name="CampaignId" value={formData.CampaignId} onChange={handleChange} required>
+                        <select name="CampaignId" value={formData.CampaignId} onChange={handleChange}>
                             <option value="">בחר קמפיין</option>
                             {campaigns.map((campaign) => (
                                 <option key={campaign._id} value={campaign._id}>
-                                    {campaign.campainName}
+                                    {campaign.CampainName}
                                 </option>
                             ))}
                         </select>
                     </div>
                     <div>
                         <label>סכום התחייבות:</label>
-                        <input type="text" name="CommitmentAmount" value={formData.CommitmentAmount} onChange={handleChange} />
+                        <input type="Number" name="CommitmentAmount" value={formData.CommitmentAmount} onChange={handleChange} />
                     </div>
                     <div>
                         <label>סכום שולם:</label>
-                        <input type="text" name="AmountPaid" value={formData.AmountPaid} onChange={handleChange} />
+                        <input type="Number" name="AmountPaid" value={formData.AmountPaid} onChange={handleChange} />
                     </div>
                     <div>
                         <label>סכום שנותר:</label>
-                        <input type="text" name="AmountRemaining" value={formData.AmountRemaining} onChange={handleChange} />
+                        <input type="Number" name="AmountRemaining" value={formData.AmountRemaining} onChange={handleChange} />
                     </div>
                     <div>
                         <label>מספר תשלומים:</label>
-                        <input type="text" name="NumberOfPayments" value={formData.NumberOfPayments} onChange={handleChange} />
+                        <input type="Number" name="NumberOfPayments" value={formData.NumberOfPayments} onChange={handleChange} />
                     </div>
                     <div>
                         <label>תשלומים שבוצעו:</label>
-                        <input type="text" name="PaymentsMade" value={formData.PaymentsMade} onChange={handleChange} />
+                        <input type="Number" name="PaymentsMade" value={formData.PaymentsMade} onChange={handleChange} />
                     </div>
                     <div>
                         <label>תשלומים שנותרו:</label>
-                        <input type="text" name="PaymentsRemaining" value={formData.PaymentsRemaining} onChange={handleChange} />
+                        <input type="Number" name="PaymentsRemaining" value={formData.PaymentsRemaining} onChange={handleChange} />
                     </div>
                     <div>
                         <label>מתרים:</label>

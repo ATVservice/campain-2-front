@@ -15,7 +15,7 @@ function CampainsPage() {
   const [campainData, setCampainData] = useState({
     start: null,
     end: null,
-    campainName: ""
+    CampainName: ""
   });
   const [showAddCampainInputs, setShowAddCampainInputs] = useState(false);
   let [message, setmessage] = useState('');
@@ -32,20 +32,20 @@ function CampainsPage() {
   const handleCampainNameChange = (e) => {
     setCampainData(prevData => ({
       ...prevData,
-      campainName: e.target.value
+      CampainName: e.target.value
     }));
   };
 
   const handleAddCampain = async () => {
-    const { start, end, campainName } = campainData;
-    if (!start || !end || !campainName)
+    const { start, end, CampainName } = campainData;
+    if (!start || !end || !CampainName)
         {
           setmessage('נא למלא את כל השדות')
           return
 
         } 
         
-        await addCampain({ start, end, campainName });
+        await addCampain({ start, end, CampainName });
        
 
   };
@@ -69,7 +69,7 @@ function CampainsPage() {
         {campains.map((campain) => (
           <button
           onClick={() => navigate(`/campain/${campain._id}`)}
-           className="p-1 border border-stone-950	 hover:bg-gray-300" key={campain._id}>{campain.campainName}</button>
+           className="p-1 border border-stone-950	 hover:bg-gray-300" key={campain._id}>{campain.CampainName}</button>
         ))}
       </div>
       <button
@@ -114,7 +114,7 @@ function CampainsPage() {
               type="text"
               placeholder="שם הקמפיין"
               className="border-2 p-1"
-              value={campainData.campainName}
+              value={campainData.CampainName}
               onChange={handleCampainNameChange}
             />
           </div>

@@ -74,10 +74,10 @@ export const uploadPayment = async (paymentData) => {
   }
 };
 
-export const getUserDetails = async (anashIdentifier) => {
+export const getUserDetails = async (AnashIdentifier) => {
   try {
-    console.log(anashIdentifier);
-    const response = await apiConfig.get(`/api/alfon/get-user-details/${anashIdentifier}`);
+    console.log(AnashIdentifier);
+    const response = await apiConfig.get(`/api/alfon/get-user-details/${AnashIdentifier}`);
 
     return response;
   } catch (error) {
@@ -88,6 +88,15 @@ export const getUserDetails = async (anashIdentifier) => {
 export const getCommitmentDetails = async (_id) => {
   try {
     const response = await apiConfig.get(`/api/commitment/get-commitment/${_id}`);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getCommitmentByAnashAndCampaign  = async (AnashIdentifier, CampainName) => {
+  try {
+    const response = await apiConfig.get(`/api/commitment/getcommitmentbyanashandcampaign/${AnashIdentifier}/${CampainName}`);
     return response.data;
   } catch (error) {
     console.log(error);
@@ -126,10 +135,10 @@ export const upadateUserDetails = async (data) => {
     console.log(error);
   }
 }
-export const deleteUser= async (anashIdentifier) => {
+export const deleteUser= async (AnashIdentifier) => {
   try {
-    console.log(anashIdentifier);
-    const response = await apiConfig.delete(`/api/alfon/delete-user/${anashIdentifier}`);
+    console.log(AnashIdentifier);
+    const response = await apiConfig.delete(`/api/alfon/delete-user/${AnashIdentifier}`);
     return response;
   } catch (error) {
     console.log(error);
