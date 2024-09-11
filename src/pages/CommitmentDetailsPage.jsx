@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getCommitmentDetails, deleteCommitment, updateCommitmentDetails, uploadPayment, getCampains } from '../requests/ApiRequests';
+import { getCommitmentDetails, deleteCommitment, updateCommitmentDetails, uploadCommitmentPayment, getCampains } from '../requests/ApiRequests';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Modal from 'react-modal';
@@ -182,7 +182,7 @@ function CommitmentDetailsPage() {
           CommitmentId: commitmentId,
           AnashIdentifier: AnashIdentifier // הוספת מזהה אנש לבקשת התשלום
         };
-        const response = await uploadPayment(paymentDataWithId);
+        const response = await uploadCommitmentPayment(paymentDataWithId);
 
         if (response && response.status === 200) {
           const updatedCommitmentDetails = await getCommitmentDetails(commitmentId);
