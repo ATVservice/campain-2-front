@@ -1,12 +1,10 @@
 import React from 'react';
 
-function DetailModal({ data = { success: [], failed: [] }, onClose }) {
-  const successData = data.success || [];
+function DetailModal({ data = { success: 0, failed: [], isPayments, reason}, onClose }) {
+  const numberOfSuccess = data.success;
   const failedData = data.failed || [];
-
-  // Determine if the data is related to payments or commitments based on success and failed data
-  const isPayments = (successData.length > 0 && successData[0].paymentAmount !== undefined) ||
-                     (failedData.length > 0 && failedData[0].paymentAmount !== undefined);
+  const isPayments = data.isPayments;
+  const reason = data.reason || '';
 
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-500 bg-opacity-75 z-50">
@@ -20,13 +18,14 @@ function DetailModal({ data = { success: [], failed: [] }, onClose }) {
         <h2 className="text-2xl font-bold mb-4">
           {isPayments ? 'סיכום העלאת תשלומים' : 'סיכום העלאת התחייבויות'}
         </h2>
+        <h2 className="text-2xl font-bold mb-4 text-red-500">{reason}</h2>
         <div>
           <h3 className="text-xl font-semibold">
-            {isPayments ? `תשלומים שהועלו בהצלחה (${successData.length}):` : `התחייבויות שהועלו בהצלחה (${successData.length}):`}
+            {isPayments ? `תשלומים שהועלו בהצלחה (${numberOfSuccess}):` : `התחייבויות שהועלו בהצלחה (${numberOfSuccess}):`}
           </h3>
           <ul>
-            {successData.length > 0 ? (
-              <li>{`הועלו בהצלחה ${successData.length} ${isPayments ? 'תשלומים' : 'התחייבויות'}`}</li>
+            {numberOfSuccess > 0 ? (
+              <li>{`הועלו בהצלחה ${numberOfSuccess} ${isPayments ? 'תשלומים' : 'התחייבויות'}`}</li>
             ) : (
               <li>{`לא הועלו ${isPayments ? 'תשלומים' : 'התחייבויות'} בהצלחה`}</li>
             )}

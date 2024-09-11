@@ -6,12 +6,12 @@ import Spinner from './Spinner';
 
 function AlfonChanges({ data, handelSubmit }) {
   const englishToHebrewMapping = {
-    'anashIdentifier': 'מזהה אנש',
+    'AnashIdentifier': 'מזהה אנש',
     'FullNameForLists': 'שם מלא',
     'FirstName': 'שם',
     'LastName': 'משפחה',
     'FatherName': 'שם האב',
-    'IdentityNumber': 'מספר זהות',
+    'PersonID': 'מספר זהות',
     'Address': 'כתובת',
     'addressNumber': 'מספר',
     'floor': 'קומה',
@@ -49,7 +49,7 @@ function AlfonChanges({ data, handelSubmit }) {
       const initialSelectedProperties = {};
       data.diffs.forEach(diff => {
         if (diff && diff.existingPerson) {
-          initialSelectedProperties[diff.anashIdentifier] = Object.keys(diff.existingPerson).reduce((acc, key) => {
+          initialSelectedProperties[diff.AnashIdentifier] = Object.keys(diff.existingPerson).reduce((acc, key) => {
             acc[key] = 'existing';
             return acc;
           }, {});
@@ -73,23 +73,23 @@ function AlfonChanges({ data, handelSubmit }) {
     window.location.reload(true);
   };
 
-  const handlePropertySelect = (anashIdentifier, key, source) => {
+  const handlePropertySelect = (AnashIdentifier, key, source) => {
     setSelectedProperties(prev => ({
       ...prev,
-      [anashIdentifier]: {
-        ...(prev[anashIdentifier] || {}),
+      [AnashIdentifier]: {
+        ...(prev[AnashIdentifier] || {}),
         [key]: source
       }
     }));
   };
 
-  const handleSelectAll = (anashIdentifier, source) => {
-    const diff = data.diffs.find(diff => diff.anashIdentifier === anashIdentifier);
+  const handleSelectAll = (AnashIdentifier, source) => {
+    const diff = data.diffs.find(diff => diff.AnashIdentifier === AnashIdentifier);
     if (diff && diff.existingPerson) {
       const allProperties = Object.keys(diff.existingPerson);
       setSelectedProperties(prev => ({
         ...prev,
-        [anashIdentifier]: allProperties.reduce((acc, key) => {
+        [AnashIdentifier]: allProperties.reduce((acc, key) => {
           acc[key] = source;
           return acc;
         }, {})
@@ -109,9 +109,9 @@ function AlfonChanges({ data, handelSubmit }) {
         console.error('Invalid diff object:', diff);
         return null;
       }
-      const selectedProps = selectedProperties[diff.anashIdentifier] || {};
+      const selectedProps = selectedProperties[diff.AnashIdentifier] || {};
       // console.log(selectedProps);
-      const updatedObject = { anashIdentifier: diff.anashIdentifier };
+      const updatedObject = { AnashIdentifier: diff.AnashIdentifier };
       // console.log(updatedObject);
 
       Object.keys(selectedProps).forEach(key => {
@@ -157,21 +157,21 @@ function AlfonChanges({ data, handelSubmit }) {
               return (
                 <div key={index} className="bg-green-200 mb-[50px]">
                   <div className="mb-2">
-                    <span>מזהה אנש: {dif.anashIdentifier}</span>
+                    <span>מזהה אנש: {dif.AnashIdentifier}</span>
                     <span className="mr-4">שם מלא: {dif.fullName}</span>
                   </div>
                   <div className="flex flex-col gap-2">
                     {Object.keys(dif.existingPerson).map((key, index) => (
                       <div key={index} className="flex w-full justify-between">
                         <span 
-                          className={`bg-blue-200 text-right w-1/2 pr-2 cursor-pointer ${selectedProperties[dif.anashIdentifier]?.[key] === 'existing' ? 'border-2 border-blue-500' : ''}`}
-                          onClick={() => handlePropertySelect(dif.anashIdentifier, key, 'existing')}
+                          className={`bg-blue-200 text-right w-1/2 pr-2 cursor-pointer ${selectedProperties[dif.AnashIdentifier]?.[key] === 'existing' ? 'border-2 border-blue-500' : ''}`}
+                          onClick={() => handlePropertySelect(dif.AnashIdentifier, key, 'existing')}
                         >
                           {englishToHebrewMapping[key]} : {getDisplayedvalue(dif.existingPerson[key])}
                         </span>
                         <span 
-                          className={`bg-orange-200 text-right w-1/2 pl-2 cursor-pointer ${selectedProperties[dif.anashIdentifier]?.[key] === 'uploaded' ? 'border-2 border-orange-500' : ''}`}
-                          onClick={() => handlePropertySelect(dif.anashIdentifier, key, 'uploaded')}
+                          className={`bg-orange-200 text-right w-1/2 pl-2 cursor-pointer ${selectedProperties[dif.AnashIdentifier]?.[key] === 'uploaded' ? 'border-2 border-orange-500' : ''}`}
+                          onClick={() => handlePropertySelect(dif.AnashIdentifier, key, 'uploaded')}
                         >
                           {englishToHebrewMapping[key]} : {getDisplayedvalue(dif.uploadedPerson[key])}
                         </span>
@@ -181,7 +181,7 @@ function AlfonChanges({ data, handelSubmit }) {
   {/* Container for the first button, placed at the right side */}
   <div className="flex flex-1 justify-start">
     <button
-      onClick={() => handleSelectAll(dif.anashIdentifier, 'existing')}
+      onClick={() => handleSelectAll(dif.AnashIdentifier, 'existing')}
       className="bg-blue-500 text-white px-4 py-2 rounded w-[150px]"
     >
       בחר הכל ישן
@@ -191,7 +191,7 @@ function AlfonChanges({ data, handelSubmit }) {
   {/* Container for the second button, positioned at the start of the left half */}
   <div className="flex flex-1 justify-start">
     <button
-      onClick={() => handleSelectAll(dif.anashIdentifier, 'uploaded')}
+      onClick={() => handleSelectAll(dif.AnashIdentifier, 'uploaded')}
       className="bg-orange-500 text-white px-4 py-2 rounded w-[150px]"
     >
       בחר הכל חדש

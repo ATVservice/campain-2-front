@@ -26,7 +26,7 @@ function Table({rowData, setRowData}) {
       setSearchText(event.target.value);
     };
     const hebrewToEnglishMapping = {
-        'מזהה אנש': 'anashIdentifier',
+        'מזהה אנש': 'AnashIdentifier',
         'שם': 'FirstName',
         'משפחה': 'LastName',
         'כתובת': 'Address',
@@ -69,7 +69,7 @@ function Table({rowData, setRowData}) {
             if (isConfirmed) {
               const originalRowData = node.data;
               try {
-                const res = await deleteUser(originalRowData.anashIdentifier);
+                const res = await deleteUser(originalRowData.AnashIdentifier);
                 console.log(res);
                 api.applyTransaction({
                   remove: [node.data]
@@ -95,7 +95,7 @@ function Table({rowData, setRowData}) {
             });
             if ( Object.keys(updatedData).length > 0) {
               try {
-               editedCells = {...editedCells,anashIdentifier:node.data.anashIdentifier};
+               editedCells = {...editedCells,AnashIdentifier:node.data.AnashIdentifier};
                 const res = await upadateUserDetails(editedCells);
                 console.log(res);
               } catch (error) {
@@ -158,8 +158,8 @@ function Table({rowData, setRowData}) {
             
             {
             const handleDetailsClick = () => {
-              const anashIdentifier = params.data.anashIdentifier; // Replace 'id' with the actual field name for the user ID
-              navigate(`/user-details/${anashIdentifier}`);
+              const AnashIdentifier = params.data.AnashIdentifier; // Replace 'id' with the actual field name for the user ID
+              navigate(`/user-details/${AnashIdentifier}`);
             };
       
             return (
@@ -175,7 +175,7 @@ function Table({rowData, setRowData}) {
           }
         },
         
-        { headerName: 'מזהה אנש', field: 'anashIdentifier', editable: false, sortable: true, filter: true,width: 120 },
+        { headerName: 'מזהה אנש', field: 'AnashIdentifier', editable: false, sortable: true, filter: true,width: 120 },
         { headerName: 'שם', field: 'FirstName', editable: true, sortable: true, filter: true },
         { headerName: 'משפחה', field: 'LastName', editable: true, sortable: true, filter: true },
         { headerName: 'כתובת', field: 'Address', editable: true, sortable: true, filter: true },
@@ -205,7 +205,7 @@ function Table({rowData, setRowData}) {
           cellRenderer: (params) => {
             return (
               <input 
-              id={`isActive-${params.data.anashIdentifier}`} 
+              id={`isActive-${params.data.AnashIdentifier}`} 
 
                 type="checkbox" 
                 checked={params.value.toString() === 'true'} 

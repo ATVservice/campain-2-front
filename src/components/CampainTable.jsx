@@ -16,7 +16,7 @@ function CampainTable({rowData}) {
     
     
     const hebrewToEnglishMapping = {
-        'מזהה אנש': 'anashIdentifier',
+        'מזהה אנש': 'AnashIdentifier',
         'שם': 'FirstName',
         'משפחה': 'LastName',
         'כתובת': 'Address',
@@ -89,8 +89,8 @@ function CampainTable({rowData}) {
             
             {
             const handleDetailsClick = () => {
-              const anashIdentifier = params.data.anashIdentifier; // Replace 'id' with the actual field name for the user ID
-              navigate(`/user-details/${anashIdentifier}`);
+              const AnashIdentifier = params.data.AnashIdentifier; // Replace 'id' with the actual field name for the user ID
+              navigate(`/user-details/${AnashIdentifier}`);
             };
       
             return (
@@ -106,7 +106,7 @@ function CampainTable({rowData}) {
           }
         },
         
-        { headerName: 'מזהה אנש', field: 'anashIdentifier', editable: false, sortable: true, filter: true,width: 120 },
+        { headerName: 'מזהה אנש', field: 'AnashIdentifier', editable: false, sortable: true, filter: true,width: 120 },
         { headerName: 'שם', field: 'FirstName', editable: true, sortable: true, filter: true },
         { headerName: 'משפחה', field: 'LastName', editable: true, sortable: true, filter: true },
         { headerName: 'כתובת', field: 'Address', editable: true, sortable: true, filter: true ,width: 120 },

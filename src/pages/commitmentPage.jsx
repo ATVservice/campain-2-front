@@ -5,7 +5,7 @@ import * as XLSX from 'xlsx';
 import CommitmentForm from '../components/ManualCommitmentForm';
 import PaymentForm from '../components/ManualPaymentForm';
 import DetailModal from '../components/DetailModal';
-import { uploadCommitment, getCommitment, uploadPayment, updateCommitmentDetails, getCommitmentDetails } from '../requests/ApiRequests';
+import { uploadCommitment, getCommitment, uploadPayment, updateCommitmentDetails, getCommitmentDetails, getCampains } from '../requests/ApiRequests';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
@@ -43,7 +43,8 @@ function CommitmentPage() {
     'מספר התחייבות': 'CommitmentId',
     'סכום': 'Amount',
     'תאריך': 'Date',
-    // 'קמפיין': 'Campaign',
+    'קמפיין': 'CampainName'
+
   };
 
   function convertExcelDate(excelDate) {
@@ -277,7 +278,7 @@ function CommitmentPage() {
         // תרגום סיבות השגיאה לעברית
         let reasonInHebrew = '';
         const errorMessage = error.error?.message || error.message || '';
-        
+
         if (errorMessage.includes('Payment amount exceeds remaining amount')) {
           reasonInHebrew = 'סכום התשלום חורג מהיתרה הקיימת בהתחייבות.';
         } else if (errorMessage.includes('Commitment not found')) {
@@ -311,7 +312,7 @@ function CommitmentPage() {
     showFeedbackModal({ success: successData, failed: failedData });
   };
 
-const updateCommitmentAfterPayment = async (commitmentId, paymentAmount) => {
+  const updateCommitmentAfterPayment = async (commitmentId, paymentAmount) => {
     let commitment; // Declare the commitment variable outside the try block
     try {
       const response = await getCommitmentDetails(commitmentId);
@@ -335,7 +336,7 @@ const updateCommitmentAfterPayment = async (commitmentId, paymentAmount) => {
       }
       if (updatedPaymentsMade > commitment.NumberOfPayments) {
         throw new Error('מספר התשלומים בפועל לא יכול לעלות על מספר התשלומים הכולל');
-    }
+      }
 
       await updateCommitmentDetails(commitmentId, {
         AmountPaid: updatedAmountPaid,
@@ -381,11 +382,11 @@ const updateCommitmentAfterPayment = async (commitmentId, paymentAmount) => {
     const headers = uploadingData[0];
     const rows = uploadingData.slice(1);
 
-    let successData = [];
+    let numberOfSuccess = 0;
     let failedData = [];
 
     // מיפוי הנתונים
-    const mappedData = rows.map(row => {
+    let mappedData = rows.map(row => {
       const mappedRow = {};
       headers.forEach((header, index) => {
         const englishKey = hebrewToEnglishMapping[header];
@@ -393,11 +394,11 @@ const updateCommitmentAfterPayment = async (commitmentId, paymentAmount) => {
           if (row[index] === '' || row[index] == null) {
             // הוספת ערכים ברירת מחדל
             if (englishKey === 'AmountRemaining') {
-              mappedRow[englishKey] = mappedRow['CommitmentAmount'] || 0;
+              mappedRow[englishKey] = mappedRow['CommitmentAmount'];
             } else if (englishKey === 'AmountPaid') {
               mappedRow[englishKey] = 0;
             } else if (englishKey === 'PaymentsRemaining') {
-              mappedRow[englishKey] = mappedRow['NumberOfPayments'] || 0;
+              mappedRow[englishKey] = mappedRow['NumberOfPayments'];
             } else if (englishKey === 'PaymentsMade') {
               mappedRow[englishKey] = 0;
             } else {
@@ -412,7 +413,16 @@ const updateCommitmentAfterPayment = async (commitmentId, paymentAmount) => {
       // בדיקות נוספות לפני הוספת הנתונים
       try {
         if (mappedRow['AmountRemaining'] <= 0) {
-          throw new Error('לא ניתן להוסיף התחייבות כיוון שסכום שנותר לתשלומים אפס.');
+          throw new Error('סכום שנותר לתשלומים אפס.');
+        }
+        if (mappedRow['PaymentsRemaining'] <= 0) {
+          throw new Error('מספר התשלומים שנותרו אפס.');
+        }
+        if (mappedRow['CommitmentAmount'] <= 0) {
+          throw new Error('סכום ההתחייבות היא אפס.');
+        }
+        if (mappedRow['NumberOfPayments'] <= 0) {
+          throw new Error('מספר התשלומים הוא אפס.');
         }
         if (mappedRow['CommitmentAmount'] < mappedRow['AmountPaid']) {
           throw new Error('סכום התחייבות לא יכול להיות קטן מסכום ששולם.');
@@ -420,57 +430,97 @@ const updateCommitmentAfterPayment = async (commitmentId, paymentAmount) => {
         if (mappedRow['NumberOfPayments'] < mappedRow['PaymentsMade']) {
           throw new Error('מספר התשלומים לא יכול להיות קטן ממספר התשלומים שבוצעו.');
         }
+        const isValideAmount = mappedRow['CommitmentAmount'] - mappedRow['AmountPaid'] === mappedRow['AmountRemaining']
+        if (!isValideAmount) {
+          throw new Error('פרטי סכום התחייבות אינם תקינים.');
+        }
+        const isValidePayments = mappedRow['NumberOfPayments'] - mappedRow['PaymentsMade'] === mappedRow['PaymentsRemaining']
+        if (!isValidePayments) {
+          throw new Error('פרטי מספר התשלומים אינם תקינים.');
+        }
         return mappedRow;
       } catch (error) {
         failedData.push({ ...mappedRow, reason: error.message });
         return null;
       }
     }).filter(row => row !== null);
+    // בדיקת קיום הקמפיינים
+    Array.from(new Set(mappedData.map(data => data['CampainName'])));
 
-    // הצגת שגיאות מהבדיקות המקומיות במודל
-    if (failedData.length > 0) {
-      showFeedbackModal({ success: [], failed: failedData });
-      return;
-    }
-
+    // בדיקת קיום הקמפיינים
     try {
-      const response = await uploadCommitment(mappedData);
-      console.log(response);
+      const response = await getCampains(); // קבלת כל הקמפיינים מהפונקציה
 
-      if (response && response.data) {
-        const { successfulCommitments = [], failedCommitments = [] } = response.data;
 
-        // עיבוד נתוני ההצלחה
-        successData = successfulCommitments.map(commitment => ({
-          CommitmentId: commitment._id, // Assuming the ID field is '_id'
-          Amount: commitment.Amount || 0 // Assuming there's an 'Amount' field in commitment
-        }));
+      // גישה לשדה שמכיל את המערך
+      const campaigns = response.data.data.campains || []; // ניגש ל-campains מתוך הנתונים
 
-        // עיבוד נתוני הכישלון
-        failedData = failedCommitments.map(failed => ({
-          AnashIdentifier: failed.AnashIdentifier || 'N/A',
-          PersonID: failed.PersonID || 'N/A',
-          FirstName: failed.FirstName || 'N/A',
-          LastName: failed.LastName || 'N/A',
-          CommitmentId: failed._id || 'N/A', // If there's no ID, return 'N/A'
-          Amount: failed.Amount || 0,
-          reason: failed.reason || 'שגיאה לא ידועה'
-        }));
+      if (!Array.isArray(campaigns)) {
+        throw new Error('הנתונים מהשרת אינם במבנה של מערך.');
+      }
 
-        // הצגת המידע במודל
-        showFeedbackModal({ success: successData, failed: failedData });
-      } else {
-        console.error('Unexpected response structure:', response);
-        showFeedbackModal({ success: [], failed: mappedData.map(row => ({ ...row, reason: 'תגובה לא תקינה מהשרת' })) });
+      const existingCampaignNames = campaigns.map(campaign => campaign.CampainName);
+
+      const invalidCampaigns = mappedData.filter(data => !existingCampaignNames.includes(data['CampainName']));
+      const invalidCampaignsNames = invalidCampaigns.map(data => data['CampainName']);
+      if (invalidCampaigns.length > 0) {
+        failedData.push(...invalidCampaigns.map(data => ({
+          ...data,
+          reason: 'שם הקמפיין אינו קיים במערכת.',
+        })));
+      }
+      console.log(invalidCampaignsNames);
+      mappedData = mappedData.filter(data => !invalidCampaignsNames.includes(data.CampainName));
+      console.log(mappedData);
+      
+      //mappedData האם יש מידע ב 
+      if (mappedData.length === 0) {
+        throw new Error('אין נתונים תקינים בקובץ .');
+      }
+
+      try {
+        
+        const response = await uploadCommitment(mappedData);
+        console.log(response);
+
+        if (response && response.data) {
+          const failedCommitments = response.data.failedCommitments;
+          console.log(failedCommitments);
+
+          const successfulCommitments = response.data.successfulCommitments
+          console.log(successfulCommitments);
+          // עיבוד נתוני ההצלחה
+          numberOfSuccess = successfulCommitments;
+          console.log(numberOfSuccess);
+
+          // עיבוד נתוני הכישלון
+          failedData.push(...failedCommitments.map(failed => ({
+            AnashIdentifier: failed.AnashIdentifier || 'N/A',
+            PersonID: failed.PersonID || 'N/A',
+            FirstName: failed.FirstName || 'N/A',
+            LastName: failed.LastName || 'N/A',
+            CommitmentId: failed._id || 'N/A', // If there's no ID, return 'N/A'
+            Amount: failed.Amount || 0,
+            reason: failed.reason || 'שגיאה לא ידועה'
+          })));
+
+          // הצגת המידע במודל
+          console.log(failedData);
+
+          showFeedbackModal({ success: numberOfSuccess, failed: failedData, isPayments: false });
+        } else {
+          console.error('Unexpected response structure:', response);
+          showFeedbackModal({ success: numberOfSuccess, failed: failedData, isPayments: false, reason: 'תגובה לא תקינה מהשרת' });
+        }
+      } catch (error) {
+        console.error('Error uploading commitments:', error);
+        showFeedbackModal({ success: numberOfSuccess, failed: failedData, isPayments: false, reason: 'העלאה נכשלה' });
       }
     } catch (error) {
-      console.error('Error uploading commitments:', error);
-      showFeedbackModal({ success: [], failed: mappedData.map(row => ({ ...row, reason: 'העלאה נכשלה' })) });
+      console.error('Error fetching campaigns:', error);
+      showFeedbackModal({ success: numberOfSuccess, failed: failedData, isPayments: false, reason: error.message });
     }
   };
-
-
-
 
   const handleRowClick = (rowData) => {
     setSelectedRowData(rowData);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { uploadPayment } from '../requests/ApiRequests';
+import { uploadPayment, getCampains, getCommitmentByAnashAndCampaign } from '../requests/ApiRequests';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -7,38 +7,53 @@ function PaymentForm({ onClose, onSubmit, rowData, updateCommitmentAfterPayment,
     const [formData, setFormData] = useState({
         AnashIdentifier: '',
         PersonID: '',
-        CommitmentId: '',
         Amount: '',
         Date: '',
         PaymentMethod: '',
+        CampainName: ''
     });
 
     const [commitmentDetails, setCommitmentDetails] = useState(null);
+    const [campaigns, setCampaigns] = useState([]);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        if (formData.CommitmentId) {
-            const fetchDetails = async () => {
-                setLoading(true);
-                try {
-                    const response = await getCommitmentDetails(formData.CommitmentId);
-                    console.log('Fetched commitment details:', response.data); // Log the fetched commitment details
-                    if (response.data) {
-                        setCommitmentDetails(response.data.commitmentDetails); // Adjusted to access commitmentDetails
-                    } else {
-                        toast.error('לא נמצאו פרטי התחייבות');
-                    }
-                } catch (error) {
-                    console.error('Error fetching commitment details:', error);
-                    toast.error('שגיאה בטעינת פרטי התחייבות');
-                } finally {
-                    setLoading(false);
-                }
-            };
+        const fetchCampaigns = async () => {
+            setLoading(true);
+            try {
+                const response = await getCampains();
+                setCampaigns(response.data.data.campains); // הנחה שהמידע יושב במערך בשם data
+            } catch (error) {
+                toast.error('שגיאה בטעינת הקמפיינים');
+            } finally {
+                setLoading(false);
+            }
+        };
 
-            fetchDetails();
-        }
-    }, [formData.CommitmentId]);
+        fetchCampaigns();
+    }, []);
+
+    useEffect(() => {
+        const fetchCommitmentDetails = async () => {
+            if (formData.AnashIdentifier && formData.CampainName) {
+                console.log('AnashIdentifier:', formData.AnashIdentifier);
+                console.log('CampainName:', formData.CampainName);
+                console.log('מנסה להביא את פרטי ההתחייבות...');
+    
+                try {
+                    const response = await getCommitmentByAnashAndCampaign(formData.AnashIdentifier, formData.CampainName);
+                    console.log('תשובת השרת:', response);
+    
+                    setCommitmentDetails(response);
+                } catch (error) {
+                    console.error('שגיאה בטעינת פרטי ההתחייבות:', error);
+                    toast.error('שגיאה בטעינת פרטי ההתחייבות');
+                }
+            }
+        };
+    
+        fetchCommitmentDetails();
+    }, [formData.AnashIdentifier, formData.CampainName]);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -46,15 +61,12 @@ function PaymentForm({ onClose, onSubmit, rowData, updateCommitmentAfterPayment,
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
-    
-        if (!formData.CommitmentId) {
-            toast.error('ID התחייבות חסר או לא תקין');
-            return;
-        }
+        console.log(commitmentDetails);
+
         const paymentAmount = parseFloat(formData.Amount);
         const remainingAmount = commitmentDetails.AmountRemaining;
         const paymentsRemaining = commitmentDetails.PaymentsRemaining;
-    
+
         // Validation before proceeding with payment
         if (paymentAmount <= 0) {
             toast.error('הסכום לתשלום חייב להיות גדול מ-0');
@@ -72,23 +84,25 @@ function PaymentForm({ onClose, onSubmit, rowData, updateCommitmentAfterPayment,
             toast.error('לא ניתן להוסיף תשלום כשלא נותרו תשלומים');
             return;
         }
-    
+
         try {
+            console.log(formData);
+
             // Update the commitment first
             const updateStatus = await updateCommitmentAfterPayment(formData.CommitmentId, paymentAmount);
-    
+
             if (updateStatus) {
                 // If the update was successful, proceed to upload the payment
                 const paymentDataWithId = { ...formData, CommitmentId: formData.CommitmentId };
                 const response = await uploadPayment(paymentDataWithId);
-    
+
                 if (response && response.status === 200) {
                     const updatedCommitmentDetails = await getCommitmentDetails(formData.CommitmentId);
                     setCommitmentDetails(updatedCommitmentDetails.data.commitmentDetails);
-    
+
                     // Display success message and close form
                     toast.success('התשלום התעדכן בהצלחה!');
-                    onClose(); // Close the form after submission
+                    onClose(); // Close the form after submission      
                 } else {
                     toast.error('עידכון התשלום נכשל!');
                 }
@@ -103,7 +117,7 @@ function PaymentForm({ onClose, onSubmit, rowData, updateCommitmentAfterPayment,
             onClose(); // Ensure the form closes regardless of success or failure
         }
     };
-    
+
     return (
         <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-500 bg-opacity-75 z-50">
             <div className="bg-white p-8 rounded-lg shadow-lg w-1/2">
@@ -116,10 +130,6 @@ function PaymentForm({ onClose, onSubmit, rowData, updateCommitmentAfterPayment,
                     <div>
                         <label>מספר זהות:</label>
                         <input type="text" name="PersonID" value={formData.PersonID} onChange={handleChange} required />
-                    </div>
-                    <div>
-                        <label>מספר התחייבות:</label>
-                        <input type="text" name="CommitmentId" value={formData.CommitmentId} onChange={handleChange} required />
                     </div>
                     <div>
                         <label>סכום:</label>
@@ -139,6 +149,17 @@ function PaymentForm({ onClose, onSubmit, rowData, updateCommitmentAfterPayment,
                             <option value="הו&quot;ק אשראי">הו"ק אשראי</option>
                             <option value="העברה בנקאית">העברה בנקאית</option>
                             <option value="הו&quot;ק בנקאית">הו"ק בנקאית</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>קמפיין:</label>
+                        <select name="CampainName" value={formData.CampainName} onChange={handleChange} required>
+                            <option value="">בחר קמפיין</option>
+                            {campaigns.map((campaign) => (
+                                <option key={campaign._id} value={campaign.CampainName}>
+                                    {campaign.CampainName}
+                                </option>
+                            ))}
                         </select>
                     </div>
                     <div className="flex justify-end">

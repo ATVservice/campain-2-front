@@ -7,12 +7,12 @@
 
 // function AlfonChangesPage() {
 //   const englishToHebrewMapping = {
-//     anashIdentifier: 'מזהה אנש',
+//     AnashIdentifier: 'מזהה אנש',
 //     FullNameForLists: 'שם מלא',
 //     FirstName: 'שם',
 //     LastName: 'משפחה',
 //     FatherName: 'שם האב',
-//     IdentityNumber: 'מספר זהות',
+//     PersonID: 'מספר זהות',
 //     Address: 'כתובת',
 //     addressNumber: 'מספר',
 //     floor: 'קומה',
@@ -58,9 +58,9 @@
 //     setUpdatedNeedsUpdate((prev) => [...prev, anashObject]);
 //   };
 
-//   const handleUnselect = (anashIdentifier) => {
+//   const handleUnselect = (AnashIdentifier) => {
 //     setUpdatedNeedsUpdate((prev) =>
-//       prev.filter((obj) => obj.anashIdentifier !== anashIdentifier)
+//       prev.filter((obj) => obj.AnashIdentifier !== AnashIdentifier)
 //     );
 //   };
 
@@ -80,7 +80,7 @@
 //           {data.diffs.map((dif, index) => (
 //             <div key={index} className="bg-green-200 mb-[50px]">
 //               <div className="mb-2">
-//                 <span>מזהה אנש: {dif.anashIdentifier}</span>
+//                 <span>מזהה אנש: {dif.AnashIdentifier}</span>
 //                 <span className="mr-4">שם מלא: {dif.fullName}</span>
 //               </div>
 //               <div className="flex flex-col gap-2">
@@ -99,10 +99,10 @@
 //                 <div className="flex w-full justify-end mb-2">
 //                   <div className="w-1/2 flex justify-start">
 //                     {updatedNeedsUpdate.some(
-//                       (obj) => obj.anashIdentifier === dif.anashIdentifier
+//                       (obj) => obj.AnashIdentifier === dif.AnashIdentifier
 //                     ) ? (
 //                       <button
-//                         onClick={() => handleUnselect(dif.anashIdentifier)}
+//                         onClick={() => handleUnselect(dif.AnashIdentifier)}
 //                         className="bg-orange-500 text-white px-4 py-2 rounded w-[150px]"
 //                       >
 //                         ביטול
@@ -112,7 +112,7 @@
 //                         onClick={() =>
 //                           handleSelect({
 //                             ...dif.uploadedPerson,
-//                             anashIdentifier: dif.anashIdentifier,
+//                             AnashIdentifier: dif.AnashIdentifier,
 //                           })
 //                         }
 //                         className="bg-red-500 text-white px-4 py-2 rounded w-[150px]"
@@ -189,7 +189,7 @@
 // //       {data.diffs.map((dif, index) => (
 // //         <div key={index} className="bg-green-200 mb-[50px]">
 // //           <div className="mb-2">
-// //             <span>מזהה אנש: {dif.anashIdentifier}</span>
+// //             <span>מזהה אנש: {dif.AnashIdentifier}</span>
 // //             <span className="mr-4">שם מלא: {dif.fullName}</span>
 // //           </div >
 // //           <div className="flex flex-col gap-2">
@@ -207,16 +207,16 @@
 // //                     <div className="w-1/2 flex justify-start">
 // //                       {
                         
-// //                         updatedNeedsUpadate.some((obj) => obj.anashIdentifier === dif.anashIdentifier) ? (
+// //                         updatedNeedsUpadate.some((obj) => obj.AnashIdentifier === dif.AnashIdentifier) ? (
 // //                         <button
-// //                           onClick={() => handleUnselect(dif.anashIdentifier)}
+// //                           onClick={() => handleUnselect(dif.AnashIdentifier)}
 // //                           className="bg-orange-500 text-white px-4 py-2 rounded w-[150px]"
 // //                         >
 // //                           ביטול
 // //                         </button>
 // //                       ) : (
 // //                         <button
-// //                           onClick={() => handleSelect({...dif.uploadedPerson, anashIdentifier: dif.anashIdentifier})}
+// //                           onClick={() => handleSelect({...dif.uploadedPerson, AnashIdentifier: dif.AnashIdentifier})}
 // //                           className="bg-red-500 text-white px-4 py-2 rounded w-[150px]"
 // //                         >
 // //                           בחירת חדש
