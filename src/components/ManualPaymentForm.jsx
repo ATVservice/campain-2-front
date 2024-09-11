@@ -1,19 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { uploadPayment, getCampains, getCommitmentByAnashAndCampaign } from '../requests/ApiRequests';
+import { uploadPayment, getCampains } from '../requests/ApiRequests';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 function PaymentForm({ onClose, onSubmit, rowData, updateCommitmentAfterPayment, getCommitmentDetails }) {
     const [formData, setFormData] = useState({
         AnashIdentifier: '',
-        PersonID: '',
         Amount: '',
         Date: '',
         PaymentMethod: '',
         CampainName: ''
     });
 
-    const [commitmentDetails, setCommitmentDetails] = useState(null);
     const [campaigns, setCampaigns] = useState([]);
     const [loading, setLoading] = useState(false);
 
@@ -33,82 +31,51 @@ function PaymentForm({ onClose, onSubmit, rowData, updateCommitmentAfterPayment,
         fetchCampaigns();
     }, []);
 
-    useEffect(() => {
-        const fetchCommitmentDetails = async () => {
-            if (formData.AnashIdentifier && formData.CampainName) {
-                console.log('AnashIdentifier:', formData.AnashIdentifier);
-                console.log('CampainName:', formData.CampainName);
-                console.log('מנסה להביא את פרטי ההתחייבות...');
-    
-                try {
-                    const response = await getCommitmentByAnashAndCampaign(formData.AnashIdentifier, formData.CampainName);
-                    console.log('תשובת השרת:', response);
-    
-                    setCommitmentDetails(response);
-                } catch (error) {
-                    console.error('שגיאה בטעינת פרטי ההתחייבות:', error);
-                    toast.error('שגיאה בטעינת פרטי ההתחייבות');
-                }
-            }
-        };
-    
-        fetchCommitmentDetails();
-    }, [formData.AnashIdentifier, formData.CampainName]);
-
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
-        console.log(commitmentDetails);
-
-        const paymentAmount = parseFloat(formData.Amount);
-        const remainingAmount = commitmentDetails.AmountRemaining;
-        const paymentsRemaining = commitmentDetails.PaymentsRemaining;
+        console.log(formData);
 
         // Validation before proceeding with payment
-        if (paymentAmount <= 0) {
+        if (formData.Amount <= 0) {
             toast.error('הסכום לתשלום חייב להיות גדול מ-0');
             return;
         }
-        if (remainingAmount <= 0) {
-            toast.error('לא ניתן להוסיף תשלום כשיתרת התשלום היא 0');
-            return;
-        }
-        if (paymentAmount > remainingAmount) {
-            toast.error('הסכום לתשלום לא יכול לחרוג מהיתרה לתשלום');
-            return;
-        }
-        if (paymentsRemaining <= 0) {
-            toast.error('לא ניתן להוסיף תשלום כשלא נותרו תשלומים');
-            return;
-        }
-
         try {
             console.log(formData);
-
-            // Update the commitment first
-            const updateStatus = await updateCommitmentAfterPayment(formData.CommitmentId, paymentAmount);
-
-            if (updateStatus) {
-                // If the update was successful, proceed to upload the payment
-                const paymentDataWithId = { ...formData, CommitmentId: formData.CommitmentId };
-                const response = await uploadPayment(paymentDataWithId);
-
-                if (response && response.status === 200) {
-                    const updatedCommitmentDetails = await getCommitmentDetails(formData.CommitmentId);
-                    setCommitmentDetails(updatedCommitmentDetails.data.commitmentDetails);
-
-                    // Display success message and close form
-                    toast.success('התשלום התעדכן בהצלחה!');
-                    onClose(); // Close the form after submission      
-                } else {
-                    toast.error('עידכון התשלום נכשל!');
-                }
-            } else {
-                toast.error('עידכון ההתחייבות נכשל!');
+            const response = await uploadPayment(formData);
+            console.log(response.data.data.invalidPayments);
+            
+            if (response.data.data.invalidPayments.length > 0) {
+                
+                toast.error(invalidPayments.AnashIdentifier || '', invalidPayments.reason)
             }
+            else{
+                toast.success('התשלום התעדכן בהצלחה!')
+            }
+            console.log('chch');
+            
+            // if (updateStatus) {
+            //     // If the update was successful, proceed to upload the payment
+            //     const paymentDataWithId = { ...formData, CommitmentId: formData.CommitmentId };
+            //     const response = await uploadPayment(paymentDataWithId);
+
+            //     if (response && response.status === 200) {
+            //         const updatedCommitmentDetails = await getCommitmentDetails(formData.CommitmentId);
+            //         setCommitmentDetails(updatedCommitmentDetails.data.commitmentDetails);
+
+            //         // Display success message and close form
+            //         toast.success('התשלום התעדכן בהצלחה!');
+            //         onClose(); // Close the form after submission      
+            //     } else {
+            //         toast.error('עידכון התשלום נכשל!');
+            //     }
+            // } else {
+            //     toast.error('עידכון ההתחייבות נכשל!');
+            // }
         } catch (error) {
             // Show the error message
             const errorMessage = error?.error?.message || 'שגיאה בעדכון התשלום';
@@ -126,10 +93,6 @@ function PaymentForm({ onClose, onSubmit, rowData, updateCommitmentAfterPayment,
                     <div>
                         <label>מזהה אנש:</label>
                         <input type="text" name="AnashIdentifier" value={formData.AnashIdentifier} onChange={handleChange} required />
-                    </div>
-                    <div>
-                        <label>מספר זהות:</label>
-                        <input type="text" name="PersonID" value={formData.PersonID} onChange={handleChange} required />
                     </div>
                     <div>
                         <label>סכום:</label>
