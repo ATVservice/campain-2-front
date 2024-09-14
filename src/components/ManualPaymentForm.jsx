@@ -45,9 +45,7 @@ function PaymentForm({ onClose, onSubmit, rowData, updateCommitmentAfterPayment,
             return;
         }
         try {
-            console.log(formData);
             const response = await uploadPayment(formData);
-            console.log(response.data.data.invalidPayments);
             
             if (response.data.data.invalidPayments.length > 0) {
                 

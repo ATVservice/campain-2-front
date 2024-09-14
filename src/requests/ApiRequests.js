@@ -108,15 +108,6 @@ export const getCommitmentDetails = async (_id) => {
   }
 };
 
-export const getCommitmentByAnashAndCampaign  = async (AnashIdentifier, CampainName) => {
-  try {
-    console.log(AnashIdentifier, CampainName);
-    const response = await apiConfig.get(`/api/commitment/getcommitmentbyanashandcampaign/${AnashIdentifier}/${CampainName}`);
-    return response.data;
-  } catch (error) {
-    console.log(error);
-  }
-};
 
 export const deleteCommitment = async (commitmentId) => {
   try {
@@ -216,5 +207,25 @@ export const addPerson= async (data) => {
     console.log(error);
   }
 }
+export const getCommitmentByAnashAndCampain= async (AnashIdentifier, CampainName) => {
+  try {
+    const response = await apiConfig.get(`api/commitment/get-commitment-by-anash-and-campain?AnashIdentifier=${AnashIdentifier}&CampainName=${CampainName}`);
+    return response;
+  } catch (error) {
+    throw error
+  }
+}
+export const updatePaymentAndCommitment= async (data) => {
+  try {
+    const response = await apiConfig.post(`/api/update-payment-and-commitment`,data);
+    return response;
+  } catch (error) {
+    throw error
+  }
+}
+
+
+
+  
   
 

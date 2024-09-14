@@ -111,7 +111,6 @@ function CommitmentForm({ onClose, onSubmit }) {
             toast.error('מספר התשלומים לא יכול להיות קטן ממספר התשלומים שבוצעו.');
             return;
         }
-        console.log(updatedFormData);       
         const isValideAmount = updatedFormData.CommitmentAmount - updatedFormData.AmountPaid == updatedFormData.AmountRemaining;
         if (!isValideAmount) {
             toast.error('פרטי סכום התחייבות אינם תקינים.');
@@ -129,8 +128,10 @@ function CommitmentForm({ onClose, onSubmit }) {
 
             if (response && response.status === 200) {
                 const { successfulCommitments, failedCommitments } = response.data;
+                console.log(response);
 
-                if (successfulCommitments.length > 0) {
+                if (successfulCommitments > 0) {
+                    console.log('Commitment saved successfully');
                     toast.success('ההתחייבות נוספה בהצלחה!');
                     console.log('Commitment saved successfully');
                     onSubmit(formData); // קריאה אופציונלית ל-callback onSubmit אם נדרש

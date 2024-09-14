@@ -35,7 +35,7 @@ function CampainPage() {
     const fetchPeopleNotInCampain = async () => {
       try {
         const response = await getPeopleNotInCampain(campainId);
-        setPeopleNotInCampain(response.data);
+        setPeopleNotInCampain(response.data);2
       } catch (error) {
         console.error(error);
       }
