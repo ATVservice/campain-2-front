@@ -4,7 +4,7 @@ import * as XLSX from 'xlsx';
 import CommitmentForm from '../components/ManualCommitmentForm';
 import PaymentForm from '../components/ManualPaymentForm';
 import DetailModal from '../components/DetailModal';
-import { uploadCommitment, getCommitment, uploadPayment, updateCommitmentDetails, getCommitmentDetails, getCampains ,getCommitmentByAnashAndCampain,getUserDetails} from '../requests/ApiRequests';
+import { uploadCommitment, getCommitment, uploadPayment, uploadCommitmentPayment, getCommitmentDetails, getCampains ,getCommitmentByAnashAndCampain,getUserDetails} from '../requests/ApiRequests';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import CommitmentTable from "../components/CommitmentTable";
@@ -115,6 +115,7 @@ function CommitmentPage() {
   };
 
   function validatePayment(commitment, paymentAmount) {
+    console.log(commitment);
     console.log('enter');
     try {
       if (!commitment) {
@@ -176,7 +177,6 @@ function CommitmentPage() {
       });
       return mappedRow;
     }).filter(row => row.AnashIdentifier);
-    console.log(mappedData);
     
     let numOfSucces = 0
     let failedData = [];
@@ -191,6 +191,7 @@ function CommitmentPage() {
       try {
          
         commitmentResponse = await getCommitmentByAnashAndCampain(AnashIdentifier, campainName);
+        row.CommitmentId = commitmentResponse.data?._id;
         console.log(commitmentResponse);
       } 
       catch (error) {
@@ -224,7 +225,6 @@ function CommitmentPage() {
       }
       try {
         const validatePaymentRes = validatePayment(commitmentResponse.data, paymentAmount);
-        numOfSucces += 1
         console.log(validatePaymentRes);
       }
       catch (error) {
@@ -238,22 +238,39 @@ function CommitmentPage() {
             status: 'failure',
             reason: error.message
         });
-
+        
         continue;
       }
-      return
-      // try {
-      //   const updatePaymentAndCommitmentRes = await updatePaymentAndCommitment(row);
-      //   successData.push({
-      //     commitmentId,
-      //     paymentAmount,
-      //     status: 'success',
-      //     message: 'העדכון ותשלום ההתחייבות הצליחו'
-      //   });
-          
-      // } catch (error) {
-      //   // תרגום סיבות השגיאה לעברית
-      // }
+      
+      try {
+        const res= await uploadCommitmentPayment(row);      
+        if(res.status === 200){
+          numOfSucces += 1
+          console.log(res);
+        }
+        
+      } catch (error) {
+        console.error('Error:', error);
+        failedData.push({
+            AnashIdentifier: commitmentResponse.data?.AnashIdentifier || 'N/A',
+            PersonID: commitmentResponse.data?.PersonID || 'N/A',
+            FirstName:commitmentResponse.data?.FirstName || 'N/A',
+            LastName: commitmentResponse.data?.LastName || 'N/A',
+            paymentAmount: paymentAmount || 0,
+            status: 'failure',
+            reason: error.response.data.message || error.message
+        });
+        
+      }
+    }
+    try {
+      if(numOfSucces > 0){
+      const response = await getCommitment();
+      setRowData(response.data.data.commitment || []);
+    } 
+  }
+    catch (error) {
+      console.error('Error fetching commitments:', error);
     }
 
     // הצגת המודל עם המידע על ההצלחות והכישלונות
@@ -397,6 +414,11 @@ function CommitmentPage() {
             Amount: failed.Amount || 0,
             reason: failed.reason || 'שגיאה לא ידועה'
           })));
+          if(numberOfSuccess > 0)
+          {
+            const res = await getCommitment();
+            setRowData(res.data.data.commitment || []);
+          }
 
           // הצגת המידע במודל
 
@@ -447,7 +469,7 @@ function CommitmentPage() {
       </div>
       {isPaymentFormOpen && (
         <PaymentForm
-          onClose={handleClosePaymentForm} rowData={rowData} updateCommitmentAfterPayment={validatePayment} getCommitmentDetails={getCommitmentDetails}
+          onClose={handleClosePaymentForm} rowData={rowData} validatePayment={validatePayment} setRowData={setRowData}
         />
       )}
 

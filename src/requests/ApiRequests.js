@@ -74,19 +74,19 @@ export const uploadPayment = async (paymentData) => {
   }
 };
 
-export const uploadCommitmentPayment = async (paymentData) => {
-  try {
-    console.log(paymentData);
+// export const uploadCommitmentPayment = async (paymentData) => {
+//   try {
+//     console.log(paymentData);
     
-    const response = await apiConfig.post('/api/payment/uploadCommitmentPayment', paymentData);
-    console.log(response);
+//     const response = await apiConfig.post('/api/payment/uploadCommitmentPayment', paymentData);
+//     console.log(response);
     
-    return response;
-  } catch (error) {
-    console.error('Error uploading payment:', error);
-    throw error; // Optional: re-throw the error if you want to handle it outside the function
-  }
-};
+//     return response;
+//   } catch (error) {
+//     console.error('Error uploading payment:', error);
+//     throw error; // Optional: re-throw the error if you want to handle it outside the function
+//   }
+// };
 
 export const getUserDetails = async (AnashIdentifier) => {
   try {
@@ -215,9 +215,9 @@ export const getCommitmentByAnashAndCampain= async (AnashIdentifier, CampainName
     throw error
   }
 }
-export const updatePaymentAndCommitment= async (data) => {
+export const uploadCommitmentPayment = async (data) => {
   try {
-    const response = await apiConfig.post(`/api/update-payment-and-commitment`,data);
+    const response = await apiConfig.post(`/api/commitment/upload-commitment-payment`,data);
     return response;
   } catch (error) {
     throw error
