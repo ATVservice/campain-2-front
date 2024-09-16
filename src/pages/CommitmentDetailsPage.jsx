@@ -142,7 +142,7 @@ function CommitmentDetailsPage() {
   };
   const handlePaymentSubmit = async (e) => {
     e.preventDefault();
-
+    console.log(commitmentDetails);
     if (!commitmentId) {
       console.error('Commitment ID is missing');
       return;
@@ -172,10 +172,6 @@ function CommitmentDetailsPage() {
     }
 
     try {
-      // Update the commitment first
-      const updateStatus = await updateCommitmentAfterPayment(commitmentId, paymentAmount);
-
-      if (updateStatus) {
         // If the update was successful, proceed to upload the payment
         const paymentDataWithId = {
           ...paymentData,
@@ -193,9 +189,7 @@ function CommitmentDetailsPage() {
         } else {
           toast.error('עידכון התשלום נכשל!');
         }
-      } else {
-        toast.error('עידכון התשלום נכשל!');
-      }
+      
     } catch (error) {
       toast.error('שגיאה בעדכון התשלום');
       console.error('Error saving payment:', error);
