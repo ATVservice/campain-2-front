@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { uploadPayment, getCampains } from '../requests/ApiRequests';
+import { uploadPayment, getCampains,getCommitmentByAnashAndCampain,uploadCommitmentPayment,getCommitment } from '../requests/ApiRequests';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-function PaymentForm({ onClose, onSubmit, rowData, updateCommitmentAfterPayment, getCommitmentDetails }) {
+function PaymentForm({ onClose,  rowData, validatePayment,setRowData}) {
     const [formData, setFormData] = useState({
         AnashIdentifier: '',
         Amount: '',
@@ -38,53 +38,49 @@ function PaymentForm({ onClose, onSubmit, rowData, updateCommitmentAfterPayment,
     const handleFormSubmit = async (e) => {
         e.preventDefault();
         console.log(formData);
-
-        // Validation before proceeding with payment
-        if (formData.Amount <= 0) {
-            toast.error('הסכום לתשלום חייב להיות גדול מ-0');
+        let commitmentRes = null;
+    
+        try {
+            // Validation before proceeding with payment
+            if (formData.Amount <= 0) {
+                toast.error('הסכום לתשלום חייב להיות גדול מ-0');
+                return;
+            }
+    
+            commitmentRes = await getCommitmentByAnashAndCampain(formData.AnashIdentifier, formData.CampainName);
+            formData.CommitmentId = commitmentRes.data?._id;
+        } catch (error) {
+            toast.error('התחייבות לא נמצאה');
             return;
         }
+    
         try {
-            console.log(formData);
-            const response = await uploadPayment(formData);
-            console.log(response.data.data.invalidPayments);
-            
-            if (response.data.data.invalidPayments.length > 0) {
-                
-                toast.error(invalidPayments.AnashIdentifier || '', invalidPayments.reason)
-            }
-            else{
-                toast.success('התשלום התעדכן בהצלחה!')
-            }
-            console.log('chch');
-            
-            // if (updateStatus) {
-            //     // If the update was successful, proceed to upload the payment
-            //     const paymentDataWithId = { ...formData, CommitmentId: formData.CommitmentId };
-            //     const response = await uploadPayment(paymentDataWithId);
-
-            //     if (response && response.status === 200) {
-            //         const updatedCommitmentDetails = await getCommitmentDetails(formData.CommitmentId);
-            //         setCommitmentDetails(updatedCommitmentDetails.data.commitmentDetails);
-
-            //         // Display success message and close form
-            //         toast.success('התשלום התעדכן בהצלחה!');
-            //         onClose(); // Close the form after submission      
-            //     } else {
-            //         toast.error('עידכון התשלום נכשל!');
-            //     }
-            // } else {
-            //     toast.error('עידכון ההתחייבות נכשל!');
-            // }
+            const response = validatePayment(commitmentRes.data, parseFloat(formData.Amount));
         } catch (error) {
-            // Show the error message
-            const errorMessage = error?.error?.message || 'שגיאה בעדכון התשלום';
-            toast.error(`שגיאה: ${errorMessage}`);
+            console.log(error);
+            toast.error(error.message);
+            return;
+        }
+    
+        try {
+            const res = await uploadCommitmentPayment(formData);
+        } catch (error) {
+            toast.error(error.message);
+            return;
+        }
+    
+        try {
+            const response = await getCommitment();
+            setRowData(response.data.data.commitment || []);
+        } catch (error) {
+            console.error('Error fetching commitments:', error);
         } finally {
-            onClose(); // Ensure the form closes regardless of success or failure
+            toast.success('תשלום נוצר בהצלחה');
+            // Finally will execute regardless of any return or error
+            onClose();
         }
     };
-
+    
     return (
         <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-500 bg-opacity-75 z-50">
             <div className="bg-white p-8 rounded-lg shadow-lg w-1/2">

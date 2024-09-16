@@ -47,6 +47,7 @@ function CampainPage() {
   }, [campainId]); // קריאה מחדש בכל פעם שה-campainId משתנה
   
 
+
   useEffect(() => {
     const incrementNumbers = (key, target, delay) => {
       let current = runningNumbers[key];

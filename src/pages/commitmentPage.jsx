@@ -1,28 +1,15 @@
-import { CgDetailsMore } from "react-icons/cg";
 import { useNavigate } from "react-router-dom";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useRef } from 'react';
 import * as XLSX from 'xlsx';
 import CommitmentForm from '../components/ManualCommitmentForm';
 import PaymentForm from '../components/ManualPaymentForm';
 import DetailModal from '../components/DetailModal';
-import { uploadCommitment, getCommitment, uploadPayment, updateCommitmentDetails, getCommitmentDetails, getCampains } from '../requests/ApiRequests';
-import { AgGridReact } from 'ag-grid-react';
-import 'ag-grid-community/styles/ag-grid.css';
-import 'ag-grid-community/styles/ag-theme-alpine.css';
+import { uploadCommitment, getCommitment, uploadPayment, uploadCommitmentPayment, getCommitmentDetails, getCampains ,getCommitmentByAnashAndCampain,getUserDetails} from '../requests/ApiRequests';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import CommitmentTable from "../components/CommitmentTable";
+import { constructFrom } from "date-fns";
 function CommitmentPage() {
-  const [uploadingData, setUploadingData] = useState([]);
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [isPaymentFormOpen, setIsPaymentFormOpen] = useState(false);
-  const [file, setFile] = useState(null);
-  const [rowData, setRowData] = useState([]);
-  const [gridApi, setGridApi] = useState(null);
-  const navigate = useNavigate();
-  const [originalRowData, setOriginalRowData] = useState({});
-  const [searchText, setSearchText] = useState('');
-  const [feedbackData, setFeedbackData] = useState(null);
-
   const hebrewToEnglishMapping = {
     'מזהה אנש': 'AnashIdentifier',
     'מספר זהות': 'PersonID',
@@ -47,13 +34,18 @@ function CommitmentPage() {
 
   };
 
-  function convertExcelDate(excelDate) {
-    // אקסל מתחיל את הספירה מ-1 בינואר 1900, לכן נוסיף את מספר הימים מאז
-    const startDate = new Date(1900, 0, 1);
-    // הפחתת יומיים עקב ההטיה של אקסל (תיקון יום 29 בפברואר 1900 שאינו קיים)
-    const adjustedDate = new Date(startDate.setDate(startDate.getDate() + excelDate - 2));
-    return adjustedDate.toISOString(); // המרת התאריך לפורמט ISO
-  }
+  const [uploadingData, setUploadingData] = useState([]);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isPaymentFormOpen, setIsPaymentFormOpen] = useState(false);
+  const [file, setFile] = useState(null);
+  const [rowData, setRowData] = useState([]);
+  const [gridApi, setGridApi] = useState(null);
+  const navigate = useNavigate();
+  const [originalRowData, setOriginalRowData] = useState({});
+  const [searchText, setSearchText] = useState('');
+  const [feedbackData, setFeedbackData] = useState(null);
+  const fileRef = useRef(null);
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -66,127 +58,15 @@ function CommitmentPage() {
     };
     fetchData();
   }, []);
-
-  const commonColumnProps = {
-    resizable: true,
-    sortable: true,
-    filter: true,
-    editable: false
-  };
-
-  const onSearchChange = (e) => {
-    setSearchText(e.target.value);
-    gridApi.setQuickFilter(e.target.value);
-  };
-  const hebrewFilterOptions = [
-    {
-      displayKey: 'contains',
-      displayName: 'מכיל',
-      test: (filterValue, cellValue) => {
-        return cellValue != null && cellValue.toString().toLowerCase().indexOf(filterValue.toLowerCase()) >= 0;
-      }
-    },
-    {
-      displayKey: 'startsWith',
-      displayName: 'מתחיל ב',
-      test: (filterValue, cellValue) => {
-        return cellValue != null && cellValue.toString().toLowerCase().startsWith(filterValue.toLowerCase());
-      }
-    }
-  ];
-  const columns = [
-    {
-      headerName: 'פרטים מלאים',
-      field: 'userDetails',
-      editable: false,
-      cellRenderer: (params) => {
-        const handleDetailsClick = () => {
-          const _id = params.data._id; // Replace 'id' with the actual field name for the user ID
-          navigate(`/commitment-details/${_id}`);
-        };
-
-        return (
-          <button onClick={() => handleDetailsClick()}>
-            <CgDetailsMore style={{ fontSize: '20px' }} />
-          </button>
-        );
-      },
-      width: 70,
-      headerComponentParams: {
-        displayName: 'פרטים<br>מלאים'
-      }
-    },
-    { headerName: 'מזהה אנש', field: 'AnashIdentifier', width: 80, ...commonColumnProps },
-    { headerName: 'מספר זהות', field: 'PersonID', width: 150, ...commonColumnProps },
-    { headerName: 'שם', field: 'FirstName', width: 150, ...commonColumnProps },
-    { headerName: 'משפחה', field: 'LastName', width: 150, ...commonColumnProps },
-    { headerName: 'סכום התחייבות', field: 'CommitmentAmount', width: 80, ...commonColumnProps },
-    { headerName: 'סכום שולם', field: 'AmountPaid', width: 80, ...commonColumnProps },
-    { headerName: 'סכום שנותר', field: 'AmountRemaining', width: 80, ...commonColumnProps },
-    { headerName: 'מספר תשלומים', field: 'NumberOfPayments', width: 80, ...commonColumnProps },
-    { headerName: 'תשלומים שבוצעו', field: 'PaymentsMade', width: 80, ...commonColumnProps },
-    { headerName: 'תשלומים שנותרו', field: 'PaymentsRemaining', width: 50, ...commonColumnProps },
-    { headerName: 'מתרים', field: 'Fundraiser', width: 150, ...commonColumnProps },
-    {
-      headerName: 'אופן תשלום',
-      field: 'PaymentMethod',
-      width: 150,
-      ...commonColumnProps,
-      valueFormatter: (params) => {
-        if (params.value === 'DirectDebit') {
-          return 'הו"ק בנקאי';
-        } else if (params.value === 'DirectDebitCredit') {
-          return 'הו"ק אשראי';
-        } else {
-          return params.value;
-        }
-      }
-    },
-    { headerName: 'הערות', field: 'Notes', width: 150, ...commonColumnProps }
-
-  ];
-
-  const gridOptions = {
-    defaultColDef: {
-      minWidth: 50,
-      maxWidth: 300
-    },
-    columnDefs: columns,
-    domLayout: 'autoHeight',
-    suppressHorizontalScroll: true
-  };
+  function convertExcelDate(excelDate) {
+    // אקסל מתחיל את הספירה מ-1 בינואר 1900, לכן נוסיף את מספר הימים מאז
+    const startDate = new Date(1900, 0, 1);
+    // הפחתת יומיים עקב ההטיה של אקסל (תיקון יום 29 בפברואר 1900 שאינו קיים)
+    const adjustedDate = new Date(startDate.setDate(startDate.getDate() + excelDate - 2));
+    return adjustedDate.toISOString(); // המרת התאריך לפורמט ISO
+  }
 
 
-
-  const onGridReady = (params) => {
-    setGridApi(params.api);
-  };
-
-  const onRowEditingStarted = (params) => {
-    const originalData = { ...params.data }; // Clone the original row data
-    setOriginalRowData(originalData);
-    params.api.refreshCells({
-      columns: ["action"],
-      rowNodes: [params.node],
-      force: true
-    });
-  };
-
-  const onRowEditingStopped = (params) => {
-    params.api.refreshCells({
-      columns: ["action"],
-      rowNodes: [params.node],
-      force: true
-    });
-  };
-
-  const gridStyle = {
-    height: '84vh',
-    overflow: 'auto',
-    overflowX: 'hidden',
-    margin: '0 auto',
-    width: '98vw',
-  };
   const handleAddPaymentClick = () => {
     setIsPaymentFormOpen(true); // Open payment form
   };
@@ -229,17 +109,60 @@ function CommitmentPage() {
       const sheet = workbook.Sheets[sheetName];
       const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
       setUploadingData(json);
+      
     };
     reader.readAsArrayBuffer(file);
   };
 
-
+  function validatePayment(commitment, paymentAmount) {
+    console.log(commitment);
+    console.log('enter');
+    try {
+      if (!commitment) {
+        throw new Error('Commitment not found');
+      }
+  
+      const updatedAmountPaid = (commitment.AmountPaid || 0) + paymentAmount;
+      const updatedAmountRemaining = (commitment.CommitmentAmount || 0) - updatedAmountPaid;
+      const updatedPaymentsMade = (commitment.PaymentsMade || 0) + 1;
+      const updatedPaymentsRemaining = (commitment.PaymentsRemaining || 0) - 1;
+  
+      if (updatedAmountPaid > commitment.CommitmentAmount) {
+        throw new Error("סכום התשלום חורג מסכום ההתחייבות");
+      }
+      if (updatedAmountRemaining < 0) {
+        throw new Error('סכום התשלום גדול מהסכום שנותר לתשלום');
+      }
+      if (updatedAmountRemaining > commitment.CommitmentAmount) {
+        throw new Error('הסכום שנותר לתשלום לא יכול לחרוג מסכום ההתחייבות');
+      }
+      if (updatedPaymentsMade > commitment.NumberOfPayments) {
+        throw new Error('מספר התשלומים בפועל לא יכול לעלות על מספר התשלומים הכולל');
+      }
+      if (updatedPaymentsRemaining < 0) {
+        throw new Error('מספר התשלומים הנותרים לא יכול להיות פחות מאפס');
+      }
+      if (updatedPaymentsRemaining > commitment.NumberOfPayments) {
+        throw new Error('מספר התשלומים שנותרו גדול מסך התשלומיס');
+      }
+  
+      return {
+        status: 'success',
+      };
+    } catch (error) {
+      // Rethrow the error to be caught by the outer catch block
+      throw error;
+    }
+  }
+  
 
 
   const handlePaymentFileSubmit = async () => {
+    fileRef.current.value = null;
+
     const headers = uploadingData[0];
     const rows = uploadingData;
-
+    
     const mappedData = rows.slice(1).map(row => {
       const mappedRow = {};
       headers.forEach((header, index) => {
@@ -253,132 +176,119 @@ function CommitmentPage() {
         }
       });
       return mappedRow;
-    });
-    console.log("Data being sent to server:", mappedData);
-    let successData = [];
+    }).filter(row => row.AnashIdentifier);
+    
+    let numOfSucces = 0
     let failedData = [];
 
     for (const row of mappedData) {
+      // const commitmentId = row.CommitmentId || 'N/A';
+      const AnashIdentifier = row.AnashIdentifier || 'N/A';
+      const paymentAmount = row.Amount || 0;
+      const campainName = row.CampainName || 'N/A';
+      let commitmentResponse = null
+
       try {
-        const commitmentId = row.CommitmentId || 'N/A';
-        const paymentAmount = row.Amount || 0;
-
-        // Execute the update and retrieve additional details
-        const commitmentDetails = await updateCommitmentAfterPayment(commitmentId, paymentAmount);
-
-        // אם העדכון הצליח, מוסיף את התשלום
-        const response = await uploadPayment([row]);
-        successData.push({
-          commitmentId,
-          paymentAmount,
-          status: 'success',
-          message: 'העדכון ותשלום ההתחייבות הצליחו'
+         
+        commitmentResponse = await getCommitmentByAnashAndCampain(AnashIdentifier, campainName);
+        row.CommitmentId = commitmentResponse.data?._id;
+        console.log(commitmentResponse);
+      } 
+      catch (error) {
+        try{
+          const res = await getUserDetails(row.AnashIdentifier)
+          failedData.push({
+            AnashIdentifier: res.data.data.userDetails?.AnashIdentifier || 'N/A',
+            PersonID: res.data.data.userDetails?.PersonID || 'N/A',
+            FirstName:res.data.data.userDetails?.FirstName || 'N/A',
+            LastName: res.data.data.userDetails?.LastName || 'N/A',
+            paymentAmount: paymentAmount || 0,
+            status: 'failure',
+            reason: "התחייבות לא נמצאה במערכת"
         });
-      } catch (error) {
-        // תרגום סיבות השגיאה לעברית
-        let reasonInHebrew = '';
-        const errorMessage = error.error?.message || error.message || '';
+        
 
-        if (errorMessage.includes('Payment amount exceeds remaining amount')) {
-          reasonInHebrew = 'סכום התשלום חורג מהיתרה הקיימת בהתחייבות.';
-        } else if (errorMessage.includes('Commitment not found')) {
-          reasonInHebrew = 'ההתחייבות לא נמצאה.';
-        } else if (errorMessage.includes('מספר התשלומים הנותרים לא יכול להיות פחות מאפס')) {
-          reasonInHebrew = 'מספר התשלומים הנותרים לא יכול להיות פחות מאפס';
-        } else if (errorMessage.includes('מספר התשלומים בפועל לא יכול לעלות על מספר התשלומים הכולל')) {
-          reasonInHebrew = 'מספר התשלומים בפועל לא יכול לעלות על מספר התשלומים הכולל';
-        } else {
-          reasonInHebrew = 'אירעה שגיאה במהלך עדכון ההתחייבות או הוספת התשלום.';
+      }
+      catch(error)
+      {
+          failedData.push({
+            status: 'failure',
+            reason: "משתמש אינו קיים במערכתת"
+        });
+
+        }
+        finally{
+          continue;
         }
 
-        console.log(row);
-        console.log(error);
-
-        // הוספת פרטי השגיאה לרשימת הכישלונות כולל הפרטים הנדרשים
-        failedData.push({
-          AnashIdentifier: error.commitmentDetails?.AnashIdentifier || 'N/A',
-          PersonID: error.commitmentDetails?.PersonID || 'N/A',
-          FirstName: error.commitmentDetails?.FirstName || 'N/A',
-          LastName: error.commitmentDetails?.LastName || 'N/A',
-          commitmentId: row.CommitmentId || 'N/A',
-          paymentAmount: row.Amount || 0,
-          status: 'failure',
-          reason: reasonInHebrew
-        });
+        
       }
+      try {
+        const validatePaymentRes = validatePayment(commitmentResponse.data, paymentAmount);
+        console.log(validatePaymentRes);
+      }
+      catch (error) {
+        console.error('Error:', error);
+        failedData.push({
+            AnashIdentifier: commitmentResponse.data?.AnashIdentifier || 'N/A',
+            PersonID: commitmentResponse.data?.PersonID || 'N/A',
+            FirstName:commitmentResponse.data?.FirstName || 'N/A',
+            LastName: commitmentResponse.data?.LastName || 'N/A',
+            paymentAmount: paymentAmount || 0,
+            status: 'failure',
+            reason: error.message
+        });
+        
+        continue;
+      }
+      
+      try {
+        const res= await uploadCommitmentPayment(row);      
+        if(res.status === 200){
+          numOfSucces += 1
+          console.log(res);
+        }
+        
+      } catch (error) {
+        console.error('Error:', error);
+        failedData.push({
+            AnashIdentifier: commitmentResponse.data?.AnashIdentifier || 'N/A',
+            PersonID: commitmentResponse.data?.PersonID || 'N/A',
+            FirstName:commitmentResponse.data?.FirstName || 'N/A',
+            LastName: commitmentResponse.data?.LastName || 'N/A',
+            paymentAmount: paymentAmount || 0,
+            status: 'failure',
+            reason: error.response.data.message || error.message
+        });
+        
+      }
+    }
+    try {
+      if(numOfSucces > 0){
+      const response = await getCommitment();
+      setRowData(response.data.data.commitment || []);
+    } 
+  }
+    catch (error) {
+      console.error('Error fetching commitments:', error);
     }
 
     // הצגת המודל עם המידע על ההצלחות והכישלונות
-    showFeedbackModal({ success: successData, failed: failedData });
+    showFeedbackModal({ success: numOfSucces, failed: failedData,isPayments: true});
   };
 
-  const updateCommitmentAfterPayment = async (commitmentId, paymentAmount) => {
-    let commitment; // Declare the commitment variable outside the try block
-    try {
-      const response = await getCommitmentDetails(commitmentId);
+          
 
-      commitment = response.data.commitmentDetails; // Assign value to commitment here
-      if (!commitment) {
-        throw new Error('Commitment not found');
-      }
-
-      const updatedAmountPaid = (commitment.AmountPaid || 0) + paymentAmount;
-      const updatedAmountRemaining = (commitment.CommitmentAmount || 0) - updatedAmountPaid;
-      const updatedPaymentsMade = (commitment.PaymentsMade || 0) + 1;
-      const updatedPaymentsRemaining = (commitment.PaymentsRemaining || 0) - 1;
-
-      if (updatedAmountRemaining < 0) {
-        throw new Error('Payment amount exceeds remaining amount');
-      }
-
-      if (updatedPaymentsRemaining < 0) {
-        throw new Error('מספר התשלומים הנותרים לא יכול להיות פחות מאפס');
-      }
-      if (updatedPaymentsMade > commitment.NumberOfPayments) {
-        throw new Error('מספר התשלומים בפועל לא יכול לעלות על מספר התשלומים הכולל');
-      }
-
-      await updateCommitmentDetails(commitmentId, {
-        AmountPaid: updatedAmountPaid,
-        AmountRemaining: updatedAmountRemaining,
-        PaymentsMade: updatedPaymentsMade,
-        PaymentsRemaining: updatedPaymentsRemaining,
-      });
-
-      const updatedRowData = rowData.map((row) => {
-        if (row._id === commitmentId) {
-          return {
-            ...row,
-            AmountPaid: updatedAmountPaid,
-            AmountRemaining: updatedAmountRemaining,
-            PaymentsMade: updatedPaymentsMade,
-            PaymentsRemaining: updatedPaymentsRemaining,
-          };
-        }
-        return row;
-      });
-
-      setRowData(updatedRowData);
-      return {
-        AnashIdentifier: commitment.AnashIdentifier,
-        PersonID: commitment.PersonID,
-        FirstName: commitment.FirstName,
-        LastName: commitment.LastName,
-      };
-    } catch (error) {
-      const commitmentDetails = {
-        AnashIdentifier: commitment?.AnashIdentifier || 'N/A',
-        PersonID: commitment?.PersonID || 'N/A',
-        FirstName: commitment?.FirstName || 'N/A',
-        LastName: commitment?.LastName || 'N/A',
-      };
-      console.error('Error updating commitment after payment:', error);
-      throw { error, commitmentDetails }; // זרוק את השגיאה עם הפרטים
-    }
-  };
+  
+  
+  
+  
+  
 
 
   const handleFileSubmit = async () => {
+    fileRef.current.value = null;
+
     const headers = uploadingData[0];
     const rows = uploadingData.slice(1);
 
@@ -432,6 +342,7 @@ function CommitmentPage() {
         }
         const isValideAmount = mappedRow['CommitmentAmount'] - mappedRow['AmountPaid'] === mappedRow['AmountRemaining']
         if (!isValideAmount) {
+          console.log(mappedRow);
           throw new Error('פרטי סכום התחייבות אינם תקינים.');
         }
         const isValidePayments = mappedRow['NumberOfPayments'] - mappedRow['PaymentsMade'] === mappedRow['PaymentsRemaining']
@@ -459,7 +370,7 @@ function CommitmentPage() {
         throw new Error('הנתונים מהשרת אינם במבנה של מערך.');
       }
 
-      const existingCampaignNames = campaigns.map(campaign => campaign.CampainName);
+      const existingCampaignNames = [...new Set(campaigns.map(campaign => campaign.CampainName))];
 
       const invalidCampaigns = mappedData.filter(data => !existingCampaignNames.includes(data['CampainName']));
       const invalidCampaignsNames = invalidCampaigns.map(data => data['CampainName']);
@@ -469,29 +380,29 @@ function CommitmentPage() {
           reason: 'שם הקמפיין אינו קיים במערכת.',
         })));
       }
-      console.log(invalidCampaignsNames);
       mappedData = mappedData.filter(data => !invalidCampaignsNames.includes(data.CampainName));
-      console.log(mappedData);
       
       //mappedData האם יש מידע ב 
       if (mappedData.length === 0) {
         throw new Error('אין נתונים תקינים בקובץ .');
       }
 
+    } catch (error) {
+        console.error('Error fetching campaigns:', error);
+        showFeedbackModal({ success: numberOfSuccess, failed: failedData, isPayments: false, reason: error.message });
+        return;
+      }
+
       try {
         
         const response = await uploadCommitment(mappedData);
-        console.log(response);
 
         if (response && response.data) {
           const failedCommitments = response.data.failedCommitments;
-          console.log(failedCommitments);
 
           const successfulCommitments = response.data.successfulCommitments
-          console.log(successfulCommitments);
           // עיבוד נתוני ההצלחה
           numberOfSuccess = successfulCommitments;
-          console.log(numberOfSuccess);
 
           // עיבוד נתוני הכישלון
           failedData.push(...failedCommitments.map(failed => ({
@@ -503,9 +414,13 @@ function CommitmentPage() {
             Amount: failed.Amount || 0,
             reason: failed.reason || 'שגיאה לא ידועה'
           })));
+          if(numberOfSuccess > 0)
+          {
+            const res = await getCommitment();
+            setRowData(res.data.data.commitment || []);
+          }
 
           // הצגת המידע במודל
-          console.log(failedData);
 
           showFeedbackModal({ success: numberOfSuccess, failed: failedData, isPayments: false });
         } else {
@@ -516,11 +431,8 @@ function CommitmentPage() {
         console.error('Error uploading commitments:', error);
         showFeedbackModal({ success: numberOfSuccess, failed: failedData, isPayments: false, reason: 'העלאה נכשלה' });
       }
-    } catch (error) {
-      console.error('Error fetching campaigns:', error);
-      showFeedbackModal({ success: numberOfSuccess, failed: failedData, isPayments: false, reason: error.message });
-    }
-  };
+    } 
+  
 
   const handleRowClick = (rowData) => {
     setSelectedRowData(rowData);
@@ -541,7 +453,7 @@ function CommitmentPage() {
         >
           הוספת תשלום
         </button>
-        <input type="file" onChange={handleFileUpload} />
+        <input type="file" onChange={handleFileUpload} ref={fileRef}  />
         <button
           onClick={handleFileSubmit}
           className="px-4 py-2 bg-green-500 text-white rounded"
@@ -554,17 +466,10 @@ function CommitmentPage() {
         >
           עדכון תשלומים
         </button>
-        <input
-          type="text"
-          placeholder="חפש..."
-          value={searchText}
-          onChange={onSearchChange}
-          className="mb-2 p-2 border rounded"
-        />
       </div>
       {isPaymentFormOpen && (
         <PaymentForm
-          onClose={handleClosePaymentForm} rowData={rowData} updateCommitmentAfterPayment={updateCommitmentAfterPayment} getCommitmentDetails={getCommitmentDetails}
+          onClose={handleClosePaymentForm} rowData={rowData} validatePayment={validatePayment} setRowData={setRowData}
         />
       )}
 
@@ -580,29 +485,8 @@ function CommitmentPage() {
           onClose={handleCloseFeedbackModal}
         />
       )}
-      <div className="ag-theme-alpine" style={gridStyle}>
-        <AgGridReact
-          columnDefs={columns}
-          rowData={rowData}
-          pagination={true}
-          paginationPageSize={50}
-          domLayout="normal"
-          enableRtl={true}
-          onGridReady={onGridReady}
-          quickFilterText={searchText}
-          defaultColDef={{
-            minWidth: 50,
-            maxWidth: 300,
-            resizable: true,
-            sortable: true,
-            filter: true,
-            editable: false,
-            filterParams: {
-              filterOptions: hebrewFilterOptions, // Custom Hebrew filter options
-            },
-          }}
-        />
-      </div>
+      {rowData &&<CommitmentTable rowsData={rowData}/>}
+    
     </div>
   );
 }
