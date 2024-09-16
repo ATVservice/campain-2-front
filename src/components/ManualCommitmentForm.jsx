@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { uploadCommitment, getCampains, getUserDetails } from '../requests/ApiRequests';
+import { uploadCommitment, getCampains, getUserDetails ,getCommitment} from '../requests/ApiRequests';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -111,7 +111,6 @@ function CommitmentForm({ onClose, onSubmit }) {
             toast.error('מספר התשלומים לא יכול להיות קטן ממספר התשלומים שבוצעו.');
             return;
         }
-        console.log(updatedFormData);       
         const isValideAmount = updatedFormData.CommitmentAmount - updatedFormData.AmountPaid == updatedFormData.AmountRemaining;
         if (!isValideAmount) {
             toast.error('פרטי סכום התחייבות אינם תקינים.');
@@ -129,12 +128,13 @@ function CommitmentForm({ onClose, onSubmit }) {
 
             if (response && response.status === 200) {
                 const { successfulCommitments, failedCommitments } = response.data;
+                console.log(response);
 
-                if (successfulCommitments.length > 0) {
+                if (successfulCommitments > 0) {
+                    console.log('Commitment saved successfully');
                     toast.success('ההתחייבות נוספה בהצלחה!');
                     console.log('Commitment saved successfully');
                     onSubmit(formData); // קריאה אופציונלית ל-callback onSubmit אם נדרש
-                    onClose(); // סגירת הטופס לאחר השמירה
                 }
 
                 if (failedCommitments.length > 0) {
@@ -150,6 +150,9 @@ function CommitmentForm({ onClose, onSubmit }) {
         } catch (error) {
             toast.error('שגיאה בשמירת ההתחייבות.');
             console.error('Error saving commitment:', error);
+        }
+        finally {
+            onClose();
         }
     };
 

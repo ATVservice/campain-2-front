@@ -74,6 +74,20 @@ export const uploadPayment = async (paymentData) => {
   }
 };
 
+// export const uploadCommitmentPayment = async (paymentData) => {
+//   try {
+//     console.log(paymentData);
+    
+//     const response = await apiConfig.post('/api/payment/uploadCommitmentPayment', paymentData);
+//     console.log(response);
+    
+//     return response;
+//   } catch (error) {
+//     console.error('Error uploading payment:', error);
+//     throw error; // Optional: re-throw the error if you want to handle it outside the function
+//   }
+// };
+
 export const getUserDetails = async (AnashIdentifier) => {
   try {
     console.log(AnashIdentifier);
@@ -94,14 +108,6 @@ export const getCommitmentDetails = async (_id) => {
   }
 };
 
-export const getCommitmentByAnashAndCampaign  = async (AnashIdentifier, CampainName) => {
-  try {
-    const response = await apiConfig.get(`/api/commitment/getcommitmentbyanashandcampaign/${AnashIdentifier}/${CampainName}`);
-    return response.data;
-  } catch (error) {
-    console.log(error);
-  }
-};
 
 export const deleteCommitment = async (commitmentId) => {
   try {
@@ -201,5 +207,25 @@ export const addPerson= async (data) => {
     console.log(error);
   }
 }
+export const getCommitmentByAnashAndCampain= async (AnashIdentifier, CampainName) => {
+  try {
+    const response = await apiConfig.get(`api/commitment/get-commitment-by-anash-and-campain?AnashIdentifier=${AnashIdentifier}&CampainName=${CampainName}`);
+    return response;
+  } catch (error) {
+    throw error
+  }
+}
+export const uploadCommitmentPayment = async (data) => {
+  try {
+    const response = await apiConfig.post(`/api/commitment/upload-commitment-payment`,data);
+    return response;
+  } catch (error) {
+    throw error
+  }
+}
+
+
+
+  
   
 
