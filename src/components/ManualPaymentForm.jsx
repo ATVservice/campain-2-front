@@ -59,11 +59,14 @@ function PaymentForm({ onClose,  rowData, validatePayment,setRowData}) {
         } catch (error) {
             console.log(error);
             toast.error(error.message);
+            onClose();
+
             return;
         }
     
         try {
             const res = await uploadCommitmentPayment(formData);
+            toast.success('התשלום נוסף בהצלחה');
         } catch (error) {
             toast.error(error.message);
             return;
@@ -72,10 +75,11 @@ function PaymentForm({ onClose,  rowData, validatePayment,setRowData}) {
         try {
             const response = await getCommitment();
             setRowData(response.data.data.commitment || []);
+
         } catch (error) {
             console.error('Error fetching commitments:', error);
         } finally {
-            toast.success('תשלום נוצר בהצלחה');
+            console.log('e');
             // Finally will execute regardless of any return or error
             onClose();
         }

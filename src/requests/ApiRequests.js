@@ -216,6 +216,7 @@ export const getCommitmentByAnashAndCampain= async (AnashIdentifier, CampainName
   }
 }
 export const uploadCommitmentPayment = async (data) => {
+  console.log(data)
   try {
     const response = await apiConfig.post(`/api/commitment/upload-commitment-payment`,data);
     return response;
