@@ -1,106 +1,114 @@
-import React,{useState,useEffect} from 'react'
-import { Await, useParams } from 'react-router-dom'
-import { getCampainPeople,getPeople,addPersonToCampain ,addPeopleToCampain,getPeopleNotInCampain,getUserDetails} from '../requests/ApiRequests';
-import AddToCampainTable from '../components/AddToCampainTable';
-import CampainTable from '../components/CampainTable';
-import { handleFileUpload } from '../components/Utils';
-
-
-
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { getCampainPeople } from '../requests/ApiRequests';
 
 function CampainPage() {
   const { campainId } = useParams();
-  const [peopleInCampain, setPeopleInCampain] = useState([]);
-  const [peopleNotInCampain, setPeopleNotInCampain] = useState([]);
-  const [searchText, setSearchText] = useState('');
-  const [uploadedData, setUploadedData] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const [stats, setStats] = useState({
+    peopleInCampain: 0,
+    peopleWithCommitments: 0,
+    totalCommitted: 0,
+    totalPaid: 0,
+  });
 
-  const onSearch = (event) => {
-    setSearchText(event.target.value);
-    
+  const [runningNumbers, setRunningNumbers] = useState({
+    peopleInCampain: 0,
+    peopleWithCommitments: 0,
+    totalCommitted: 0,
+    totalPaid: 0,
+  });
+
+  const fetchStats = async () => {
+    try {
+      const response = await getCampainPeople(campainId);
+      console.log(response);
+      
+      const peopleData = response.data; // קבלת מערך האנשים
+  
+      // סכימה של מספר האנשים בקמפיין
+      const peopleInCampain = peopleData.length;
+  
+      // עדכון הסטטיסטיקות ב-state
+      setStats({
+        peopleInCampain,
+        peopleWithCommitments: 0, // אין צורך לעדכן אם לא רוצים להשתמש
+        totalCommitted: 0, // אין צורך לעדכן אם לא רוצים להשתמש
+        totalPaid: 0, // אין צורך לעדכן אם לא רוצים להשתמש
+      });
+    } catch (error) {
+      console.error('Error fetching campaign stats:', error);
+    }
   };
 
+  // שימוש ב-useEffect להפעלת הפונקציה fetchStats בעת טעינת הדף
   useEffect(() => {
-
-    const fetchCampainPeople = async () => {
-      try {
-        const response = await getCampainPeople(campainId);
-        console.log(response);
-        setPeopleInCampain(response.data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    const fetchPeopleNotInCampain = async () => {
-      try {
-        const response = await getPeopleNotInCampain(campainId);
-        setPeopleNotInCampain(response.data);2
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchCampainPeople();
-    fetchPeopleNotInCampain();
-   
-  }, [])
-  async function onAddPersonToCampain(AnashIdentifier) {
-    setLoading(true);
-    let removedPerson;
-    try {
-      setPeopleNotInCampain(prevPeopleNotInCampain => {
-        removedPerson = prevPeopleNotInCampain.find(person => person.AnashIdentifier === AnashIdentifier);
-        return prevPeopleNotInCampain.filter(person => person.AnashIdentifier !== AnashIdentifier);
-      });
-      setPeopleInCampain(prevPeopleInCampain => [...prevPeopleInCampain, removedPerson]);
-      await addPersonToCampain({ campainId, AnashIdentifier });
-    } catch (error) {
-      console.error('Error adding person to campaign:', error);
-      setPeopleNotInCampain(prevPeopleNotInCampain => [...prevPeopleNotInCampain, removedPerson]);
-      setPeopleInCampain(prevPeopleInCampain => prevPeopleInCampain.filter(person => person.AnashIdentifier !== AnashIdentifier));
-    } finally {
-      setLoading(false);
-    }
-  }
-    async function handelSubmit() {
-}
+    fetchStats(); // קריאה לפונקציה המעדכנת את הנתונים
+  }, [campainId]); // קריאה מחדש בכל פעם שה-campainId משתנה
   
+
+
+  useEffect(() => {
+    const incrementNumbers = (key, target, delay) => {
+      let current = runningNumbers[key];
+      if (current < target) {
+        const increment = Math.ceil((target - current) / 20);
+        setTimeout(() => {
+          setRunningNumbers(prev => ({
+            ...prev,
+            [key]: Math.min(prev[key] + increment, target),
+          }));
+        }, delay);
+      }
+    };
+
+    incrementNumbers('peopleInCampain', stats.peopleInCampain, 50);
+    incrementNumbers('peopleWithCommitments', stats.peopleWithCommitments, 50);
+    incrementNumbers('totalCommitted', stats.totalCommitted, 50);
+    incrementNumbers('totalPaid', stats.totalPaid, 50);
+  }, [stats, runningNumbers]);
+
   return (
-    <div>
-      <input type="file" onChange={(e) => handleFileUpload(e, (jsonData) => setUploadedData(jsonData))} />
-      <div>
-        {uploadedData.length > 0 && (
-          <div>
-            <button onClick={handelSubmit}>Submit</button>
-          </div>
-        )}
+    <div className="p-6 bg-gray-50 min-h-screen">
+      <h1 className="text-2xl font-semibold text-center mb-6">ניהול קמפיין</h1>
+
+      {/* הצגת מספרים רצים */}
+      <div className="grid grid-cols-2 gap-8 text-center mb-6">
+        <div className="bg-white shadow-lg p-4 rounded-lg">
+          <h2 className="text-xl font-semibold text-gray-700">אנשים בקמפיין</h2>
+          <p className="text-3xl font-bold text-blue-600">{runningNumbers.peopleInCampain}</p>
+        </div>
+        <div className="bg-white shadow-lg p-4 rounded-lg">
+          <h2 className="text-xl font-semibold text-gray-700">אנשים עם התחייבויות</h2>
+          <p className="text-3xl font-bold text-blue-600">{runningNumbers.peopleWithCommitments}</p>
+        </div>
+        <div className="bg-white shadow-lg p-4 rounded-lg">
+          <h2 className="text-xl font-semibold text-gray-700">סך ההתחייבויות</h2>
+          <p className="text-3xl font-bold text-blue-600">{runningNumbers.totalCommitted} ₪</p>
+        </div>
+        <div className="bg-white shadow-lg p-4 rounded-lg">
+          <h2 className="text-xl font-semibold text-gray-700">סך הכל שולם</h2>
+          <p className="text-3xl font-bold text-blue-600">{runningNumbers.totalPaid} ₪</p>
+        </div>
       </div>
 
-
-
-
-      <input 
-        type="text" 
-        placeholder="חיפוש..." 
-        value={searchText} 
-        onChange={onSearch} 
-        className="m-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-sky-100" 
-
-      />
-
-      
-        
-       <div className='flex flex-col gap-4'>
-         {peopleNotInCampain.length > 0 &&searchText.length > 1 &&
-          <AddToCampainTable rowData={peopleNotInCampain} onAddPersonToCampain={onAddPersonToCampain} searchText={searchText} />}
-          <h2>אנשים בקמפיין</h2>
-
-         
-        { peopleInCampain.length > 0 &&<CampainTable rowData={peopleInCampain} />}
-       </div>
+      {/* כפתורים לתחתית הדף */}
+      <div className="mt-8 flex justify-center gap-4">
+        <button 
+          onClick={() => navigate(`/peopleincampain/${campainId}`)} 
+          className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all"
+        >
+          רשימת אנשים בקמפיין
+        </button>
+        <button 
+          onClick={() => navigate(`/campain-commitments-list/${campainId}`)} 
+          className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-all"
+        >
+          רשימת התחייבויות בקמפיין
+        </button>
+      </div>
     </div>
   );
 }
 
-export default CampainPage
+export default CampainPage;
