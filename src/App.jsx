@@ -12,6 +12,7 @@ import CommitmentDetailsPage from './pages/CommitmentDetailsPage';
 import CampainsPage from './pages/CampainsPage';
 import MemorialBoard from './pages/MemorialBoard';
 import CampainPage from './pages/CampainPage';
+import PeopleInCampain from './pages/peopleInCampain';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import AddPersonPage from './pages/AddPersonPage';
@@ -40,6 +41,7 @@ const App = () => {
               <Route path="/campains" element={<CampainsPage />} />
               <Route path="/memorial-Board" element={<MemorialBoard />} />
               <Route path="/campain/:campainId" element={<CampainPage />} />
+              <Route path="/PeopleInCampain/:campainId" element={<PeopleInCampain />} />
               <Route path="/add-person" element={<AddPersonPage />} />
               <Route path="/memorial-day-2" element={<MemorialDay2 />} />
 

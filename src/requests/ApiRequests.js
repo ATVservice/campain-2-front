@@ -160,7 +160,7 @@ export const deleteUser= async (AnashIdentifier) => {
   }
 }
 export const addCampain= async (data) => {
-  try {
+  try {    
     const response = await apiConfig.post(`/api/campain/add-campain`,data);
     return response;
   } catch (error) {
