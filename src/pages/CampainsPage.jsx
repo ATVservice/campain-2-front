@@ -11,7 +11,6 @@ import { toast, ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
 function CampainsPage() {
-
   const navigate = useNavigate();
   const [campains, setCampains] = useState([]);
   const [campainData, setCampainData] = useState({
@@ -68,7 +67,6 @@ function CampainsPage() {
       try {
         const response = await getCampains();
         setCampains(response.data.data.campains);
-        console.log(response.data.data.campains);
       } catch (error) {
         console.log(error);
       }
@@ -83,7 +81,7 @@ function CampainsPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4 mb-6">
         {campains.map((campain) => (
           <button
-            onClick={() => navigate(`/campain/${campain._id}`)}
+            onClick={() => navigate(`/campain/${campain._id}?campainName=${encodeURIComponent(campain.CampainName)}`)}
             className="p-3 bg-blue-200 text-blue-900 hover:bg-blue-300 transition-colors rounded-lg shadow-md"
             key={campain._id}
           >
