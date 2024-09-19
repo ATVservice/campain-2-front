@@ -37,6 +37,9 @@ function CommitmentForm({ onClose, onSubmit }) {
         fetchCampaigns();
     }, []);
     const handleChange = (e) => {
+        const { name, value } = e.target;
+        console.log(formData);
+        console.log(name, value);
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
@@ -180,10 +183,10 @@ function CommitmentForm({ onClose, onSubmit }) {
                     </div>
                     <div>
                         <label>קמפיין:</label>
-                        <select name="CampaignId" value={formData.CampaignId} onChange={handleChange}>
+                        <select name="CampainName" value={formData.CampainName} onChange={handleChange}>
                             <option value="">בחר קמפיין</option>
                             {campaigns.map((campaign) => (
-                                <option key={campaign._id} value={campaign._id}>
+                                <option key={campaign._id} value={campaign.CampainName}>
                                     {campaign.CampainName}
                                 </option>
                             ))}
