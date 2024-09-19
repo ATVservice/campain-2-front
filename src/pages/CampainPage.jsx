@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getCampainPeople } from '../requests/ApiRequests';
-
+import { useLocation} from 'react-router-dom';
+import { getCampainPeople,  getCommitmentInCampain} from '../requests/ApiRequests';
 function CampainPage() {
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const campainName = queryParams.get('campainName');
   const { campainId } = useParams();
   const navigate = useNavigate();
   const [stats, setStats] = useState({
@@ -21,30 +24,32 @@ function CampainPage() {
 
   const fetchStats = async () => {
     try {
-      const response = await getCampainPeople(campainId);
-      console.log(response);
-      
+      const response = await getCampainPeople(campainName);
+      const response2 = await getCommitmentInCampain(campainName);
+  
       const peopleData = response.data; // קבלת מערך האנשים
+      const commitmentData = response2.data.data; // קבלת הנתונים מההתחייבויות
   
       // סכימה של מספר האנשים בקמפיין
       const peopleInCampain = peopleData.length;
-  
+      
       // עדכון הסטטיסטיקות ב-state
       setStats({
         peopleInCampain,
-        peopleWithCommitments: 0, // אין צורך לעדכן אם לא רוצים להשתמש
-        totalCommitted: 0, // אין צורך לעדכן אם לא רוצים להשתמש
-        totalPaid: 0, // אין צורך לעדכן אם לא רוצים להשתמש
+        peopleWithCommitments: commitmentData.numberOfCommitments, // שימוש במספר ההתחייבויות
+        totalCommitted: commitmentData.totalCommitted,
+        totalPaid: commitmentData.totalPaid,
       });
     } catch (error) {
       console.error('Error fetching campaign stats:', error);
     }
   };
+  
 
   // שימוש ב-useEffect להפעלת הפונקציה fetchStats בעת טעינת הדף
   useEffect(() => {
     fetchStats(); // קריאה לפונקציה המעדכנת את הנתונים
-  }, [campainId]); // קריאה מחדש בכל פעם שה-campainId משתנה
+  }, []);
   
 
 
@@ -52,7 +57,7 @@ function CampainPage() {
     const incrementNumbers = (key, target, delay) => {
       let current = runningNumbers[key];
       if (current < target) {
-        const increment = Math.ceil((target - current) / 20);
+        const increment = Math.ceil((target - current) / 3);
         setTimeout(() => {
           setRunningNumbers(prev => ({
             ...prev,
@@ -70,7 +75,7 @@ function CampainPage() {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      <h1 className="text-2xl font-semibold text-center mb-6">ניהול קמפיין</h1>
+      <h1 className="text-2xl font-semibold text-center mb-6">ניהול קמפיין {campainName}</h1>
 
       {/* הצגת מספרים רצים */}
       <div className="grid grid-cols-2 gap-8 text-center mb-6">
@@ -95,13 +100,13 @@ function CampainPage() {
       {/* כפתורים לתחתית הדף */}
       <div className="mt-8 flex justify-center gap-4">
         <button 
-          onClick={() => navigate(`/peopleincampain/${campainId}`)} 
+          onClick={() => navigate(`/peopleincampain/${campainName}`)} 
           className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all"
         >
           רשימת אנשים בקמפיין
         </button>
         <button 
-          onClick={() => navigate(`/campain-commitments-list/${campainId}`)} 
+          onClick={() => navigate(`/campaign-commitments/${campainName}`)} 
           className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-all"
         >
           רשימת התחייבויות בקמפיין

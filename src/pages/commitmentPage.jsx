@@ -372,7 +372,7 @@ function CommitmentPage() {
 
       const existingCampaignNames = [...new Set(campaigns.map(campaign => campaign.CampainName))];
 
-      const invalidCampaigns = mappedData.filter(data => !existingCampaignNames.includes(data['CampainName']));
+      const invalidCampaigns = mappedData.filter(data =>data.CampainName && !existingCampaignNames.includes(data['CampainName']));
       const invalidCampaignsNames = invalidCampaigns.map(data => data['CampainName']);
       if (invalidCampaigns.length > 0) {
         failedData.push(...invalidCampaigns.map(data => ({
