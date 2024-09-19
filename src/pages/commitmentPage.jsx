@@ -192,7 +192,6 @@ function CommitmentPage() {
          
         commitmentResponse = await getCommitmentByAnashAndCampain(AnashIdentifier, campainName);
         row.CommitmentId = commitmentResponse.data?._id;
-        console.log(commitmentResponse);
       } 
       catch (error) {
         try{
@@ -225,7 +224,6 @@ function CommitmentPage() {
       }
       try {
         const validatePaymentRes = validatePayment(commitmentResponse.data, paymentAmount);
-        console.log(validatePaymentRes);
       }
       catch (error) {
         console.error('Error:', error);
@@ -342,7 +340,6 @@ function CommitmentPage() {
         }
         const isValideAmount = mappedRow['CommitmentAmount'] - mappedRow['AmountPaid'] === mappedRow['AmountRemaining']
         if (!isValideAmount) {
-          console.log(mappedRow);
           throw new Error('פרטי סכום התחייבות אינם תקינים.');
         }
         const isValidePayments = mappedRow['NumberOfPayments'] - mappedRow['PaymentsMade'] === mappedRow['PaymentsRemaining']
@@ -394,7 +391,7 @@ function CommitmentPage() {
       }
 
       try {
-        
+        console.log('mappedData', mappedData);
         const response = await uploadCommitment(mappedData);
 
         if (response && response.data) {

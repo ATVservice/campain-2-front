@@ -37,6 +37,9 @@ function CommitmentForm({ onClose, onSubmit }) {
         fetchCampaigns();
     }, []);
     const handleChange = (e) => {
+        const { name, value } = e.target;
+        console.log(formData);
+        console.log(name, value);
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
