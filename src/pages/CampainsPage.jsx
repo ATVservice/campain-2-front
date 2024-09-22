@@ -49,6 +49,11 @@ function CampainsPage() {
       setmessage("נא למלא את כל השדות");
       return;
     }
+    if (start.date.getTime() > end.date.getTime()) {
+      setmessage(" תאריך התחלה אינו יכול להיות גדול מתאריך הסיום");
+      return;
+    }
+    
     try {
       await addCampain({ start, end, CampainName, minimumAmountForMemorialDay });
       toast.success("קמפיין נוסף בהצלחה!"); // הודעת Toast על הצלחה
