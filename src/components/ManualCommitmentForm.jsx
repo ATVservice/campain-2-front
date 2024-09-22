@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { uploadCommitment, getCampains, getUserDetails ,getCommitment} from '../requests/ApiRequests';
+import { uploadCommitment, getCampains, getUserDetails, getCommitment } from '../requests/ApiRequests';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -37,6 +37,9 @@ function CommitmentForm({ onClose, onSubmit }) {
         fetchCampaigns();
     }, []);
     const handleChange = (e) => {
+        const { name, value } = e.target;
+        console.log(formData);
+        console.log(name, value);
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
@@ -73,7 +76,7 @@ function CommitmentForm({ onClose, onSubmit }) {
         updatedFormData.AmountPaid = updatedFormData.AmountPaid || 0;
         updatedFormData.PaymentsMade = updatedFormData.PaymentsMade || 0;
 
-        if (updatedFormData.AmountRemaining == 0 ) {
+        if (updatedFormData.AmountRemaining == 0) {
             updatedFormData.AmountRemaining = updatedFormData.CommitmentAmount;
         }
 
@@ -180,10 +183,10 @@ function CommitmentForm({ onClose, onSubmit }) {
                     </div>
                     <div>
                         <label>קמפיין:</label>
-                        <select name="CampaignId" value={formData.CampaignId} onChange={handleChange}>
+                        <select name="CampainName" value={formData.CampainName} onChange={handleChange}>
                             <option value="">בחר קמפיין</option>
                             {campaigns.map((campaign) => (
-                                <option key={campaign._id} value={campaign._id}>
+                                <option key={campaign._id} value={campaign.CampainName}>
                                     {campaign.CampainName}
                                 </option>
                             ))}

@@ -60,6 +60,15 @@ export const getCommitment = async () => {
   }
 }
 
+export const getCommitmentsByCampaign = async () => {
+  try {
+    const response = await apiConfig.get('/api/commitment'); 
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 export const uploadPayment = async (paymentData) => {
   try {
     console.log(paymentData);
@@ -74,6 +83,15 @@ export const uploadPayment = async (paymentData) => {
   }
 };
 
+export const deletePayment = async (paymentId) => {
+  try {
+    console.log(paymentId);
+    const response = await apiConfig.delete(`/api/payment/delete-payment/${paymentId}`);
+    return response;
+  } catch (error) {
+    console.error('Error deleting payment:', error);
+  }
+};
 // export const uploadCommitmentPayment = async (paymentData) => {
 //   try {
 //     console.log(paymentData);
@@ -151,7 +169,7 @@ export const deleteUser= async (AnashIdentifier) => {
   }
 }
 export const addCampain= async (data) => {
-  try {
+  try {    
     const response = await apiConfig.post(`/api/campain/add-campain`,data);
     return response;
   } catch (error) {
@@ -167,17 +185,17 @@ export const getCampains= async () => {
     console.log(error);
   }
 }
-export const getCampainPeople= async (campainId) => {
+export const getCampainPeople= async (campainName) => {
   try {
-    const response = await apiConfig.get(`/api/campain/get-campain-people/${campainId}`);
+    const response = await apiConfig.get(`/api/campain/get-campain-people/${campainName}`);
     return response;
   } catch (error) {
     console.log(error);
   }
 }
-export const getPeopleNotInCampain= async (campainId) => {
+export const getPeopleNotInCampain= async (campainName) => {
   try {
-    const response = await apiConfig.get(`/api/campain/get-people-not-in-campain/${campainId}`);
+    const response = await apiConfig.get(`/api/campain/get-people-not-in-campain/${campainName}`);
     return response;
   } catch (error) {
     console.log(error);
@@ -185,6 +203,8 @@ export const getPeopleNotInCampain= async (campainId) => {
 }
 export const addPersonToCampain= async (data) => {
   try {
+    console.log(data);
+    
     const response = await apiConfig.post(`/api/campain/add-person-to-campain`,data);
     return response;
   } catch (error) {
@@ -199,6 +219,20 @@ export const addPeopleToCampain= async (data) => {
     console.log(error);
   }
 }
+
+export const getCommitmentInCampain= async (campainName) => {
+  try {
+    const response = await apiConfig.get(`/api/campain/get-commitment-in-campain/${campainName}`);
+    console.log(response);
+    
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+  
+}
+
+
 export const addPerson= async (data) => {
   try {
     const response = await apiConfig.post(`/api/alfon/add-user`,data);
@@ -216,6 +250,7 @@ export const getCommitmentByAnashAndCampain= async (AnashIdentifier, CampainName
   }
 }
 export const uploadCommitmentPayment = async (data) => {
+  console.log(data)
   try {
     const response = await apiConfig.post(`/api/commitment/upload-commitment-payment`,data);
     return response;

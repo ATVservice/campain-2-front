@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getCommitmentDetails, deleteCommitment, updateCommitmentDetails, uploadCommitmentPayment, getCampains } from '../requests/ApiRequests';
+import { getCommitmentDetails, deleteCommitment, updateCommitmentDetails, uploadCommitmentPayment, getCampains, deletePayment } from '../requests/ApiRequests';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { FaTrash } from 'react-icons/fa';
 import Modal from 'react-modal';
 
 Modal.setAppElement('#root');
@@ -66,6 +67,8 @@ function CommitmentDetailsPage() {
     const paymentsMade = parseInt(commitmentDetails.PaymentsMade, 10) || 0;
     const paymentsRemaining = parseInt(commitmentDetails.PaymentsRemaining, 10) || 0;
 
+
+
     // Validation checks
     if (amountPaid > commitmentAmount) {
       toast.error('הסכום ששולם לא יכול להיות גדול מסכום ההתחייבות');
@@ -95,6 +98,17 @@ function CommitmentDetailsPage() {
       toast.error('מספר התשלומים שבוצעו לא יכול להיות גדול מסך התשלומים');
       return;
     }
+
+    if (commitmentAmount - amountPaid !== amountRemaining) {
+      toast.error('פרטי סכום התחייבות אינם תקינים.');
+      return;
+    }
+
+    if (numberOfPayments - paymentsMade !== paymentsRemaining) {
+      toast.error('פרטי מספר התשלומים אינם תקינים.');
+      return;
+    }
+
 
     if (Object.keys(editedData).length > 0) {
       try {
@@ -142,11 +156,12 @@ function CommitmentDetailsPage() {
   };
   const handlePaymentSubmit = async (e) => {
     e.preventDefault();
-
+    console.log(commitmentDetails);
     if (!commitmentId) {
       console.error('Commitment ID is missing');
       return;
     }
+    console.log(commitmentDetails);
 
     const paymentAmount = parseFloat(paymentData.Amount);
     const remainingAmount = commitmentDetails.AmountRemaining;
@@ -172,30 +187,24 @@ function CommitmentDetailsPage() {
     }
 
     try {
-      // Update the commitment first
-      const updateStatus = await updateCommitmentAfterPayment(commitmentId, paymentAmount);
+      // If the update was successful, proceed to upload the payment
+      const paymentDataWithId = {
+        ...paymentData,
+        CommitmentId: commitmentId,
+        AnashIdentifier: AnashIdentifier // הוספת מזהה אנש לבקשת התשלום
+      };
+      const response = await uploadCommitmentPayment(paymentDataWithId);
 
-      if (updateStatus) {
-        // If the update was successful, proceed to upload the payment
-        const paymentDataWithId = {
-          ...paymentData,
-          CommitmentId: commitmentId,
-          AnashIdentifier: AnashIdentifier // הוספת מזהה אנש לבקשת התשלום
-        };
-        const response = await uploadCommitmentPayment(paymentDataWithId);
+      if (response && response.status === 200) {
+        const updatedCommitmentDetails = await getCommitmentDetails(commitmentId);
+        setCommitmentDetails(updatedCommitmentDetails.data.commitmentDetails);
 
-        if (response && response.status === 200) {
-          const updatedCommitmentDetails = await getCommitmentDetails(commitmentId);
-          setCommitmentDetails(updatedCommitmentDetails.data.commitmentDetails);
-
-          toast.success('התשלום עודכן בהצלחה!');
-          closePaymentModal();
-        } else {
-          toast.error('עידכון התשלום נכשל!');
-        }
+        toast.success('התשלום עודכן בהצלחה!');
+        closePaymentModal();
       } else {
         toast.error('עידכון התשלום נכשל!');
       }
+
     } catch (error) {
       toast.error('שגיאה בעדכון התשלום');
       console.error('Error saving payment:', error);
@@ -263,7 +272,7 @@ function CommitmentDetailsPage() {
   useEffect(() => {
     const fetchCommitmentDetails = async () => {
       try {
-        const result = await getCommitmentDetails(commitmentId);
+        const result = await getCommitmentDetails(commitmentId); 
         if (result.data) {
           const { commitmentDetails, payments } = result.data;
           setCommitmentDetails(commitmentDetails || {});
@@ -283,17 +292,33 @@ function CommitmentDetailsPage() {
   const [campaigns, setCampaigns] = useState([]);
   useEffect(() => {
     const fetchCampaigns = async () => {
-        try {
-            const response = await getCampains();
-            setCampaigns(response.data.data.campains); // הנחה שהמידע יושב במערך בשם data
-        } catch (error) {
-            toast.error('שגיאה בטעינת הקמפיינים');
-        }
+      try {
+        const response = await getCampains();
+        setCampaigns(response.data.data.campains); // הנחה שהמידע יושב במערך בשם data
+      } catch (error) {
+        toast.error('שגיאה בטעינת הקמפיינים');
+      }
     };
 
     fetchCampaigns();
-}, []);
+  }, []);
 
+  // פונקציה לטיפול במחיקת תשלום
+  const handleDeletePayment = async (paymentId) => {
+    try {
+      console.log('paymentId', paymentId);
+      
+      const response = await deletePayment(paymentId); // קרא ל-API למחיקת תשלום
+      if (response.status === 200) {
+        toast.success('התשלום נמחק בהצלחה!');
+      } else {
+        toast.error('שגיאה במחיקת התשלום');
+      }
+    } catch (error) {
+      toast.error('שגיאה במחיקת התשלום');
+      console.error('Error deleting payment:', error);
+    }
+  };
 
   return (
     <>
@@ -610,39 +635,45 @@ function CommitmentDetailsPage() {
           </form>
         </div>
       </Modal>
-      <div className="max-w-7xl mx-auto p-3">
-        <h3 className="text-lg font-semibold mb-4">תשלומים קשורים</h3>
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white">
+      <div className="max-w-4xl mx-auto p-3">
+        <h3 className="text-lg font-semibold mb-4 text-center">תשלומים קשורים</h3>
+        <div className="overflow-y-auto max-h-80"> {/* הגדרת גובה מקסימלי וגלילה אנכית */}
+          <table className="table-auto mx-auto bg-white border-separate border-spacing-2 min-w-full">
             <thead>
-              <tr>
+              <tr className="text-center">
                 <th className="px-4 py-2 border-b">סכום</th>
                 <th className="px-4 py-2 border-b">תאריך</th>
                 <th className="px-4 py-2 border-b">אמצעי תשלום</th>
+                <th className="px-4 py-2 border-b">מחיקה</th>
               </tr>
             </thead>
             <tbody>
               {payments.length > 0 ? (
-                payments.map((payment) => {
-                  return (
-                    <tr key={payment._id}>
-                      <td className="px-4 py-2 border-b text-center">{payment.Amount}</td>
-                      <td className="px-4 py-2 border-b text-center">
-                        {new Date(payment.Date).toLocaleDateString('he-IL')}
-                      </td>
-                      <td className="px-4 py-2 border-b text-center">{payment.PaymentMethod}</td>
-                    </tr>
-                  );
-                })
+                payments.map((payment) => (
+                  <tr key={payment._id} className="text-center">
+                    <td className="px-4 py-2 border-b">{payment.Amount}</td>
+                    <td className="px-4 py-2 border-b">
+                      {new Date(payment.Date).toLocaleDateString('he-IL')}
+                    </td>
+                    <td className="px-4 py-2 border-b">{payment.PaymentMethod}</td>
+                    <td className="px-4 py-2 border-b">
+                      <button
+                        onClick={() => handleDeletePayment(payment._id)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        <FaTrash />
+                      </button>
+                    </td>
+                  </tr>
+                ))
               ) : (
                 <tr>
-                  <td className="px-4 py-2 border-b text-center" colSpan="3">
+                  <td className="px-4 py-2 border-b text-center" colSpan="4">
                     אין תשלומים להצגה
                   </td>
                 </tr>
               )}
             </tbody>
-
           </table>
         </div>
       </div>

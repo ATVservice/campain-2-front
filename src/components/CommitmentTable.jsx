@@ -70,63 +70,140 @@ function CommitmentTable({rowsData}) {
           editable: false,
           cellRenderer: (params) => {
             const handleDetailsClick = () => {
-              const _id = params.data._id; // Replace 'id' with the actual field name for the user ID
+              const _id = params.data._id;
               navigate(`/commitment-details/${_id}`);
             };
-    
+      
             return (
               <button onClick={() => handleDetailsClick()}>
                 <CgDetailsMore style={{ fontSize: '20px' }} />
               </button>
             );
           },
-          width: 70,
-          headerComponentParams: {
-            displayName: 'פרטים<br>מלאים'
-          }
+          width: 110, 
+          headerClass: 'multi-line-header'
         },
-        { headerName: 'מזהה אנש', field: 'AnashIdentifier', width: 80, ...commonColumnProps },
-        { headerName: 'מספר זהות', field: 'PersonID', width: 150, ...commonColumnProps },
-        { headerName: 'שם', field: 'FirstName', width: 150, ...commonColumnProps },
-        { headerName: 'משפחה', field: 'LastName', width: 150, ...commonColumnProps },
-        { headerName: 'סכום התחייבות', field: 'CommitmentAmount', width: 80, ...commonColumnProps },
-        { headerName: 'סכום שולם', field: 'AmountPaid', width: 80, ...commonColumnProps },
-        { headerName: 'סכום שנותר', field: 'AmountRemaining', width: 80, ...commonColumnProps },
-        { headerName: 'מספר תשלומים', field: 'NumberOfPayments', width: 80, ...commonColumnProps },
-        { headerName: 'תשלומים שבוצעו', field: 'PaymentsMade', width: 80, ...commonColumnProps },
-        { headerName: 'תשלומים שנותרו', field: 'PaymentsRemaining', width: 50, ...commonColumnProps },
-        { headerName: 'מתרים', field: 'Fundraiser', width: 150, ...commonColumnProps },
-        {
-          headerName: 'אופן תשלום',
-          field: 'PaymentMethod',
-          width: 150,
-          ...commonColumnProps,
-          valueFormatter: (params) => {
-            if (params.value === 'DirectDebit') {
-              return 'הו"ק בנקאי';
-            } else if (params.value === 'DirectDebitCredit') {
-              return 'הו"ק אשראי';
-            } else {
-              return params.value;
-            }
-          }
+        { 
+          headerName: 'מזהה אנש', 
+          field: 'AnashIdentifier', 
+          minWidth: 80, 
+          maxWidth: 90, 
+          headerClass: 'multi-line-header', 
+          ...commonColumnProps 
         },
-        { headerName: 'הערות', field: 'Notes', width: 150, ...commonColumnProps }
-    
+        { 
+          headerName: 'מספר זהות', 
+          field: 'PersonID', 
+          minWidth: 110, 
+          maxWidth: 120, 
+          ...commonColumnProps 
+        },
+        { 
+          headerName: 'שם', 
+          field: 'FirstName', 
+          minWidth: 90, 
+          maxWidth: 100, 
+          flex: 1, 
+          ...commonColumnProps 
+        },
+        { 
+          headerName: 'משפחה', 
+          field: 'LastName', 
+          minWidth: 90, 
+          maxWidth: 100, 
+          flex: 1, 
+          ...commonColumnProps 
+        },
+        { 
+          headerName: 'סכום התחייבות', 
+          field: 'CommitmentAmount', 
+          minWidth: 120, 
+          maxWidth: 130, 
+          headerClass: 'multi-line-header', 
+          ...commonColumnProps 
+        },
+        { 
+          headerName: 'סכום שנותר', 
+          field: 'AmountRemaining', 
+          minWidth: 100, 
+          maxWidth: 110,
+          headerClass: 'multi-line-header', 
+          ...commonColumnProps 
+        },
+        { 
+          headerName: 'מספר תשלומים', 
+          field: 'NumberOfPayments', 
+          minWidth: 120, 
+          maxWidth: 130, 
+          headerClass: 'multi-line-header', 
+          ...commonColumnProps 
+        },
+        { 
+          headerName: 'תשלומים שנותרו', 
+          field: 'PaymentsRemaining', 
+          minWidth: 120, 
+          maxWidth: 130, 
+          headerClass: 'multi-line-header', 
+          ...commonColumnProps 
+        },
+        { 
+          headerName: 'אופן תשלום', 
+          field: 'PaymentMethod', 
+          minWidth: 90, 
+          maxWidth: 100, 
+          headerClass: 'multi-line-header', 
+          ...commonColumnProps 
+        },
+        { 
+          headerName: 'הערות', 
+          field: 'Notes', 
+          minWidth: 200, 
+          maxWidth: 250, 
+          flex: 1.5, 
+          ...commonColumnProps 
+        }
       ];
-    
+      
+      // התאמת gridOptions לשימוש במבנה קטן יותר ובצמצום רוחב
       const gridOptions = {
         defaultColDef: {
           minWidth: 50,
-          maxWidth: 300
+          maxWidth: 300,
+          resizable: true,
+          flex: 1,
         },
         columnDefs: columns,
         domLayout: 'autoHeight',
-        suppressHorizontalScroll: true
+        suppressHorizontalScroll: true,
+        onFirstDataRendered: (params) => {
+          params.api.sizeColumnsToFit();
+        },
+        onGridReady: (params) => {
+          params.api.autoSizeAllColumns();
+        }
       };
-    
-    
-    
+      
+      // הוספת CSS מותאם לכותרות
+      const styles = `
+        .multi-line-header .ag-header-cell-label {
+          white-space: normal !important;
+          line-height: 1.2;
+          text-align: center;
+        }
+        
+        .ag-header-cell-label {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100%;
+        }
+      `;
+      
+      const styleSheet = document.createElement("style");
+      styleSheet.type = "text/css";
+      styleSheet.innerText = styles;
+      document.head.appendChild(styleSheet);
+      
       const onGridReady = (params) => {
         setGridApi(params.api);
       };
