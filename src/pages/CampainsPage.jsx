@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react";
 import { ReactJewishDatePicker } from "react-jewish-datepicker";
 import "react-jewish-datepicker/dist/index.css";
-import { dontSelectShabatAndHolidays } from "jewish-dates-core";
 import { IoMdAdd, IoMdClose } from "react-icons/io";
 import { addCampain } from "../requests/ApiRequests";
 import { getCampains } from "../requests/ApiRequests";
@@ -21,7 +20,6 @@ function CampainsPage() {
   });
   const [showAddCampainInputs, setShowAddCampainInputs] = useState(false);
   let [message, setmessage] = useState('');
-  const excludeShabatAndHolidays = dontSelectShabatAndHolidays();
 
   const handleDateChange = (key, day) => {
     console.log("Selected day:", day); // Check the structure of the day object
@@ -125,7 +123,6 @@ function CampainsPage() {
             <ReactJewishDatePicker
               onClick={(day) => handleDateChange("start", day)}
               isHebrew
-              canSelect={excludeShabatAndHolidays}
               className="mt-2"
             />
           </div>
@@ -142,7 +139,6 @@ function CampainsPage() {
             <ReactJewishDatePicker
               onClick={(day) => handleDateChange("end", day)}
               isHebrew
-              canSelect={excludeShabatAndHolidays}
               className="mt-2"
             />
           </div>

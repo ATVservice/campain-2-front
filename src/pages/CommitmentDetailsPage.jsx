@@ -5,6 +5,8 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { FaTrash } from 'react-icons/fa';
 import Modal from 'react-modal';
+import { ReactJewishDatePicker } from "react-jewish-datepicker";
+import "react-jewish-datepicker/dist/index.css";
 
 Modal.setAppElement('#root');
 
@@ -18,7 +20,7 @@ function CommitmentDetailsPage() {
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false); // עבור הטופס להוספת תשלום
   const [payments, setPayments] = useState([]);
   const [paymentData, setPaymentData] = useState({ Amount: '', Date: '', PaymentMethod: '' }); // נתוני התשלום
-
+  const [MemorialDays, setMemorialDays] = useState({});
 
   const openModal = (e) => {
     e.preventDefault();
@@ -113,7 +115,9 @@ function CommitmentDetailsPage() {
     if (Object.keys(editedData).length > 0) {
       try {
         setIsLoading(true);
-        const commitmentEditedData = { ...editedData, commitmentId: commitmentDetails._id };
+        const commitmentEditedData = { ...editedData, commitmentId: commitmentDetails._id, MemorialDays: MemorialDays };
+        console.log(commitmentEditedData);
+        
         const response = await updateCommitmentDetails(commitmentDetails._id, commitmentEditedData);
         setCommitmentDetails(response.data.data.updateCommitmentDetails);
         toast.success('הפרטים נשמרו בהצלחה', {
@@ -272,7 +276,7 @@ function CommitmentDetailsPage() {
   useEffect(() => {
     const fetchCommitmentDetails = async () => {
       try {
-        const result = await getCommitmentDetails(commitmentId); 
+        const result = await getCommitmentDetails(commitmentId);
         if (result.data) {
           const { commitmentDetails, payments } = result.data;
           setCommitmentDetails(commitmentDetails || {});
@@ -307,7 +311,7 @@ function CommitmentDetailsPage() {
   const handleDeletePayment = async (paymentId) => {
     try {
       console.log('paymentId', paymentId);
-      
+
       const response = await deletePayment(paymentId); // קרא ל-API למחיקת תשלום
       if (response.status === 200) {
         toast.success('התשלום נמחק בהצלחה!');
@@ -319,6 +323,39 @@ function CommitmentDetailsPage() {
       console.error('Error deleting payment:', error);
     }
   };
+
+  const handleDateChange = (e, day) => {
+    console.log(e);
+    console.log("Selected day:", day); // בדוק את מבנה האובייקט day
+    
+    const key = e; // כאן e מייצג את המפתח, למשל אינדקס
+  
+    // יצירת עותק חדש של האובייקט הקיים
+    const updatedDays = { ...MemorialDays };
+  
+    // עדכון היום במפתח המתאים
+    updatedDays[key] = day;
+  
+    // עדכון ה-state עם האובייקט המעודכן
+    setMemorialDays(updatedDays);
+  
+    console.log("Updated MemorialDays:", updatedDays);
+  };
+  
+  
+
+  function name(params) {
+    //   const { name, value } = e.target;
+    //   setCommitmentDetails({
+    //     ...commitmentDetails,
+    //     [name]: value,
+    //   });
+    //   setEditedData({
+    //     ...editedData,
+    //     [name]: value,
+    //   });
+    // };
+  }
 
   return (
     <>
@@ -356,6 +393,7 @@ function CommitmentDetailsPage() {
               value={commitmentDetails.FirstName || ''}
               onChange={handleChange}
               className="mt-1 block w-full p-2 border border-gray-300 rounded"
+              readOnly
             />
           </label>
           <label>
@@ -366,6 +404,7 @@ function CommitmentDetailsPage() {
               value={commitmentDetails.LastName || ''}
               onChange={handleChange}
               className="mt-1 block w-full p-2 border border-gray-300 rounded"
+              readOnly
             />
           </label>
           <label>
@@ -376,6 +415,7 @@ function CommitmentDetailsPage() {
               value={commitmentDetails.CommitmentAmount || ''}
               onChange={handleChange}
               className="mt-1 block w-full p-2 border border-gray-300 rounded"
+
             />
           </label>
           <label>
@@ -478,12 +518,12 @@ function CommitmentDetailsPage() {
           </label>
           <label>
             יום הנצחה:
-            <input
-              type="date"
+            <ReactJewishDatePicker
               name="MemorialDay"
-              value={commitmentDetails.MemorialDay ? commitmentDetails.MemorialDay.substring(0, 10) : ''}
-              onChange={handleChange}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded"
+              value={MemorialDays[1]|| new Date()}
+              onClick={(day) => handleDateChange(1, day)}
+              isHebrew // ציין שמדובר בתאריך עברי
+              className="mt-2 block w-full p-2 border border-gray-300 rounded"
             />
           </label>
           <label>
@@ -498,20 +538,14 @@ function CommitmentDetailsPage() {
           </label>
           <label>
             קמפיין:
-            <select
+            <input
               name="CampainName"
+              type="text"
               value={commitmentDetails.CampainName || ''}
               onChange={handleChange}
               className="mt-1 block w-full p-2 border border-gray-300 rounded"
-              required
-            >
-              <option value="">בחר קמפיין</option>
-              {campaigns.map((campaign) => (
-                <option key={campaign._id} value={campaign.CampainName}>
-                  {campaign.CampainName}
-                </option>
-              ))}
-            </select>
+              readOnly
+            />
           </label>
         </div>
         <button

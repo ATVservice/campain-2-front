@@ -60,9 +60,9 @@ export const getCommitment = async () => {
   }
 }
 
-export const getCommitmentsByCampaign = async () => {
+export const getCommitmentsByCampaign = async (campainName) => {
   try {
-    const response = await apiConfig.get('/api/commitment'); 
+    const response = await apiConfig.get(`/api/commitment/getCommitmentsByCampaign/${campainName}`); 
     return response;
   } catch (error) {
     console.log(error);
@@ -223,8 +223,6 @@ export const addPeopleToCampain= async (data) => {
 export const getCommitmentInCampain= async (campainName) => {
   try {
     const response = await apiConfig.get(`/api/campain/get-commitment-in-campain/${campainName}`);
-    console.log(response);
-    
     return response;
   } catch (error) {
     console.log(error);

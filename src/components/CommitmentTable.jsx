@@ -14,8 +14,7 @@ function CommitmentTable({rowsData}) {
       const navigate = useNavigate();
       const [originalRowData, setOriginalRowData] = useState({});
       const [searchText, setSearchText] = useState('');
-    
-    
+  
       function convertExcelDate(excelDate) {
         // אקסל מתחיל את הספירה מ-1 בינואר 1900, לכן נוסיף את מספר הימים מאז
         const startDate = new Date(1900, 0, 1);
@@ -80,7 +79,7 @@ function CommitmentTable({rowsData}) {
               </button>
             );
           },
-          width: 110, 
+          width: 100, 
           headerClass: 'multi-line-header'
         },
         { 
@@ -109,8 +108,8 @@ function CommitmentTable({rowsData}) {
         { 
           headerName: 'משפחה', 
           field: 'LastName', 
-          minWidth: 90, 
-          maxWidth: 100, 
+          minWidth: 100, 
+          maxWidth: 120, 
           flex: 1, 
           ...commonColumnProps 
         },

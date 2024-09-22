@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { uploadPayment, getCampains,getCommitmentByAnashAndCampain,uploadCommitmentPayment,getCommitment } from '../requests/ApiRequests';
+import { uploadPayment, getCampains, getCommitmentByAnashAndCampain, uploadCommitmentPayment, getCommitment } from '../requests/ApiRequests';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-function PaymentForm({ onClose,  rowData, validatePayment,setRowData}) {
+function PaymentForm({ onClose, rowData, validatePayment, setRowData, campainName }) {
     const [formData, setFormData] = useState({
         AnashIdentifier: '',
         Amount: '',
         Date: '',
         PaymentMethod: '',
-        CampainName: ''
+        CampainName: campainName
     });
 
     const [campaigns, setCampaigns] = useState([]);
@@ -39,21 +39,21 @@ function PaymentForm({ onClose,  rowData, validatePayment,setRowData}) {
         e.preventDefault();
         console.log(formData);
         let commitmentRes = null;
-    
+
         try {
             // Validation before proceeding with payment
             if (formData.Amount <= 0) {
                 toast.error('הסכום לתשלום חייב להיות גדול מ-0');
                 return;
             }
-    
+
             commitmentRes = await getCommitmentByAnashAndCampain(formData.AnashIdentifier, formData.CampainName);
             formData.CommitmentId = commitmentRes.data?._id;
         } catch (error) {
             toast.error('התחייבות לא נמצאה');
             return;
         }
-    
+
         try {
             const response = validatePayment(commitmentRes.data, parseFloat(formData.Amount));
         } catch (error) {
@@ -63,7 +63,7 @@ function PaymentForm({ onClose,  rowData, validatePayment,setRowData}) {
 
             return;
         }
-    
+
         try {
             const res = await uploadCommitmentPayment(formData);
             toast.success('התשלום נוסף בהצלחה');
@@ -71,7 +71,7 @@ function PaymentForm({ onClose,  rowData, validatePayment,setRowData}) {
             toast.error(error.message);
             return;
         }
-    
+
         try {
             const response = await getCommitment();
             setRowData(response.data.data.commitment || []);
@@ -84,7 +84,7 @@ function PaymentForm({ onClose,  rowData, validatePayment,setRowData}) {
             onClose();
         }
     };
-    
+
     return (
         <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-500 bg-opacity-75 z-50">
             <div className="bg-white p-8 rounded-lg shadow-lg w-1/2">
@@ -114,7 +114,7 @@ function PaymentForm({ onClose,  rowData, validatePayment,setRowData}) {
                             <option value="הו&quot;ק בנקאית">הו"ק בנקאית</option>
                         </select>
                     </div>
-                    <div>
+                    {!campainName&&<div>
                         <label>קמפיין:</label>
                         <select name="CampainName" value={formData.CampainName} onChange={handleChange} required>
                             <option value="">בחר קמפיין</option>
@@ -125,6 +125,7 @@ function PaymentForm({ onClose,  rowData, validatePayment,setRowData}) {
                             ))}
                         </select>
                     </div>
+                    }
                     <div className="flex justify-end">
                         <button type="button" onClick={onClose} className="mr-4 px-4 py-2 bg-red-500 text-white rounded">ביטול</button>
                         <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded">שמור טופס</button>
