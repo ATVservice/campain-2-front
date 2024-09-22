@@ -117,28 +117,7 @@ function CampainTable({ rowData }) {
       sortable: true,
       filter: true,
       width: 120,
-    },
-    {
-      headerName: 'פעיל',
-      field: 'isActive',
-      editable: true,
-      width: 80,
-      cellRenderer: (params) => {
-        return (
-          <input
-            type="checkbox"
-            checked={params.value}
-            disabled
-            style={{
-              width: '15px',
-              height: '15px',
-              margin: 'auto'
-            }}
-
-          />
-        );
-      },
-    },
+    }
     // {
     //   headerName: 'הוספה לקמפיין',
     //   cellRenderer: ActionCellRenderer,

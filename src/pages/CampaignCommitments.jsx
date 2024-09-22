@@ -4,7 +4,7 @@ import * as XLSX from 'xlsx';
 import CommitmentForm from '../components/ManualCommitmentForm';
 import PaymentForm from '../components/ManualPaymentForm';
 import DetailModal from '../components/DetailModal';
-import { getCommitmentsByCampaign, uploadCommitment, uploadCommitmentPayment, getCampains } from '../requests/ApiRequests'; // הפונקציה המעודכנת
+import { getCommitmentsByCampaign, getCommitmentByAnashAndCampain, uploadCommitment, uploadCommitmentPayment, getCampains, getCommitment } from '../requests/ApiRequests'; // הפונקציה המעודכנת
 import CommitmentTable from "../components/CommitmentTable";
 
 function CampaignCommitments() {  
@@ -27,16 +27,14 @@ function CampaignCommitments() {
         'הנצחה': 'Commemoration',
         'מספר התחייבות': 'CommitmentId',
         'סכום': 'Amount',
-        'תאריך': 'Date',
-        'קמפיין': 'CampainName'
-    
+        'תאריך': 'Date',    
       };
       const { campainName } = useParams();// מקבל את מזהה הקמפיין מ-URL
       const [uploadingData, setUploadingData] = useState([]);
       const [isFormOpen, setIsFormOpen] = useState(false);
       const [isPaymentFormOpen, setIsPaymentFormOpen] = useState(false);
       const [file, setFile] = useState(null);
-      const [rowData, setRowData] = useState([]);
+      const [rowsData, setRowsData] = useState([]);
       const [gridApi, setGridApi] = useState(null);
       const navigate = useNavigate();
       const [originalRowData, setOriginalRowData] = useState({});
@@ -48,10 +46,8 @@ function CampaignCommitments() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await getCommitmentsByCampaign();
-                console.log(response.data.data.commitment);
-
-                setRowData(response.data.data.commitment || []);
+                const response = await getCommitmentsByCampaign(campainName);
+                setRowsData(response.data.data.commitment || []);
             } catch (error) {
                 console.error('Error fetching campaign commitments:', error);
             }
@@ -117,8 +113,6 @@ function CampaignCommitments() {
       };
     
       function validatePayment(commitment, paymentAmount) {
-        console.log(commitment);
-        console.log('enter');
         try {
           if (!commitment) {
             throw new Error('Commitment not found');
@@ -176,6 +170,7 @@ function CampaignCommitments() {
                 mappedRow[englishKey] = row[index];
               }
             }
+            mappedRow.CampainName=campainName
           });
           return mappedRow;
         }).filter(row => row.AnashIdentifier);
@@ -194,7 +189,6 @@ function CampaignCommitments() {
              
             commitmentResponse = await getCommitmentByAnashAndCampain(AnashIdentifier, campainName);
             row.CommitmentId = commitmentResponse.data?._id;
-            console.log(commitmentResponse);
           } 
           catch (error) {
             try{
@@ -227,7 +221,6 @@ function CampaignCommitments() {
           }
           try {
             const validatePaymentRes = validatePayment(commitmentResponse.data, paymentAmount);
-            console.log(validatePaymentRes);
           }
           catch (error) {
             console.error('Error:', error);
@@ -267,8 +260,10 @@ function CampaignCommitments() {
         }
         try {
           if(numOfSucces > 0){
-          const response = await getCommitment();
-          setRowData(response.data.data.commitment || []);
+          const response = await getCommitmentsByCampaign(campainName);
+          console.log(response);
+          
+          setRowsData(response.data.data.commitment || []);
         } 
       }
         catch (error) {
@@ -278,15 +273,7 @@ function CampaignCommitments() {
         // הצגת המודל עם המידע על ההצלחות והכישלונות
         showFeedbackModal({ success: numOfSucces, failed: failedData,isPayments: true});
       };
-    
-              
-    
-      
-      
-      
-      
-      
-    
+
     
       const handleFileSubmit = async () => {
         fileRef.current.value = null;
@@ -320,6 +307,7 @@ function CampaignCommitments() {
                 mappedRow[englishKey] = row[index];
               }
             }
+            mappedRow.CampainName=campainName
           });
     
           // בדיקות נוספות לפני הוספת הנתונים
@@ -418,8 +406,9 @@ function CampaignCommitments() {
               })));
               if(numberOfSuccess > 0)
               {
-                const res = await getCommitment();
-                setRowData(res.data.data.commitment || []);
+                const res = await getCommitmentsByCampaign(campainName);
+                console.log(res);
+                setRowsData(res.data.data.commitment || []);
               }
     
               // הצגת המידע במודל
@@ -472,7 +461,9 @@ function CampaignCommitments() {
             </div>
             {isPaymentFormOpen && (
                 <PaymentForm
-                    onClose={handleClosePaymentForm} rowData={rowData} validatePayment={validatePayment} setRowData={setRowData}
+                    onClose={handleClosePaymentForm}
+                    rowData={rowsData} validatePayment={validatePayment}
+                    setRowData={setRowsData} campainName={campainName}
                 />
             )}
 
@@ -480,6 +471,7 @@ function CampaignCommitments() {
                 <CommitmentForm
                     onClose={handleCloseForm}
                     onSubmit={handleFormSubmit}
+                    campainName={campainName}
                 />
             )}
             {feedbackData && (
@@ -489,7 +481,7 @@ function CampaignCommitments() {
                 />
             )}
 
-            <CommitmentTable rowData={rowData} />
+            {rowsData&&<CommitmentTable rowsData={rowsData} />}
         </div>
     );
 }

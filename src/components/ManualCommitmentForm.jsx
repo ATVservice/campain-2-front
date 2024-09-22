@@ -3,7 +3,7 @@ import { uploadCommitment, getCampains, getUserDetails, getCommitment } from '..
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-function CommitmentForm({ onClose, onSubmit }) {
+function CommitmentForm({ onClose, onSubmit, campainName}) {
     const [formData, setFormData] = useState({
         AnashIdentifier: '',
         PersonID: '',
@@ -19,9 +19,9 @@ function CommitmentForm({ onClose, onSubmit }) {
         PaymentMethod: '',
         Notes: '',
         ResponseToFundraiser: '',
-        CampainName: ''
+        CampainName: campainName
     });
-
+    
     const [campaigns, setCampaigns] = useState([]);
 
     useEffect(() => {
@@ -181,6 +181,7 @@ function CommitmentForm({ onClose, onSubmit }) {
                         <label>משפחה:</label>
                         <input className="bg-gray-200 outline-none cursor-auto" type="text" name="LastName" value={formData.LastName} onChange={handleChange} readOnly />
                     </div>
+                    {!campainName&&
                     <div>
                         <label>קמפיין:</label>
                         <select name="CampainName" value={formData.CampainName} onChange={handleChange}>
@@ -192,6 +193,7 @@ function CommitmentForm({ onClose, onSubmit }) {
                             ))}
                         </select>
                     </div>
+                    }
                     <div>
                         <label>סכום התחייבות:</label>
                         <input type="Number" name="CommitmentAmount" value={formData.CommitmentAmount} onChange={handleChange} />
