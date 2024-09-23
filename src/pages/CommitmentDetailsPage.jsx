@@ -7,6 +7,7 @@ import { FaTrash } from 'react-icons/fa';
 import Modal from 'react-modal';
 import { ReactJewishDatePicker } from "react-jewish-datepicker";
 import "react-jewish-datepicker/dist/index.css";
+import { set } from 'date-fns';
 
 Modal.setAppElement('#root');
 
@@ -20,7 +21,7 @@ function CommitmentDetailsPage() {
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false); // עבור הטופס להוספת תשלום
   const [payments, setPayments] = useState([]);
   const [paymentData, setPaymentData] = useState({ Amount: '', Date: '', PaymentMethod: '' }); // נתוני התשלום
-  const [MemorialDays, setMemorialDays] = useState({});
+  const [MemorialDays, setMemorialDays] = useState([]);
 
   const openModal = (e) => {
     e.preventDefault();
@@ -115,7 +116,8 @@ function CommitmentDetailsPage() {
     if (Object.keys(editedData).length > 0) {
       try {
         setIsLoading(true);
-        const commitmentEditedData = { ...editedData, commitmentId: commitmentDetails._id, MemorialDays: MemorialDays };
+        const MemorialDaysData = MemorialDays.filter((day) => day.date);
+        const commitmentEditedData = { ...editedData, commitmentId: commitmentDetails._id, MemorialDays: MemorialDaysData };
         console.log(commitmentEditedData);
         
         const response = await updateCommitmentDetails(commitmentDetails._id, commitmentEditedData);
@@ -215,60 +217,6 @@ function CommitmentDetailsPage() {
     }
   };
 
-  const updateCommitmentAfterPayment = async (commitmentId, paymentAmount) => {
-    try {
-      const response = await getCommitmentDetails(commitmentId);
-      const commitment = response.data.commitmentDetails;
-
-      if (!commitment) {
-        throw new Error('Commitment not found');
-      }
-
-      const updatedAmountPaid = (commitment.AmountPaid || 0) + paymentAmount;
-      const updatedAmountRemaining = (commitment.CommitmentAmount || 0) - updatedAmountPaid;
-      const updatedPaymentsMade = (commitment.PaymentsMade || 0) + 1;
-      const updatedPaymentsRemaining = (commitment.PaymentsRemaining || 0) - 1;
-
-      // בדיקות תקינות לאחר העדכון
-      if (updatedAmountPaid > commitment.CommitmentAmount) {
-        toast.error('הסכום ששולם לא יכול לחרוג מסכום ההתחייבות');
-        console.error('Amount paid cannot exceed commitment amount.');
-        return false;
-      }
-      if (updatedAmountRemaining < 0) {
-        toast.error('סכום התשלום חורג מהיתרה שנותרה לתשלום');
-        console.error('Payment amount exceeds remaining amount.');
-        return false;
-      }
-      if (updatedAmountRemaining > commitment.CommitmentAmount) {
-        toast.error('הסכום שנותר לתשלום לא יכול לחרוג מסכום ההתחייבות');
-        console.error('Remaining amount cannot exceed commitment amount.');
-        return false;
-      }
-      if (updatedPaymentsRemaining < 0) {
-        toast.error('מספר התשלומים שנותרו אינו יכול להיות שלילי');
-        console.error('Number of remaining payments cannot be negative.');
-        return false;
-      }
-      if (updatedPaymentsMade > commitment.NumberOfPayments) {
-        toast.error('מספר התשלומים שבוצעו לא יכול לחרוג מסך התשלומים שהוגדרו');
-        console.error('Number of payments made cannot exceed total number of payments.');
-        return false;
-      }
-
-      await updateCommitmentDetails(commitmentId, {
-        AmountPaid: updatedAmountPaid,
-        AmountRemaining: updatedAmountRemaining,
-        PaymentsMade: updatedPaymentsMade,
-        PaymentsRemaining: updatedPaymentsRemaining
-      });
-
-      return true;
-    } catch (error) {
-      console.error('Error updating commitment after payment:', error);
-      return false;
-    }
-  };
 
 
 
@@ -277,10 +225,12 @@ function CommitmentDetailsPage() {
     const fetchCommitmentDetails = async () => {
       try {
         const result = await getCommitmentDetails(commitmentId);
+        console.log(result);
         if (result.data) {
           const { commitmentDetails, payments } = result.data;
           setCommitmentDetails(commitmentDetails || {});
           setPayments(Array.isArray(payments) ? payments : [payments]);
+          setMemorialDays(commitmentDetails.MemorialDays || []);
         }
       } catch (error) {
         console.error('Error fetching commitment details:', error);
@@ -324,38 +274,39 @@ function CommitmentDetailsPage() {
     }
   };
 
-  const handleDateChange = (e, day) => {
-    console.log(e);
-    console.log("Selected day:", day); // בדוק את מבנה האובייקט day
+  const handleDateChange = (index, memorialDate) => {
+   console.log(index, memorialDate);
+   setMemorialDays(prevMemorialDays => {
+     const newMemorialDays = [...prevMemorialDays];
+     newMemorialDays[index] = { ...newMemorialDays[index], date: memorialDate.date,hebrewDate: memorialDate.jewishDateStrHebrew };
+     return newMemorialDays;
+   })
+
     
-    const key = e; // כאן e מייצג את המפתח, למשל אינדקס
-  
-    // יצירת עותק חדש של האובייקט הקיים
-    const updatedDays = { ...MemorialDays };
-  
-    // עדכון היום במפתח המתאים
-    updatedDays[key] = day;
-  
-    // עדכון ה-state עם האובייקט המעודכן
-    setMemorialDays(updatedDays);
-  
-    console.log("Updated MemorialDays:", updatedDays);
   };
+  function AddMemorialDay()
+  {
+    console.log();
+
+    if (MemorialDays.length === 0 || MemorialDays[MemorialDays.length - 1].hasOwnProperty("date")) {
+      // Handle the case where there are no memorial days, or the last one doesn't have a "date" property
+      setMemorialDays([...MemorialDays, {}]);
+    }
+        
+
+  }
+  function handelCommartionChange(index, event) {
+    
+
+    setMemorialDays(prevMemorialDays => {
+      const newMemorialDays = [...prevMemorialDays];
+      newMemorialDays[index][event.target.name] = event.target.value;
+      return newMemorialDays;
+    })
+  }
   
   
 
-  function name(params) {
-    //   const { name, value } = e.target;
-    //   setCommitmentDetails({
-    //     ...commitmentDetails,
-    //     [name]: value,
-    //   });
-    //   setEditedData({
-    //     ...editedData,
-    //     [name]: value,
-    //   });
-    // };
-  }
 
   return (
     <>
@@ -517,26 +468,6 @@ function CommitmentDetailsPage() {
             />
           </label>
           <label>
-            יום הנצחה:
-            <ReactJewishDatePicker
-              name="MemorialDay"
-              value={MemorialDays[1]|| new Date()}
-              onClick={(day) => handleDateChange(1, day)}
-              isHebrew // ציין שמדובר בתאריך עברי
-              className="mt-2 block w-full p-2 border border-gray-300 rounded"
-            />
-          </label>
-          <label>
-            הנצחה:
-            <input
-              type="text"
-              name="Commemoration"
-              value={commitmentDetails.Commemoration || ''}
-              onChange={handleChange}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded"
-            />
-          </label>
-          <label>
             קמפיין:
             <input
               name="CampainName"
@@ -547,6 +478,59 @@ function CommitmentDetailsPage() {
               readOnly
             />
           </label>
+          <div>
+            {MemorialDays.length > 0 && (
+              MemorialDays.map((memorialDay, index) => (
+                <div key={index}>
+                  <label>
+                    יום הנצחה:
+                    <ReactJewishDatePicker
+                      value={memorialDay.date?new Date(memorialDay.date):new Date()}
+                      onClick={(day) => handleDateChange(index, day)}
+                      isHebrew // ציין שמדובר בתאריך עברי
+                      className="mt-2 block w-full p-2 border border-gray-300 rounded"
+                    />
+                  </label>
+                  <label>
+              הנצחה:
+              <input
+                type="text"
+                name="Commeration"
+                value={memorialDay.Commeration || ''}
+                onChange={(e)=>handelCommartionChange(index, e)}
+                className="mt-1 block w-full p-2 border border-gray-300 rounded"
+              />
+            </label> 
+
+                  
+                </div>
+              ))
+            )}
+              
+            <button
+            type='button'
+             onClick={()=>AddMemorialDay()} className="m-2 p-2 bg-blue-500 text-white rounded hover:bg-blue-600">+</button>
+            {/* <label>
+              יום הנצחה:
+              <ReactJewishDatePicker
+                name="MemorialDay"
+                value={MemorialDays[1]|| new Date()}
+                onClick={(day) => handleDateChange(1, day)}
+                isHebrew // ציין שמדובר בתאריך עברי
+                className="mt-2 block w-full p-2 border border-gray-300 rounded"
+              />
+            </label>
+            <label>
+              הנצחה:
+              <input
+                type="text"
+                name="Commemoration"
+                value={commitmentDetails.Commemoration || ''}
+                onChange={handleChange}
+                className="mt-1 block w-full p-2 border border-gray-300 rounded"
+              />
+            </label> */}
+          </div>
         </div>
         <button
           type="submit"
