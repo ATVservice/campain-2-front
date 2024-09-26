@@ -1,12 +1,9 @@
 import { CgDetailsMore } from "react-icons/cg";
 import { useNavigate, useParams } from "react-router-dom";
 import React, { useState, useEffect, useRef } from 'react';
-import * as XLSX from 'xlsx';
-import { uploadPeople, getPeople, upadateUserDetails, deleteUser } from '../requests/ApiRequests';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-import { max } from "date-fns";
 
 
 function CampainTable({ rowData }) {
@@ -54,26 +51,12 @@ function CampainTable({ rowData }) {
       }
     },
     {
-      displayKey: 'notContains',
-      displayName: 'לא מכיל',
-      test: (filterValue, cellValue) => {
-        return cellValue != null && cellValue.toString().toLowerCase().indexOf(filterValue.toLowerCase()) === -1;
-      }
-    },
-    {
       displayKey: 'startsWith',
       displayName: 'מתחיל ב',
       test: (filterValue, cellValue) => {
         return cellValue != null && cellValue.toString().toLowerCase().startsWith(filterValue.toLowerCase());
       }
     },
-    {
-      displayKey: 'endsWith',
-      displayName: 'מסתיים ב',
-      test: (filterValue, cellValue) => {
-        return cellValue != null && cellValue.toString().toLowerCase().endsWith(filterValue.toLowerCase());
-      }
-    }
   ];
   const CustomHeader = (props) => {
     return <div dangerouslySetInnerHTML={{ __html: props.displayName }} />;
