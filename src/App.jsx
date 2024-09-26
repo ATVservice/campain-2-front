@@ -19,6 +19,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import AddPersonPage from './pages/AddPersonPage';
 import MemorialDay2 from './pages/MemorialDay2';
 import Modal from 'react-modal';
+import MemorialDayDetails from './pages/MemorialDayDetails';
+import AddMemorialDayToPerson from './pages/AddMemorialDayToPerson';
 // import AlfonChangesPage from './pages/AlfonChangesPage';
 
 Modal.setAppElement('#root');
@@ -57,8 +59,8 @@ const App = () => {
               <Route path="/campaign-commitments/:campainName" element={<CampaignCommitments />} />
               <Route path="/add-person" element={<AddPersonPage />} />
               <Route path="/memorial-day-2" element={<MemorialDay2 />} />
-              {/* <Route path="/alfon-changes" element={<AlfonChangesPage />} /> */}
-              {/* Add other routes here if needed */}
+              <Route path="/memorial-day-details" element={<MemorialDayDetails />} />
+              <Route path="/add-memorial-day-to-person" element={<AddMemorialDayToPerson />} />
             </Routes>
           </div>
         </Layout>

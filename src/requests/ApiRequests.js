@@ -256,6 +256,46 @@ export const uploadCommitmentPayment = async (data) => {
     throw error
   }
 }
+export const AddMemorialDay = async (data) => {
+  try {
+    const response = await apiConfig.post(`/api/commitment/add-memorial-day`,data);
+    return response;
+  } catch (error) {
+    throw error
+  }
+}
+export const GetEligblePeopleToMemmorialDay = async (campainName) => {
+  try {
+    const response = await apiConfig.get(`/api/commitment/get-eligible-people/${campainName}`);
+    return response;
+  } catch (error) {
+    throw error
+  }
+}
+export const DeleteMemorialDay = async (campainName,AnashIdentifier,date) => {
+  try {
+    const response = await apiConfig.delete(`/api/commitment/delete-memorial-day?AnashIdentifier=${AnashIdentifier}&CampainName=${campainName}&date=${date}`);
+    return response;
+  } catch (error) {
+    throw error
+  }
+}
+export const getCampainByName = async (campainName) => {
+  try {
+    const response = await apiConfig.get(`/api/campain/get-campain-by-name/${campainName}`);
+    return response;
+  } catch (error) {
+    throw error
+  }
+}
+export const getAllMemorialDates = async (campainName) => {
+  try {
+    const response = await apiConfig.get(`/api/campain/get-all-memorial-dates/${campainName}`);
+    return response;
+  } catch (error) {
+    throw error
+  }
+}
 
 
 

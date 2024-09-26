@@ -40,7 +40,6 @@ function AddToCampainTable({rowData,onAddPersonToCampain,searchText}) {
     
     const addToCampain = async (api, node) => {
         const {AnashIdentifier} = node.data
-        console.log(AnashIdentifier)
 
         onAddPersonToCampain(AnashIdentifier);
     };
@@ -57,20 +56,6 @@ function AddToCampainTable({rowData,onAddPersonToCampain,searchText}) {
             displayName: 'מכיל',
             test: (filterValue, cellValue) => {
                 return cellValue != null && cellValue.toString().toLowerCase().indexOf(filterValue.toLowerCase()) >= 0;
-            }
-        },
-        {
-            displayKey: 'notContains',
-            displayName: 'לא מכיל',
-            test: (filterValue, cellValue) => {
-                return cellValue != null && cellValue.toString().toLowerCase().indexOf(filterValue.toLowerCase()) === -1;
-            }
-        },
-        {
-            displayKey: 'startsWith',
-            displayName: 'מתחיל ב',
-            test: (filterValue, cellValue) => {
-                return cellValue != null && cellValue.toString().toLowerCase().startsWith(filterValue.toLowerCase());
             }
         },
         {
@@ -159,41 +144,31 @@ function AddToCampainTable({rowData,onAddPersonToCampain,searchText}) {
       
   
   return (
-
-      <div className="ag-theme-alpine custom-theme" style={gridStyle} >
-      {(
-  <AgGridReact
-    columnDefs={columns}
-    rowData={rowData}
-    pagination={true}
-    paginationPageSize={2} // Increase the pagination page size as needed
-    paginationPageSizeSelector={pageSizeOptions} // this property is not a valid AG Grid property
-    domLayout="autoHeight" // Use autoHeight layout to adjust grid height automatically
-    enableRtl={true}
-    quickFilterText={searchText} // Applying the search text to filter the grid
-    suppressClickEdit={true}
-    onGridReady={onGridReady}
-    defaultColDef={{
-      filterParams: {
-        filterOptions: hebrewFilterOptions,
-        
-      },
-      flex: 1,
-      // headerClass: 'bg-blue-300 text-gray-700', 
-      minWidth: 100,
-      
-      
-    
-
-    }
-    
-  
-  }
-  />
-)}
-      </div>
-
-  )
+    <div className="ag-theme-alpine custom-theme" style={gridStyle}>
+      {
+        <AgGridReact
+          columnDefs={columns}
+          rowData={rowData}
+          pagination={true}
+          paginationPageSize={2} // Increase the pagination page size as needed
+          paginationPageSizeSelector={pageSizeOptions} // this property is not a valid AG Grid property
+          domLayout="autoHeight" // Use autoHeight layout to adjust grid height automatically
+          enableRtl={true}
+          quickFilterText={searchText} // Applying the search text to filter the grid
+          suppressClickEdit={true}
+          onGridReady={onGridReady}
+          defaultColDef={{
+            filterParams: {
+              filterOptions: hebrewFilterOptions,
+            },
+            flex: 1,
+            // headerClass: 'bg-blue-300 text-gray-700',
+            minWidth: 100,
+          }}
+        />
+      }
+    </div>
+  );
 }
 
 export default AddToCampainTable
