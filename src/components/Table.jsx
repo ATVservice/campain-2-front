@@ -6,99 +6,224 @@ import { uploadPeople, getPeople, upadateUserDetails, deleteUser } from '../requ
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-import { AG_GRID_LOCALE_IL, translations } from './Utils';
-import { FaPencilAlt, FaCheck, FaTimes, FaTrash } from "react-icons/fa";
+import { AG_GRID_LOCALE_IL ,translations} from './Utils';
+import { FaRegEdit } from "react-icons/fa";
+import { AiOutlineDelete } from "react-icons/ai";
+import { GrUpdate } from "react-icons/gr";
+import { MdOutlineCancel } from "react-icons/md";
 
 
 function Table({ rowData, setRowData }) {
   // console.log(rowData)
+    const navigate = useNavigate();
+    const [originalRowData, setOriginalRowData] = useState({});
+    const [searchText, setSearchText] = useState('');
+    const [gridApi, setGridApi] = useState(null);
+    const [isFilterApplied, setIsFilterApplied] = useState(false);
 
-  const navigate = useNavigate();
-  const [originalRowData, setOriginalRowData] = useState({});
-  const [searchText, setSearchText] = useState('');
-  const [gridApi, setGridApi] = useState(null);
-  const [isFilterApplied, setIsFilterApplied] = useState(false);
-
-
-
-
-  const onSearch = (event) => {
-    setSearchText(event.target.value);
-  };
-  const hebrewToEnglishMapping = {
-    'מזהה אנש': 'AnashIdentifier',
-    'שם': 'FirstName',
-    'משפחה': 'LastName',
-    'כתובת': 'Address',
-    'מספר': 'addressNumber',
-    'עיר': 'City',
-    'טל נייד': 'MobilePhone',
-    'טל בית': 'HomePhone',
-    'פעיל': 'isActive',
-  };
-  const ActionCellRenderer = (props) => {
-    const isCurrentRowEditing = props.api.getEditingCells().some((cell) => cell.rowIndex === props.node.rowIndex);
-    if (isCurrentRowEditing) {
-      return (
-        <div style={{ display: 'flex', gap: '15px', alignItems: 'center', padding: '10px 0' }}>
-          <button className="action-button update" onClick={() => onActionClick('update', props.api, props.node)}>
-            <FaCheck style={{ fontSize: '20px', color: 'green' }} />
-          </button>
-          <button className="action-button cancel" onClick={() => onActionClick('cancel', props.api, props.node)}>
-            <FaTimes style={{ fontSize: '20px', color: 'red' }} />
-          </button>
-        </div>
-      );
-    } else {
-      return (
-        <div style={{ display: 'flex', gap: '15px', alignItems: 'center', padding: '10px 0' }}>
-          <button className="action-button edit" onClick={() => onActionClick('edit', props.api, props.node)}>
-            <FaPencilAlt style={{ fontSize: '18px', color: 'blue' }} />
-          </button>
-          <button className="action-button delete" onClick={() => onActionClick('delete', props.api, props.node)}>
-            <FaTrash style={{ fontSize: '18px', color: 'red' }} />
-          </button>
-        </div>
-      );
-    }
-  };
-
-  const onActionClick = async (action, api, node) => {
-    switch (action) {
-      case 'edit':
-        api.startEditingCell({
-          rowIndex: node.rowIndex,
-          colKey: api.getColumnDefs()[0].field // Use the first column's field as the starting edit cell
-        });
-        break;
-      case 'delete':
-        const isConfirmed = window.confirm('האם את/ה בטוח שאת/ה רוצה למחוק?');
-        if (isConfirmed) {
-          const originalRowData = node.data;
-          try {
-            const res = await deleteUser(originalRowData.AnashIdentifier);
-            console.log(res);
-            api.applyTransaction({
-              remove: [node.data]
-            });
-          } catch (error) {
-            console.error(error);
-          }
+    
+    
+    
+    const onSearch = (event) => {
+      setSearchText(event.target.value);
+    };
+    const hebrewToEnglishMapping = {
+        'מזהה אנש': 'AnashIdentifier',
+        'שם': 'FirstName',
+        'משפחה': 'LastName',
+        'כתובת': 'Address',
+        'מספר': 'AddressNumber',
+        'עיר': 'City',
+        'טל נייד': 'MobilePhone',
+        'טל בית': 'HomePhone',
+        'פעיל': 'isActive',
+      };
+      const ActionCellRenderer = (props) => {
+        const isCurrentRowEditing = props.api.getEditingCells().some((cell) => cell.rowIndex === props.node.rowIndex);
+    
+        if (isCurrentRowEditing) {
+            return (
+                <div style={{ display: 'flex', gap: '15px' }} className="h-full ">
+                    <button className="action-button update p-1 px-2 text-xl bg-green-100	rounded-sm" onClick={() => onActionClick('update', props.api, props.node)}><GrUpdate/></button>
+                    <button className="action-button cancel p-1 px-2  text-xl bg-gray-200	rounded-sm" onClick={() => onActionClick('cancel', props.api, props.node)}><MdOutlineCancel/> </button>
+                </div>
+            );
+        } else {
+            return (
+                <div style={{ display: 'flex', gap: '15px' }} className="h-full "> 
+                    <button className="action-button edit   p-1 px-2 text-xl bg-blue-100	rounded-sm	 	" onClick={() => onActionClick('edit', props.api, props.node)}><FaRegEdit /> </button>
+                    <button className="action-button delete p-1 px-2  text-xl bg-red-100	rounded-sm			" onClick={() => onActionClick('delete', props.api, props.node)}> <AiOutlineDelete/></button>
+                </div>
+            );
         }
-        break;
+    };
+    
+    const onActionClick = async (action, api, node) => {
+        switch (action) {
+          case 'edit':
+            api.startEditingCell({
+              rowIndex: node.rowIndex,
+              colKey: api.getColumnDefs()[0].field // Use the first column's field as the starting edit cell
+            });
+            break;
+          case 'delete':
+            const isConfirmed = window.confirm('האם את/ה בטוח שאת/ה רוצה למחוק?');
+            if (isConfirmed) {
+              const originalRowData = node.data;
+              try {
+                const res = await deleteUser(originalRowData.AnashIdentifier);
+                console.log(res);
+                api.applyTransaction({
+                  remove: [node.data]
+                });
+              } catch (error) {
+                console.error(error);
+              }
+            }
+              break;
+    
+    
+    
+          case 'update':
+            api.stopEditing(false);
+            const updatedData = node.data; // Get the updated row data
+            let editedCells = {};
+      
+            // Compare original data with updated data
+            Object.keys(updatedData).forEach((key) => {
+              if (updatedData[key] !== originalRowData[key]) {
+                editedCells[key] = updatedData[key]; // Store only the changed cells
+              }
+            });
+            if ( Object.keys(updatedData).length > 0) {
+              try {
+               editedCells = {...editedCells,AnashIdentifier:node.data.AnashIdentifier};
+                const res = await upadateUserDetails(editedCells);
+                console.log(res);
+              } catch (error) {
+                console.error(error);
+              }
+              
+            }
+      
+            console.log('Edited cells:', editedCells); // Log or process the edited cells
+      
+            break;
+          case 'cancel':
+            api.stopEditing(true);
+            break;
+        }
+      };
+      const hebrewFilterOptions = [
+        {
+            displayKey: 'contains',
+            displayName: 'מכיל',
+            test: (filterValue, cellValue) => {
+                return cellValue != null && cellValue.toString().toLowerCase().indexOf(filterValue.toLowerCase()) >= 0;
+            }
+        },
+        {
+            displayKey: 'startsWith',
+            displayName: 'מתחיל ב',
+            test: (filterValue, cellValue) => {
+                return cellValue != null && cellValue.toString().toLowerCase().startsWith(filterValue.toLowerCase());
+            }
+        },
+    ];
 
 
-
-      case 'update':
-        api.stopEditing(false);
-        const updatedData = node.data; // Get the updated row data
-        let editedCells = {};
-
-        // Compare original data with updated data
-        Object.keys(updatedData).forEach((key) => {
-          if (updatedData[key] !== originalRowData[key]) {
-            editedCells[key] = updatedData[key]; // Store only the changed cells
+    const CustomHeader = (props) => {
+      return <div dangerouslySetInnerHTML={{ __html: props.displayName }} />;
+    };
+    
+    
+      const columns = [
+        {
+          headerName: 'פרטים מלאים',
+          field: 'userDetails',
+          editable: false,
+          cellRenderer: (params) =>
+            
+            {
+            const handleDetailsClick = () => {
+              const AnashIdentifier = params.data.AnashIdentifier; // Replace 'id' with the actual field name for the user ID
+              navigate(`/user-details/${AnashIdentifier}`);
+            };
+      
+            return (
+              <button onClick={() => handleDetailsClick()}>
+                <CgDetailsMore style={{ fontSize: '20px' }} />
+              </button>
+            );  
+          },
+          width: 70,
+          headerComponent: CustomHeader,
+          headerComponentParams: {
+            displayName: 'פרטים<br>מלאים'
           }
+        },
+        
+        { headerName: 'מזהה אנש', field: 'AnashIdentifier', editable: false, sortable: true, filter: true,width: 120 },
+        { headerName: 'שם', field: 'FirstName', editable: true, sortable: true, filter: true },
+        { headerName: 'משפחה', field: 'LastName', editable: true, sortable: true, filter: true },
+        { headerName: 'כתובת', field: 'Address', editable: true, sortable: true, filter: true },
+        { headerName: 'מספר', field: 'addressNumber', editable: true, sortable: true, filter: true,width: 100 },
+        { headerName: 'עיר', field: 'City', editable: true, sortable: true, filter: true,width: 100 },
+        {
+          headerName: 'טל בית',
+          field: 'HomePhone',
+          editable: true,
+          sortable: true,
+          filter: true,
+          width: 120,
+        },   
+        {
+          headerName: 'פעיל',
+          field: 'isActive',
+          filter: true,
+          width: 100,
+          filterParams: {
+            defaultOption: 'true',
+          },
+          
+                       
+          
+          // editable: true,
+          
+          // width: 80,
+          cellRenderer: (params) => {
+            return (
+              <input 
+              id={`isActive-${params.data.AnashIdentifier}`} 
+
+                type="checkbox" 
+                checked={params.value.toString() === 'true'} 
+                disabled 
+                style={{ 
+                  width: '15px', 
+                  height: '15px', 
+                  margin: 'auto' 
+                }}
+        
+              />
+            );
+              },
+        },
+        {
+          headerName: 'עריכה/מחיקה',
+          cellRenderer: ActionCellRenderer,
+          editable: false,
+          colId: 'action',
+          width: 150,
+        },
+      ];
+      const onRowEditingStarted = (params) => {
+        const originalData = { ...params.data }; // Clone the original row data
+        setOriginalRowData(originalData);
+        params.api.refreshCells({
+          columns: ["action"],
+          rowNodes: [params.node],
+          force: true
         });
         if (Object.keys(updatedData).length > 0) {
           try {
