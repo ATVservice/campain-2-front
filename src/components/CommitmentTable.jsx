@@ -101,7 +101,7 @@ function CommitmentTable({rowsData}) {
           headerName: 'שם', 
           field: 'FirstName', 
           minWidth: 90, 
-          maxWidth: 100, 
+          maxWidth: 130, 
           flex: 1, 
           ...commonColumnProps 
         },
@@ -226,7 +226,7 @@ function CommitmentTable({rowsData}) {
       };
     
       const gridStyle = {
-        height: '84vh',
+        height: '80vh',
         overflow: 'auto',
         overflowX: 'hidden',
         margin: '0 auto',
