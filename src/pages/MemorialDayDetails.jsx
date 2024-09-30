@@ -87,7 +87,6 @@ function MemorialDayDetails() {
         console.log(res);
 
         toast.success("הנצחה נמחקה בהצלחה");
-        navigate(-1);
       }
     }
     catch(error)
@@ -140,7 +139,6 @@ function MemorialDayDetails() {
     if(res.status === 200)
     {
       toast.success("הנצחה נוספה בהצלחה");
-      navigate(-1);
       
     }
     else
