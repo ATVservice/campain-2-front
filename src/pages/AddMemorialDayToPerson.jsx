@@ -61,7 +61,6 @@ function AddMemorialDayToPerson() {
           toast.success('הנצחה נוספה בהצלחה', {
             autoClose: 1000,
           });
-          navigate(-1);
           setIsLoading(false);
         }
         console.log(response);

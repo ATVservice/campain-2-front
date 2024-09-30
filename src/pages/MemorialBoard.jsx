@@ -223,10 +223,11 @@ function getHebrewMonths(year) {
       elements.push(
         <div
           key={i}
-          className={`py-[10px] border border-gray-300 flex items-center justify-center cursor-pointer ${backgroundColor}`}
+          className={`py-[10px] border border-gray-300 flex flex-col items-center flex-wrap justify-center cursor-pointer ${backgroundColor}`}
           onClick={addOrShowMemorialMemorialDay}
         >
           <div className="text-xl">{gematriya(i)}</div>
+          <div className="text-xs ">{isCampaignDay?isCampaignDay.CampainName:""}</div>
         </div>
       );
     }

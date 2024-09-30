@@ -285,7 +285,7 @@ function CommitmentDetailsPage() {
         console.error("Error fetching commitment details:", error);
         toast.error("שגיאה בטעינת נתוני ההתחייבות");
       }
-      if (!commitmentRes.data) {
+      if (!commitmentRes.data|| !commitmentRes.data.commitmentDetails.CampainName) {
         return;
       }
       try {
@@ -568,83 +568,91 @@ function CommitmentDetailsPage() {
               className="mt-1 block w-full p-2 border border-gray-300 rounded"
             />
           </label>
-          <label>
-            קמפיין:
-            <input
-              name="CampainName"
-              type="text"
-              value={commitmentDetails.CampainName || ""}
-              onChange={handleChange}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded"
-              readOnly
-            />
-          </label>
+          {commitmentDetails.CampainName && (
+            <>
+              <label>
+                קמפיין:
+                <input
+                  name="CampainName"
+                  type="text"
+                  value={commitmentDetails.CampainName || ""}
+                  onChange={handleChange}
+                  className="mt-1 block w-full p-2 border border-gray-300 rounded"
+                  readOnly
+                />
+              </label>
 
-          <button
-            type="button"
-            onClick={() => AddMemorialDay()}
-            className="m-2 p-2 bg-blue-500 text-white rounded hover:bg-blue-600 w-[40px]"
-          >
-            +
-          </button>
-        </div>
-        <p className="flex items-center">
-          סכום מינימום ליום הנצחה:&nbsp;	
-          <span className="flex items-center">
-            {campain.minimumAmountForMemorialDay}
-            <BiShekel />
-          </span>
-        </p>
-        <p>
-          מספר ימי זכות שנותרו ליום הנצחה:&nbsp;	
-          <span>
-            {Math.floor(
-              commitmentDetails.CommitmentAmount /
-                campain.minimumAmountForMemorialDay
-            ) - MemorialDays.length}
-          </span>
-        </p>
-        <div className="col-span-1 md:col-span-5 grid grid-cols-1 md:grid-cols-5">
-          {MemorialDays.length > 0 &&
-            MemorialDays.map((memorialDay, index) => (
-              <div
-                key={index}
-                className="border border-gray-300 m-2 p-2 rounded relative"
-              >
-                  <button
-                    type="button"
-                    onClick={() => removeMemorialDay(index)}
-                    className="text-red-500 cursor-pointer hover:text-red-700 absolute top-1 left-1"
-                  >
-                    x
-                  </button>
-                <label>
-                  יום הנצחה:
-                  <ReactJewishDatePicker
-                    value={
-                      memorialDay.date
-                        ? new Date(memorialDay.date)
-                        : campainStartDate
-                    }
-                    onClick={(day) => handleDateChange(index, day)}
-                    isHebrew // ציין שמדובר בתאריך עברי
-                    className="mt-2 block w-full p-2 border border-gray-300 rounded"
-                    canSelect={(day) => allowedSelectionRange(day)}
-                  />
-                </label>
-                <label>
-                  הנצחה:
-                  <input
-                    type="text"
-                    name="Commeration"
-                    value={memorialDay.Commeration || ""}
-                    onChange={(e) => handelCommartionChange(index, e)}
-                    className="mt-1 block w-full p-2 border border-gray-300 rounded"
-                  />
-                </label>
+              <div>
+                <button
+                  type="button"
+                  onClick={() => AddMemorialDay()}
+                  className="m-2 p-2 bg-blue-500 text-white rounded hover:bg-blue-600 w-[40px]"
+                >
+                  +
+                </button>
+                <p className="flex items-center">
+                  סכום מינימום ליום הנצחה:&nbsp;
+                  <span className="flex items-center">
+                    {campain.minimumAmountForMemorialDay}
+                    <BiShekel />
+                  </span>
+                </p>
+                <p>
+                  מספר ימי זכות שנותרו ליום הנצחה:&nbsp;
+                  <span>
+                    {Math.floor(
+                      commitmentDetails.CommitmentAmount /
+                        campain.minimumAmountForMemorialDay
+                    ) - MemorialDays.length}
+                  </span>
+                </p>
               </div>
-            ))}
+
+              <div className="col-span-1 md:col-span-5 grid grid-cols-1 md:grid-cols-5">
+                {MemorialDays.length > 0 &&
+                  MemorialDays.map((memorialDay, index) => (
+                    <div
+                      key={index}
+                      className="border border-gray-300 m-2 p-2 rounded relative"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => removeMemorialDay(index)}
+                        className="text-red-500 cursor-pointer hover:text-red-700 absolute top-1 left-1"
+                      >
+                        x
+                      </button>
+                      <label>
+                        יום הנצחה:
+                        <ReactJewishDatePicker
+                          value={
+                            memorialDay.date
+                              ? new Date(memorialDay.date)
+                              : campainStartDate
+                          }
+                          onClick={(day) => handleDateChange(index, day)}
+                          isHebrew
+                          className="mt-2 block w-full p-2 border border-gray-300 rounded"
+                          canSelect={(day) => allowedSelectionRange(day)}
+                        />
+                      </label>
+                      <label>
+                        הנצחה:
+                        <textarea
+                          name="Commeration"
+                          value={memorialDay.Commeration || ""}
+                          onChange={(e) => handelCommartionChange(index, e)}
+                          className="mt-1 block w-full p-2 border border-gray-300 rounded"
+                          rows="3" // You can adjust the number of rows as needed
+                        ></textarea>
+                      </label>
+                    </div>
+                  ))}
+              </div>
+            </>
+          )}
         </div>
+
         <button
           type="submit"
           className="m-4 p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
