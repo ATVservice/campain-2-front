@@ -21,6 +21,8 @@ import MemorialDay2 from './pages/MemorialDay2';
 import Modal from 'react-modal';
 import MemorialDayDetails from './pages/MemorialDayDetails';
 import AddMemorialDayToPerson from './pages/AddMemorialDayToPerson';
+import EditCampaignPage from './pages/EditCampaignPage';
+import PettyCash from './pages/PettyCash';
 // import AlfonChangesPage from './pages/AlfonChangesPage';
 
 Modal.setAppElement('#root');
@@ -61,6 +63,8 @@ const App = () => {
               <Route path="/memorial-day-2" element={<MemorialDay2 />} />
               <Route path="/memorial-day-details" element={<MemorialDayDetails />} />
               <Route path="/add-memorial-day-to-person" element={<AddMemorialDayToPerson />} />
+              <Route path="/edit-campaign/:campainName" element={<EditCampaignPage />} />
+              <Route path="/petty-cash" element={<PettyCash />} />
             </Routes>
           </div>
         </Layout>

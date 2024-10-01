@@ -297,6 +297,15 @@ export const getAllMemorialDates = async (campainName) => {
   }
 }
 
+export const getTransactions = async () => {
+  try {
+    const response = await apiConfig.get('/api/transaction'); 
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 
 
   
