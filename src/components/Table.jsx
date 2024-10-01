@@ -182,6 +182,8 @@ function Table({rowData, setRowData}) {
           headerName: 'פעיל',
           field: 'isActive',
           filter: true,
+          editable: true,
+         
           width: 100,
           filterParams: {
             defaultOption: 'true',
