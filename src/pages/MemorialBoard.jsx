@@ -1,31 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useMemo  } from 'react';
 import { BiChevronLeft, BiChevronRight } from 'react-icons/bi';
 import { HDate, gematriya, months } from '@hebcal/hdate';
-import { getCampains } from "../requests/ApiRequests";
-import { ca } from 'date-fns/locale';
- 
+import { getCampains,getCommitment } from "../requests/ApiRequests";
+import { useNavigate,useSearchParams  } from 'react-router-dom';
+import MemorialDayDetails from './MemorialDayDetails';
+import AddMemorialDayToPerson from './AddMemorialDayToPerson';
+
 
 function MemorialBoard() {
-  const [campains, setCampains] = useState([]);
-
-  useEffect(() => {
-
-    const fetchData = async () => {
-      try {
-        const response = await getCampains();
-        console.log(new HDate(new Date( response.data.data.campains[0].startDate)).yy);
-        // console.log(new HDate().greg());
-        // console.log(new Date());
-        setCampains(response.data.data.campains);
-      } catch (error) {
-        console.error(error);
-      }
-
-    };
-    fetchData();
-
-  }, []);
-  
   const hebrewMonths = {
     'TISHREI': 'תשרי',
     'CHESHVAN': 'חשוון',
@@ -43,9 +25,65 @@ function MemorialBoard() {
     'ELUL': 'אלול'
   };
 
+  const navigate = useNavigate();
+  const [campains, setCampains] = useState([]);
+  const [commitments, setCommitments] = useState([]);
+  const [isCommitmentLoading, setCommitmentIsLoading] = useState(true);
+  const [isCampainsLoading, setCampainsIsLoading] = useState(true);
+  const [searchParams] = useSearchParams();
 
-  const [currentDate, setCurrentDate] = useState(new HDate(1,new HDate().mm,new HDate().yy));
-  // console.log(new HDate(1, 1,5784).getMonthName());
+  const CALENDAE_STATE = 'calendarState';
+  
+  function getInitialState() {
+    const storedState = localStorage.getItem(CALENDAE_STATE);
+    if (storedState) {
+    const { mm, yy } = JSON.parse(storedState);
+    return new HDate(1, mm, yy);
+  }
+  return new HDate(1, new HDate().mm, new HDate().yy);
+}
+const [currentDate, setCurrentDate] = useState(getInitialState());
+
+  useEffect(() => {
+
+    const fetchData = async () => {
+      try {
+        setCampainsIsLoading(true);
+        const response = await getCampains();
+        setCampains(response.data.data.campains||[]);
+      } catch (error) {
+        console.error(error);
+      }
+      finally {
+        setCampainsIsLoading(false);
+      }
+
+    };
+    fetchData();
+
+  }, []);
+  useEffect(() => {
+
+    const fetchData = async () => {
+      try {
+        setCommitmentIsLoading(true);
+        const response = await getCommitment();
+        setCommitments(response.data.data.commitment||[]);
+      } catch (error) {
+        console.error(error);
+      }
+      finally {
+        setCommitmentIsLoading(false);
+      }
+
+    };
+    fetchData();
+
+  }, [currentDate]);
+  
+
+
+  // console.log(new HDate(1,new HDate().mm,new HDate().yy));
 
 
 function getHebrewMonths(year) {
@@ -68,17 +106,14 @@ function getHebrewMonths(year) {
 
   // Handle month change using navigation buttons
   function changeDate(change) {
-    console.log(currentDate);
     let d = new HDate(currentDate);
 
   if(change == -1){
     do{
       d= d.prev()
-      // console.log(currentDate.dd);
 
     }
     while(d.dd!=1);
-    // setCurrentDate((currentDate) => currentDate.subtract(1, 'M'));
   }
   else
   {
@@ -94,9 +129,11 @@ function getHebrewMonths(year) {
     function handleMonthChange(event) {
     setCurrentDate(new HDate(1, event.target.value, currentDate.yy)); // Update the current date
   }
+
+
   function isCampainDay(hdate) {
     // Return false if there are no campaigns
-    if (campains.length === 0) return false;
+    // if (campains.length === 0) return false;
     
     // Loop through each campaign in the array
     for (let i = 0; i < campains.length; i++) {
@@ -107,7 +144,8 @@ function getHebrewMonths(year) {
         continue;
       }
       if(hdate.deltaDays(campainStartDate) >= 0 && hdate.deltaDays(campainEndDate) <= 0){
-        return true;
+        
+        return {CampainName: campaign.CampainName};
       }
       return false;
       
@@ -115,26 +153,81 @@ function getHebrewMonths(year) {
   
     return false;
   }
+  function IsMemorialDay(hdate,CampainName) {
+
+    if ( !commitments){
+      return false;
+    }
+    for (const commitment of commitments) {
+      if(!commitment.MemorialDays || commitment.MemorialDays.length === 0|| commitment.CampainName != CampainName){
+        continue;
+      }
+
+      for (const memorialDay of commitment.MemorialDays) {
+
+        if(hdate.deltaDays(new HDate(new Date(memorialDay.date))) == 0){
+          return {
+            memorialDay: memorialDay,
+            anashidentifier: commitment.AnashIdentifier,
+            
+          };
+        }
+      }
+    }
+        return false;
+
+
+
+  }
+
   
   // Render the days of the month
-  function renderDays(monthDaysLength, hdate) {
-    const elements = [];
+    function renderDays(monthDaysLength, hdate) {
     
+    const elements = [];
+    // console.log(monthDaysLength);
     for (let i = 1; i <= monthDaysLength; i++) {
       // Create a new HDate instance for the current day
       
       // Check if the current day is a campaign day
       const isCampaignDay = isCampainDay(new HDate(i, hdate.mm, hdate.yy));
+      let isMemorialDay = false
+      if(isCampaignDay)
+      {
+         isMemorialDay = IsMemorialDay(new HDate(i, hdate.mm, hdate.yy),isCampaignDay.CampainName);
+
+      }
       
       // Set the background color based on whether it's a campaign day
-      const backgroundColor = isCampaignDay ? 'bg-blue-200 text-black' : 'hover:bg-blue-200';
+      let backgroundColor = 'hover:bg-blue-200';
+      let addOrShowMemorialMemorialDay= null
+      if(isMemorialDay){
+        const gerdDate  = new HDate(i, hdate.mm, hdate.yy).greg()
+        // console.log(isMemorialDay.memorialDay.Commeration);
+
+
+        addOrShowMemorialMemorialDay = ()=>{navigate(`/memorial-day-details?CampainName=${isCampaignDay.CampainName}&date=${gerdDate}
+          &anashidentifier=${isMemorialDay.anashidentifier}&commartion=${isMemorialDay.memorialDay?.Commeration||""}`)}
+        
+        backgroundColor = 'bg-green-400 text-black';
+        
+      }
+      else if(isCampaignDay){
+        const gerdDate  = new HDate(i, hdate.mm, hdate.yy).greg()
+        
+        addOrShowMemorialMemorialDay = ()=>{navigate(`/add-memorial-day-to-person?CampainName=${isCampaignDay.CampainName}&date=${gerdDate}`)}
+
+        backgroundColor = 'bg-blue-200 text-black';
+      }
       
       elements.push(
         <div
           key={i}
-          className={`py-[10px] border border-gray-300 flex items-center justify-center cursor-pointer ${backgroundColor}`}
+          className={`py-[10px] border border-gray-300 flex flex-col items-center flex-wrap justify-center cursor-pointer ${backgroundColor}`}
+          onClick={addOrShowMemorialMemorialDay}
         >
           <div className="text-xl">{gematriya(i)}</div>
+          <div className="text-xs ">{isCampaignDay?isCampaignDay.CampainName:""}</div>
         </div>
       );
     }
@@ -168,78 +261,102 @@ function getHebrewMonths(year) {
   }  
   let yearsOptions = YearsOptions()
 
+
   function handelYearChange(event) {
     setCurrentDate(new HDate(1, currentDate.mm, event.target.value));
 
   }
-    // console.log(currentDate.getMonthName());
-    // console.log(currentDate.mm);
-    // console.log(getHebrewMonths(currentDate.yy));
+  if(isCampainsLoading || isCommitmentLoading){
+      return <div>Loading...</div>;
+    
+  }
+
+  function swichCampain(campain){
+    const campainStartDate= new HDate(new Date(campain.startDate));
+    const currentDate = new HDate(1, campainStartDate.mm, campainStartDate.yy);
+    localStorage.setItem(CALENDAE_STATE, JSON.stringify({ mm: currentDate.mm, yy: currentDate.yy }));
+
+    setCurrentDate(currentDate);
+  }
 
   return (
-    <div dir="rtl" className="max-w-3xl w-full mx-auto overflow-hidden rounded-lg border border-gray-300 p-4 max-h-screen">
-      <div className="bg-blue-500 text-white p-4">
-        <div className="flex justify-between items-center">
-          <button onClick={() => changeDate(-1)} className="text-white hover:bg-blue-600 p-2 rounded-full">
-            <BiChevronRight size={24} />
-          </button>
-          <div className="text-center">
-            <h2 className="text-2xl font-bold">{hebrewMonths[currentDate.getMonthName().toUpperCase()]}</h2>
-            <h1 className="text-3xl font-bold">{gematriya(currentDate.getFullYear())}</h1>
+    <section className='flex gap-2 my-2'>
+  <div className='grid grid-cols-2 gap-4 h-full content-start p-4'>
+    {campains.map((campain, index) => (
+      <button
+        key={index}
+        className='bg-blue-200 text-blue-900 text-center px-[40px] py-[20px] rounded-lg shadow-md hover:bg-blue-300 whitespace-nowrap text-overflow-ellipsis overflow-hidden'
+        onClick={() => swichCampain(campain)}
+      >
+        {campain.CampainName}
+      </button>
+    ))}
+  </div>
+<div dir="rtl" className="max-w-3xl w-full mx-auto overflow-hidden rounded-lg border border-gray-300 p-4 max-h-screen">
+        <div className="bg-blue-500 text-white p-4">
+          <div className="flex justify-between items-center">
+            <button onClick={() => changeDate(-1)} className="text-white hover:bg-blue-600 p-2 rounded-full">
+              <BiChevronRight size={24} />
+            </button>
+            <div className="text-center">
+              <h2 className="text-2xl font-bold">{hebrewMonths[currentDate.getMonthName().toUpperCase()]}</h2>
+              <h1 className="text-3xl font-bold">{gematriya(currentDate.getFullYear())}</h1>
+            </div>
+            <button onClick={() => changeDate(1)} className="text-white hover:bg-blue-600 p-2 rounded-full">
+              <BiChevronLeft size={24} />
+            </button>
           </div>
-          <button onClick={() => changeDate(1)} className="text-white hover:bg-blue-600 p-2 rounded-full">
-            <BiChevronLeft size={24} />
-          </button>
+        </div>
+        {/* Dropdown to select Hebrew months */}
+        <div className="flex flex-col sm:flex-row gap-4 items-center bg-white p-4 rounded-md shadow-lg">
+        {/* Month Selector */}
+        <div className="flex items-center gap-2">
+        <label htmlFor="month-select" className="font-semibold text-gray-700">חודש:</label>
+        <select
+        id="month-select"
+        className="border border-gray-300 px-3 py-2 rounded-md shadow-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        value={currentDate.getMonthName().toUpperCase()} // Set the selected value of the <select>
+        onChange={handleMonthChange}
+      >
+        {getHebrewMonths(currentDate.yy).map((month) => (
+      <option key={month} value={month.toUpperCase()}>
+        {hebrewMonths[month.toUpperCase()]}
+      </option>
+        ))}
+      </select>
+        </div>
+      
+        {/* Year Selector */}
+        <div className="flex items-center gap-2">
+      <label htmlFor="year-select" className="font-semibold text-gray-700">שנה:</label>
+      <select
+        id="year-select"
+        className="border border-gray-300 px-3 py-2 rounded-md shadow-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        value={currentDate.yy}
+        onChange={handelYearChange}
+      >
+        {yearsOptions.map((year) => (
+          <option key={year} value={year}>
+            {gematriya(year)}
+          </option>
+        ))}
+      </select>
         </div>
       </div>
-
-      {/* Dropdown to select Hebrew months */}
-      <div className="flex flex-col sm:flex-row gap-4 items-center bg-white p-4 rounded-md shadow-lg">
-  {/* Month Selector */}
-  <div className="flex items-center gap-2">
-  <label htmlFor="month-select" className="font-semibold text-gray-700">חודש:</label>
-  <select
-  id="month-select"
-  className="border border-gray-300 px-3 py-2 rounded-md shadow-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-  value={currentDate.getMonthName().toUpperCase()} // Set the selected value of the <select>
-  onChange={handleMonthChange}
->
-  {getHebrewMonths(currentDate.yy).map((month) => (
-    <option key={month} value={month.toUpperCase()}>
-      {hebrewMonths[month.toUpperCase()]}
-    </option>
-  ))}
-</select>
-  </div>
-
-  {/* Year Selector */}
-  <div className="flex items-center gap-2">
-    <label htmlFor="year-select" className="font-semibold text-gray-700">שנה:</label>
-    <select
-      id="year-select"
-      className="border border-gray-300 px-3 py-2 rounded-md shadow-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-      value={currentDate.yy}
-      onChange={handelYearChange}
-    >
-      {yearsOptions.map((year) => (
-        <option key={year} value={year}>
-          {gematriya(year)}
-        </option>
-      ))}
-    </select>
-  </div>
-</div>
-
-      <div className="p-2">
-        <div className="grid grid-cols-7 text-center border-collapse border border-gray-300">
-          {['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'].map((day) => (
-            <div key={day} className="font-bold p-2 bg-blue-200 border border-gray-300">{day}</div>
-          ))}
-          {renderEmptyDays(new HDate(1, currentDate.mm, currentDate.yy).getDay())}
-          {renderDays(currentDate.daysInMonth(),currentDate)}
+        <div className="p-2">
+          <div className="grid grid-cols-7 text-center border-collapse border border-gray-300">
+            {['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'].map((day) => (
+              <div key={day} className="font-bold p-2 bg-blue-600 border border-gray-300">{day}</div>
+            ))}
+            {renderEmptyDays(new HDate(1, currentDate.mm, currentDate.yy).getDay())}
+            {renderDays(currentDate.daysInMonth(), currentDate)}
+          </div>
+        </div>
+        <div>
         </div>
       </div>
-    </div>
+    </section>
+
   );
 }
 

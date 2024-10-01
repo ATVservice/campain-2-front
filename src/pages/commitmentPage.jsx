@@ -440,13 +440,13 @@ function CommitmentPage() {
       <div className="pr-2 py-2 flex space-x-2">
         <button
           onClick={handleAddCommitmentClick}
-          className="px-4 py-2 bg-blue-500 text-white rounded"
+          className="px-4 py-2 bg-blue-500 text-white rounded ml-2"
         >
           הוספת התחייבות
         </button>
         <button
           onClick={handleAddPaymentClick}
-          className="px-4 py-2 bg-green-500 text-white rounded ml-2"
+          className="px-4 py-2 bg-green-500 text-white rounded"
         >
           הוספת תשלום
         </button>

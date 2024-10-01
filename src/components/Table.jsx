@@ -8,6 +8,9 @@ import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { AG_GRID_LOCALE_IL ,translations} from './Utils';
 import { FaRegEdit } from "react-icons/fa";
+import { AiOutlineDelete } from "react-icons/ai";
+import { GrUpdate } from "react-icons/gr";
+import { MdOutlineCancel } from "react-icons/md";
 
 
 function Table({rowData, setRowData}) {
@@ -30,7 +33,7 @@ function Table({rowData, setRowData}) {
         'שם': 'FirstName',
         'משפחה': 'LastName',
         'כתובת': 'Address',
-        'מספר': 'addressNumber',
+        'מספר': 'AddressNumber',
         'עיר': 'City',
         'טל נייד': 'MobilePhone',
         'טל בית': 'HomePhone',
@@ -41,16 +44,16 @@ function Table({rowData, setRowData}) {
     
         if (isCurrentRowEditing) {
             return (
-                <div style={{ display: 'flex', gap: '15px' }}>
-                    <button className="action-button update border-2 p-1 w-[100px]" onClick={() => onActionClick('update', props.api, props.node)}>עדכן</button>
-                    <button className="action-button cancel border-2 p-1 w-[100px]" onClick={() => onActionClick('cancel', props.api, props.node)}>בטל עדכון</button>
+                <div style={{ display: 'flex', gap: '15px' }} className="h-full ">
+                    <button className="action-button update p-1 px-2 text-xl bg-green-100	rounded-sm" onClick={() => onActionClick('update', props.api, props.node)}><GrUpdate/></button>
+                    <button className="action-button cancel p-1 px-2  text-xl bg-gray-200	rounded-sm" onClick={() => onActionClick('cancel', props.api, props.node)}><MdOutlineCancel/> </button>
                 </div>
             );
         } else {
             return (
-                <div style={{ display: 'flex', gap: '15px' }}> 
-                    <button className="action-button edit border-2 p-1 w-[100px]" onClick={() => onActionClick('edit', props.api, props.node)}>ערוך </button>
-                    <button className="action-button delete border-2 p-1 w-[100px]" onClick={() => onActionClick('delete', props.api, props.node)}>מחק שורה</button>
+                <div style={{ display: 'flex', gap: '15px' }} className="h-full "> 
+                    <button className="action-button edit   p-1 px-2 text-xl bg-blue-100	rounded-sm	 	" onClick={() => onActionClick('edit', props.api, props.node)}><FaRegEdit /> </button>
+                    <button className="action-button delete p-1 px-2  text-xl bg-red-100	rounded-sm			" onClick={() => onActionClick('delete', props.api, props.node)}> <AiOutlineDelete/></button>
                 </div>
             );
         }
@@ -121,26 +124,12 @@ function Table({rowData, setRowData}) {
             }
         },
         {
-            displayKey: 'notContains',
-            displayName: 'לא מכיל',
-            test: (filterValue, cellValue) => {
-                return cellValue != null && cellValue.toString().toLowerCase().indexOf(filterValue.toLowerCase()) === -1;
-            }
-        },
-        {
             displayKey: 'startsWith',
             displayName: 'מתחיל ב',
             test: (filterValue, cellValue) => {
                 return cellValue != null && cellValue.toString().toLowerCase().startsWith(filterValue.toLowerCase());
             }
         },
-        {
-            displayKey: 'endsWith',
-            displayName: 'מסתיים ב',
-            test: (filterValue, cellValue) => {
-                return cellValue != null && cellValue.toString().toLowerCase().endsWith(filterValue.toLowerCase());
-            }
-        }
     ];
 
 
@@ -193,6 +182,7 @@ function Table({rowData, setRowData}) {
           headerName: 'פעיל',
           field: 'isActive',
           filter: true,
+          width: 100,
           filterParams: {
             defaultOption: 'true',
           },
@@ -225,6 +215,7 @@ function Table({rowData, setRowData}) {
           cellRenderer: ActionCellRenderer,
           editable: false,
           colId: 'action',
+          width: 150,
         },
       ];
       const onRowEditingStarted = (params) => {
