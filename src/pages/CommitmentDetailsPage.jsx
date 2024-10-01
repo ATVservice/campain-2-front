@@ -43,6 +43,7 @@ function CommitmentDetailsPage() {
   const [MemorialDays, setMemorialDays] = useState([]);
   const [allCampainMemorialDates, setAllCampainMemorialDates] = useState([]);
   const [campain, setCampain] = useState({});
+  let [initialMemorialDayLength, setInitialMemorialDayLength] = useState(0);
 
   const openModal = (e) => {
     e.preventDefault();
@@ -133,12 +134,14 @@ function CommitmentDetailsPage() {
       toast.error("פרטי מספר התשלומים אינם תקינים.");
       return;
     }
+    // console.log(MemorialDays.length, initialMemorialDayLength);
 
-    if (Object.keys(editedData).length > 0 || MemorialDays.length > 0) {
+    if (Object.keys(editedData).length > 0 || MemorialDays.length > 0 || initialMemorialDayLength != MemorialDays.length) {
       let response = null;
       try {
         setIsLoading(true);
         const MemorialDaysData = MemorialDays.filter((day) => day.date);
+        console.log(MemorialDaysData.length);
         const commitmentEditedData = {
           ...editedData,
           commitmentId: commitmentDetails._id,
@@ -280,6 +283,8 @@ function CommitmentDetailsPage() {
           setCommitmentDetails(commitmentDetails || {});
           setPayments(Array.isArray(payments) ? payments : [payments]);
           setMemorialDays(commitmentDetails.MemorialDays || []);
+          
+          setInitialMemorialDayLength(commitmentDetails.MemorialDays?.length||0);
         }
       } catch (error) {
         console.error("Error fetching commitment details:", error);
@@ -323,7 +328,10 @@ function CommitmentDetailsPage() {
 
       const response = await deletePayment(paymentId); // קרא ל-API למחיקת תשלום
       if (response.status === 200) {
-        toast.success("התשלום נמחק בהצלחה!");
+        toast.success("התשלום נמחק בהצלחה!", {
+          onClose: () => window.location.reload(),autoClose: 3000
+        });
+        window.location.reload();
       } else {
         toast.error("שגיאה במחיקת התשלום");
       }
@@ -624,6 +632,7 @@ function CommitmentDetailsPage() {
                       </button>
                       <label>
                         יום הנצחה:
+                        {memorialDay.date?'':<p className="text-red-500 text-sm">אנא בחר תאריך הנצחה</p>}
                         <ReactJewishDatePicker
                           value={
                             memorialDay.date
