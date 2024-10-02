@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import TransactionsTable from '../components/TransactionsTable';
-import { getTransactions } from '../requests/ApiRequests';
+import { getTransactions, addExpense } from '../requests/ApiRequests';
 import Modal from 'react-modal';
 
 Modal.setAppElement('#root');
@@ -15,17 +15,18 @@ function PettyCashPage() {
         date: '',
     });
 
+    const fetchTransactions = async () => {
+        try {
+            const response = await getTransactions();
+            const transactions = response.data.data.transactions || [];
+            calculateBalance(transactions); // מעדכן את היתרה לפי הטרנזקציות שהתקבלו
+        } catch (error) {
+            console.error('Error fetching transactions:', error);
+        }
+    };
+    
     useEffect(() => {
-        const fetchTransactions = async () => {
-            try {
-                const response = await getTransactions();
-                const transactions = response.data.data.transactions || [];
-                setRowsData(transactions);
-                calculateBalance(transactions);
-            } catch (error) {
-                console.error('Error fetching transactions:', error);
-            }
-        };
+        // קריאה לפונקציה בתוך useEffect כשיוזר נכנס לעמוד בפעם הראשונה
         fetchTransactions();
     }, []);
 
@@ -37,30 +38,33 @@ function PettyCashPage() {
                 : currentBalance - transaction.Amount;
             return { ...transaction, currentBalance }; // נוסיף יתרה נוכחית לכל שורה
         });
-        setRowsData(updatedRows);
-        setBalance(currentBalance);
+        const reversedRows = updatedRows.reverse();
+
+    setRowsData(reversedRows);
+    setBalance(currentBalance);
     };
 
-    const handleAddExpense = (e) => {
+    const handleAddExpense = async (e) => {
         e.preventDefault();
-        const newTransaction = {
+        const newExpense = {
             FullNameOrReasonForIssue: formData.reason,
             TransactionType: 'הוצאה',
             Amount: parseFloat(formData.amount),
             TransactionDate: formData.date,
         };
-        const updatedTransactions = [...rowsData, newTransaction];
-        setRowsData(updatedTransactions);
-        calculateBalance(updatedTransactions);
+        try{
+            const addedExpense= await addExpense(newExpense);
+            console.log(addedExpense);
+            
+            fetchTransactions();
+        } catch (error) {
+            console.error('Error adding expense:', error);
+        }
         setFormData({ reason: '', amount: '', date: '' });
-        closeModal();
+        closeModal();     
     };
 
-    const handleDeleteExpense = (transaction) => {
-        const updatedTransactions = rowsData.filter((row) => row !== transaction);
-        setRowsData(updatedTransactions);
-        calculateBalance(updatedTransactions);
-    };
+    
 
     const openModal = () => {
         setIsModalOpen(true);
@@ -72,20 +76,26 @@ function PettyCashPage() {
 
     return (
         <div className="text-center py-6">
-            <h1 className="text-3xl font-bold mb-6">קופה קטנה</h1>
-
-            <div className="flex flex-col items-center mb-6">
-                <h2 className="text-2xl">יתרה נוכחית:</h2>
-                <div className="text-4xl font-bold text-green-500 mt-2">{balance} ₪</div>
+            <div className="flex justify-between items-center mb-6">
+                <button
+                    onClick={openModal}
+                    className="bg-green-500 text-white py-2 px-4 rounded-lg text-lg hover:bg-green-600 transition duration-300 mr-4"
+                >
+                    הוסף הוצאה
+                </button>
+                <div className="flex-grow flex justify-center items-center">
+                    <h2 className="text-3xl mr-2">יתרה נוכחית:</h2>
+                    <div
+                        className={`text-3xl font-bold ${
+                            balance >= 0 ? 'text-green-500' : 'text-red-500'
+                        }`}
+                        style={{ direction: 'ltr' }}
+                    >
+                        {balance < 0 && '-'}
+                        {Math.abs(balance)} ₪
+                    </div>
+                </div>
             </div>
-
-            <button
-                onClick={openModal}
-                className="bg-green-500 text-white py-2 px-4 rounded-lg text-lg hover:bg-green-600 transition duration-300"
-            >
-                הוסף הוצאה
-            </button>
-
             <Modal
                 isOpen={isModalOpen}
                 onRequestClose={closeModal}
@@ -144,7 +154,7 @@ function PettyCashPage() {
             </Modal>
 
             {rowsData.length > 0 && (
-                <TransactionsTable rowsData={rowsData} onDelete={handleDeleteExpense} />
+                <TransactionsTable rowsData={rowsData} fetchTransactions={fetchTransactions}/>
             )}
         </div>
     );

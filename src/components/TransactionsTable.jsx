@@ -3,8 +3,10 @@ import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { FaTrash } from 'react-icons/fa'; // ייבוא האייקון
+import {deleteTransaction} from '../requests/ApiRequests';
+import { set } from 'date-fns';
+function TransactionsTable({ rowsData, fetchTransactions}) {
 
-function TransactionsTable({ rowsData, onDelete }) {
   const columns = [
     {
       headerName: 'סיבת הוצאה/שם',
@@ -47,6 +49,13 @@ function TransactionsTable({ rowsData, onDelete }) {
       editable: false,
       sortable: true,
       filter: true,
+      cellStyle: (params) => {
+        return params.value < 0 ? { color: 'red', direction: 'ltr' } : { color: 'green', direction: 'ltr' };
+      },
+      cellRenderer: (params) => {
+        const balance = Math.abs(params.value).toLocaleString(); // הצגת מספרים עם פסיקים
+        return params.value < 0 ? `- ₪${balance}` : `₪${balance}`;
+      },
     },
     {
       headerName: 'מחיקה',
@@ -54,7 +63,7 @@ function TransactionsTable({ rowsData, onDelete }) {
         if (params.data.TransactionType === 'הוצאה') {
           return (
             <button
-              onClick={() => onDelete(params.data)}
+              onClick={() => deleteTransactionProcess(params.node)}
               className="text-red-500 hover:text-red-700"
             >
               <FaTrash size={18} /> {/* שימוש באייקון */}
@@ -79,6 +88,22 @@ function TransactionsTable({ rowsData, onDelete }) {
     }
     return null;
   };
+
+  const deleteTransactionProcess = async (node) => {
+    console.log(node);
+  
+    const isConfirmed = window.confirm('האם את/ה בטוח שאת/ה רוצה למחוק?');
+            if (isConfirmed) {
+              const transaction = node.data;
+              const transactionId = transaction._id;             
+              try {
+                const res = await deleteTransaction(transactionId);
+                fetchTransactions();
+              } catch (error) {
+                console.error(error);
+              }
+            }
+};
 
   return (
     <div className="ag-theme-alpine" style={gridStyle}>
