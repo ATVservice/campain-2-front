@@ -306,6 +306,25 @@ export const getTransactions = async () => {
   }
 }
 
+export const deleteTransaction = async (transactionId) => {
+  try {   
+    const response = await apiConfig.delete(`/api/transaction/delete-transaction?transactionId=${transactionId}`); 
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export const addExpense = async (newExpense) => {
+  try {
+    console.log(newExpense);  
+    const response = await apiConfig.post('/api/transaction/create-expense', newExpense); 
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 
 
   
