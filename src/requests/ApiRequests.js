@@ -325,6 +325,78 @@ export const addExpense = async (newExpense) => {
   }
 }
 
+export const login = async (data) => {
+  try {
+    const response = await apiConfig.post('/api/auth/login', data); 
+    return response;
+  } catch (error) {
+    throw error
+  }
+}
+export const logOut = async () => {
+  try {
+    const response = await apiConfig.get('/api/auth/logout'); 
+    return response;
+  } catch (error) {
+    throw error
+  }
+}
+export const getUsers = async () => {
+  try {
+    const response = await apiConfig.get('/api/auth/users'); 
+    return response;
+  } catch (error) {
+    throw error
+  }
+}
+
+export const deleteUserByAdmin = async (id) => {
+  try {
+    const response = await apiConfig.delete(`/api/auth/delete-user/${id}`); 
+    return response;
+  } catch (error) {
+    throw error
+  }
+
+}
+export const register = async (data) => {
+  try {
+    const response = await apiConfig.post(`/api/auth/register`, data); 
+    return response;
+  } catch (error) {
+    throw error
+  }
+
+}
+
+export const forgotPassword = async (data) => {
+
+  try {
+    const response = await apiConfig.post(`/api/auth/forgot-password`, data); 
+    return response;
+  } catch (error) {
+    throw error
+  }
+}
+
+export const resetPassword = async (resetToken, newPassword) => {
+  console.log(resetToken)
+  try {
+    const response = await apiConfig.post(`/api/auth/reset-password/${resetToken}`, {password: newPassword}); 
+    return response;
+  } catch (error) {
+    throw error
+  }
+}
+export const updateManegerDetails = async (data) => {
+  try {
+    const response = await apiConfig.post(`/api/auth/update-maneger-details`, data); 
+    return response;
+  } catch (error) {
+    throw error
+  }
+}
+ 
 
 
   

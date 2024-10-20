@@ -14,7 +14,7 @@ import { MdOutlineCancel } from "react-icons/md";
 
 
 function Table({rowData, setRowData}) {
-  // console.log(rowData)
+  console.log(rowData)
 
     const navigate = useNavigate();
     const [originalRowData, setOriginalRowData] = useState({});
@@ -168,7 +168,7 @@ function Table({rowData, setRowData}) {
         { headerName: 'שם', field: 'FirstName', editable: true, sortable: true, filter: true },
         { headerName: 'משפחה', field: 'LastName', editable: true, sortable: true, filter: true },
         { headerName: 'כתובת', field: 'Address', editable: true, sortable: true, filter: true },
-        { headerName: 'מספר', field: 'addressNumber', editable: true, sortable: true, filter: true,width: 100 },
+        { headerName: 'מספר', field: 'AddressNumber', editable: true, sortable: true, filter: true,width: 100 },
         { headerName: 'עיר', field: 'City', editable: true, sortable: true, filter: true,width: 100 },
         {
           headerName: 'טל בית',
