@@ -70,7 +70,6 @@ function AlfonChanges({ data, handelSubmit }) {
 
   const changeModalState = () => {
     setIsModalOpen(!isModalOpen);
-    window.location.reload(true);
   };
 
   const handlePropertySelect = (AnashIdentifier, key, source) => {
@@ -119,13 +118,10 @@ function AlfonChanges({ data, handelSubmit }) {
       });
       return updatedObject;
     }).filter(Boolean);
-    // console.log(data);
-    // console.log(data.new);
-    // console.log(data.needsUpdate);
     console.log(updatedObjects);
 
-    handelSubmit(data.new, data.needsUpdate, updatedObjects);
-    changeModalState();
+    handelSubmit(data.new, data.needsUpdate, updatedObjects,data.invalidPeople);
+    changeModalState(); 
   };
 
   return (
@@ -138,14 +134,17 @@ function AlfonChanges({ data, handelSubmit }) {
         onRequestClose={() => setIsModalOpen(false)}
       >
         <div className="bg-white p-6 rounded shadow-lg w-[90vw] h-[90vh] flex flex-col overflow-hidden relative">
-        <div className="mb-4">
+        <div className="mb-2">
       תורמים חדשים: {data.statusCounts.new}
     </div>
-    <div className="mb-4">
+    <div className="mb-2">
       תורמים קיימים: {data.statusCounts.exists}
     </div>
       <div className="mb-2">
         תורמים קיימים עם שינוי בפרטים: {data.statusCounts.needsUpdate}
+      </div>
+      <div className="mb-2">
+       תורמים לא תקינים: {data.statusCounts.notValid}
       </div>
 
           <div className="flex-1 overflow-auto">

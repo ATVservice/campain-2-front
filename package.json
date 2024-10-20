@@ -16,6 +16,7 @@
     "@ag-grid-enterprise/core": "^32.0.2",
     "@ag-grid-enterprise/range-selection": "^32.0.2",
     "@hebcal/core": "^5.4.11",
+    "@reduxjs/toolkit": "^2.2.8",
     "ag-grid-community": "^32.0.2",
     "ag-grid-react": "^32.0.2",
     "axios": "^1.7.3",
@@ -32,11 +33,13 @@
     "react-jewish-datepicker": "^2.0.12",
     "react-modal": "^3.16.1",
     "react-multi-date-picker": "^4.5.2",
+    "react-redux": "^9.1.2",
     "react-resizable": "^3.0.5",
     "react-router-dom": "^6.26.0",
     "react-spinners": "^0.14.1",
     "react-table-column-resizer": "^1.2.3",
     "react-toastify": "^10.0.5",
+    "redux-persist": "^6.0.0",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
