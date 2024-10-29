@@ -55,6 +55,8 @@ function AlfonPage() {
   const [invalidUploads, setInvalidUploads] = useState([]);
   const [errorUploads, setErrorUploads] = useState([]);
   const [succesCount, setSuccesCount] = useState(0);
+  const [existingCount, setExistingCount] = useState(0);
+  const [newCount, setNewCount] = useState(0);
 
 
   useEffect(() => {
@@ -90,7 +92,9 @@ function AlfonPage() {
       setRowData(response.data.people || {});
       setErrorUploads(response.data.errorUploads || []);
       setInvalidUploads(invalidPeople || []);
-      setSuccesCount(response.data.succesCount || 0);
+      setSuccesCount(response.data.successCount || 0);
+      setExistingCount(response.data.updatedDocCount || 0);
+      setNewCount(response.data.newDocCount || 0);
       
 
     } catch (error) {
@@ -189,7 +193,7 @@ return (
   ) : (
     <>
       {(invalidUploads.length > 0 || errorUploads.length > 0 || succesCount > 0) && (
-        <InvalidUploads invalidUploads={invalidUploads} errorUploads={errorUploads} succesCount={succesCount} />
+        <InvalidUploads invalidUploads={invalidUploads} errorUploads={errorUploads} succesCount={succesCount} existingCount={existingCount} newCount={newCount} />
       )}
       {Object.keys(alfonChangesData).length > 0 && (
         <AlfonChanges data={alfonChangesData} handelSubmit={handleSubmit}/>

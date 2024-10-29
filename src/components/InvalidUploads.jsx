@@ -4,7 +4,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Modal from 'react-modal';
 import Spinner from './Spinner';
 
-function InvalidUploads({ invalidUploads, errorUploads,succesCount }) {
+function InvalidUploads({ invalidUploads, errorUploads,succesCount ,existingCount,newCount}) {
   const [isModalOpen, setIsModalOpen] = useState(true);
 
   return (
@@ -17,10 +17,12 @@ function InvalidUploads({ invalidUploads, errorUploads,succesCount }) {
         onRequestClose={() => setIsModalOpen(false)}
       >
         <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full text-right rtl relative">
-          <h2 className='text-xl font-semibold mb-2'>העלאות תקינות {succesCount}</h2>
+          <h2 className='text-xl font-semibold mb-2'>העלאות עדכון תקינות:   {existingCount}</h2>
+          <h2 className='text-xl font-semibold mb-2'> העלאות חדשות תקינות:  {newCount}   </h2>
+          <h2 className='text-xl font-semibold mb-2'>סה"כ העלאות תקינות  {succesCount}</h2>
           
           <h2 className="text-xl font-semibold mb-4 text-gray-700">
-            העלאות לא תקינות: {invalidUploads.length}
+           סה"כ העלאות לא תקינות: {invalidUploads.length}
           </h2>
 
           <table className="w-full text-sm text-gray-700 border border-gray-200 rounded-lg overflow-hidden">
