@@ -6,7 +6,6 @@ import { uploadPeople, getPeople,upadateUserDetails ,deleteUser} from '../reques
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-import { AG_GRID_LOCALE_IL ,translations} from './Utils';
 import { FaRegEdit } from "react-icons/fa";
 import { AiOutlineDelete } from "react-icons/ai";
 import { GrUpdate } from "react-icons/gr";
@@ -14,7 +13,6 @@ import { MdOutlineCancel } from "react-icons/md";
 
 
 function Table({rowData, setRowData}) {
-  console.log(rowData)
 
     const navigate = useNavigate();
     const [originalRowData, setOriginalRowData] = useState({});
@@ -200,7 +198,7 @@ function Table({rowData, setRowData}) {
               id={`isActive-${params.data.AnashIdentifier}`} 
 
                 type="checkbox" 
-                checked={params.value.toString() === 'true'} 
+                checked={params.value?.toString() === 'true'} 
                 disabled 
                 style={{ 
                   width: '15px', 
@@ -310,7 +308,6 @@ function Table({rowData, setRowData}) {
             suppressClickEdit={true}
             defaultColDef={defaultColDef} 
             onGridReady={onGridReady}
-            localeText={translations}
 
             
           />
