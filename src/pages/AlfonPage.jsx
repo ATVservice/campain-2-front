@@ -11,6 +11,7 @@ import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import Table from "../components/Table";
 import Spinner from "../components/Spinner";
+import InvalidUploads from "../components/InvalidUploads";
 function AlfonPage() {
   const hebrewToEnglishMapping = {
      'מזהה אנש': 'AnashIdentifier',
@@ -20,7 +21,7 @@ function AlfonPage() {
     'שם האב': 'FatherName',
     'מספר זהות': 'PersonID',
     'כתובת': 'Address',
-    'מספר': 'addressNumber',
+    'מספר': 'AddressNumber',
     'קומה': 'floor',
     'מיקוד': 'zipCode',
     'עיר': 'City',
@@ -51,6 +52,11 @@ function AlfonPage() {
   const [alfonChangesData, setAlfonChangesData] = useState({}); 
   const inputRef = useRef(null);
   const [loading, setLoading] = useState(true);
+  const [invalidUploads, setInvalidUploads] = useState([]);
+  const [errorUploads, setErrorUploads] = useState([]);
+  const [succesCount, setSuccesCount] = useState(0);
+  const [existingCount, setExistingCount] = useState(0);
+  const [newCount, setNewCount] = useState(0);
 
 
   useEffect(() => {
@@ -68,15 +74,15 @@ function AlfonPage() {
     };
     fetchData();
   }, []);
-  const handleSubmit = async (newArray, needsUpdate, updatedNeedsUpdate) => {
+  const handleSubmit = async (newArray, needsUpdate, updatedNeedsUpdate,invalidPeople) => {
     const mergedNeedsUpdate = mergeAndOverride(needsUpdate, updatedNeedsUpdate);
-    const combinedArray = [...newArray, ...mergedNeedsUpdate];
-    console.log(combinedArray);
+    let combinedArray = [...newArray, ...mergedNeedsUpdate];
     // return
-
+    
     // Now set the uploading data
     setUploadingData(combinedArray);
-    console.log(combinedArray);
+    
+    console.log(invalidPeople);
   
     try {
       
@@ -84,6 +90,12 @@ function AlfonPage() {
       const response = await uploadPeople(combinedArray);
       console.log(response);
       setRowData(response.data.people || {});
+      setErrorUploads(response.data.errorUploads || []);
+      setInvalidUploads(invalidPeople || []);
+      setSuccesCount(response.data.successCount || 0);
+      setExistingCount(response.data.updatedDocCount || 0);
+      setNewCount(response.data.newDocCount || 0);
+      
 
     } catch (error) {
       console.error(error);
@@ -138,7 +150,7 @@ function AlfonPage() {
           try {
             const response = await getAlfonChanges(mappedData);
             setAlfonChangesData(response.data || []);
-            console.log(response.data);
+            console.log(response);
   
           } catch (error) {
             console.error(error);
@@ -180,6 +192,9 @@ return (
     <Spinner />
   ) : (
     <>
+      {(invalidUploads.length > 0 || errorUploads.length > 0 || succesCount > 0) && (
+        <InvalidUploads invalidUploads={invalidUploads} errorUploads={errorUploads} succesCount={succesCount} existingCount={existingCount} newCount={newCount} />
+      )}
       {Object.keys(alfonChangesData).length > 0 && (
         <AlfonChanges data={alfonChangesData} handelSubmit={handleSubmit}/>
       )}

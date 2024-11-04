@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useLocation} from 'react-router-dom';
-import { getCampainPeople,  getCommitmentInCampain} from '../requests/ApiRequests';
+import { useLocation } from 'react-router-dom';
+import { getCampainPeople, getCommitmentInCampain } from '../requests/ApiRequests';
 function CampainPage() {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -26,13 +26,13 @@ function CampainPage() {
     try {
       const response = await getCampainPeople(campainName);
       const response2 = await getCommitmentInCampain(campainName);
-  
+
       const peopleData = response.data; // קבלת מערך האנשים
       const commitmentData = response2.data.data; // קבלת הנתונים מההתחייבויות
-  
+
       // סכימה של מספר האנשים בקמפיין
       const peopleInCampain = peopleData.length;
-      
+
       // עדכון הסטטיסטיקות ב-state
       setStats({
         peopleInCampain,
@@ -44,13 +44,13 @@ function CampainPage() {
       console.error('Error fetching campaign stats:', error);
     }
   };
-  
+
 
   // שימוש ב-useEffect להפעלת הפונקציה fetchStats בעת טעינת הדף
   useEffect(() => {
     fetchStats(); // קריאה לפונקציה המעדכנת את הנתונים
   }, []);
-  
+
 
 
   useEffect(() => {
@@ -99,14 +99,20 @@ function CampainPage() {
 
       {/* כפתורים לתחתית הדף */}
       <div className="mt-8 flex justify-center gap-4">
-        <button 
-          onClick={() => navigate(`/peopleincampain/${campainName}`)} 
+        <button
+          onClick={() => navigate(`/edit-campain/${campainName}`)}
+          className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-all"
+        >
+          עריכת קמפיין
+        </button>
+        <button
+          onClick={() => navigate(`/peopleincampain/${campainName}`)}
           className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all"
         >
           רשימת אנשים בקמפיין
         </button>
-        <button 
-          onClick={() => navigate(`/campaign-commitments/${campainName}`)} 
+        <button
+          onClick={() => navigate(`/campaign-commitments/${campainName}`)}
           className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-all"
         >
           רשימת התחייבויות בקמפיין

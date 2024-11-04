@@ -4,6 +4,7 @@ import { getUserDetails, upadateUserDetails,deleteUser } from '../requests/ApiRe
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Modal from 'react-modal';
+import RecordOperation from '../components/RecordOperation';
 
 Modal.setAppElement('#root'); // This is important for accessibility
 
@@ -14,6 +15,7 @@ function UserDetailsPage() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isRecordModalOpen, setIsRecordModalOpen] = useState(false);
   const openModal = (e) =>
     {
 
@@ -108,6 +110,12 @@ function UserDetailsPage() {
         };
         fetchData();
     }, [AnashIdentifier]);
+
+
+    function handelShowOperations (e) {
+      e.preventDefault();
+      setIsRecordModalOpen(true);
+    }
 
     return (
         <>
@@ -424,8 +432,23 @@ function UserDetailsPage() {
     disabled={isLoading}
     >מחק משתמש
     </button> 
+
+    <button
+      className="m-4 p-2 bg-orange-500 text-white rounded hover:bg-orange-600"
+      onClick={handelShowOperations}
+      // disabled={isLoading}
     
-    </form> 
+    >
+      היסטוריית פעולות
+    </button>
+    
+    </form>
+    {isRecordModalOpen &&(
+      <RecordOperation operations={userDetails.Operations} isRecordModalOpen={isRecordModalOpen} setIsRecordModalOpen={setIsRecordModalOpen} />
+      
+    )
+    
+  } 
     <Modal
         isOpen={isModalOpen}
         onRequestClose={(e) => closeModal(e)}

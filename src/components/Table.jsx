@@ -6,7 +6,6 @@ import { uploadPeople, getPeople,upadateUserDetails ,deleteUser} from '../reques
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-import { AG_GRID_LOCALE_IL ,translations} from './Utils';
 import { FaRegEdit } from "react-icons/fa";
 import { AiOutlineDelete } from "react-icons/ai";
 import { GrUpdate } from "react-icons/gr";
@@ -14,7 +13,6 @@ import { MdOutlineCancel } from "react-icons/md";
 
 
 function Table({rowData, setRowData}) {
-  // console.log(rowData)
 
     const navigate = useNavigate();
     const [originalRowData, setOriginalRowData] = useState({});
@@ -168,7 +166,7 @@ function Table({rowData, setRowData}) {
         { headerName: 'שם', field: 'FirstName', editable: true, sortable: true, filter: true },
         { headerName: 'משפחה', field: 'LastName', editable: true, sortable: true, filter: true },
         { headerName: 'כתובת', field: 'Address', editable: true, sortable: true, filter: true },
-        { headerName: 'מספר', field: 'addressNumber', editable: true, sortable: true, filter: true,width: 100 },
+        { headerName: 'מספר', field: 'AddressNumber', editable: true, sortable: true, filter: true,width: 100 },
         { headerName: 'עיר', field: 'City', editable: true, sortable: true, filter: true,width: 100 },
         {
           headerName: 'טל בית',
@@ -182,6 +180,8 @@ function Table({rowData, setRowData}) {
           headerName: 'פעיל',
           field: 'isActive',
           filter: true,
+          editable: true,
+         
           width: 100,
           filterParams: {
             defaultOption: 'true',
@@ -198,7 +198,7 @@ function Table({rowData, setRowData}) {
               id={`isActive-${params.data.AnashIdentifier}`} 
 
                 type="checkbox" 
-                checked={params.value.toString() === 'true'} 
+                checked={params.value?.toString() === 'true'} 
                 disabled 
                 style={{ 
                   width: '15px', 
@@ -308,7 +308,6 @@ function Table({rowData, setRowData}) {
             suppressClickEdit={true}
             defaultColDef={defaultColDef} 
             onGridReady={onGridReady}
-            localeText={translations}
 
             
           />
