@@ -3,9 +3,10 @@
 import axios from 'axios';
 import { useNavigate ,useLocation} from 'react-router-dom';
 
-// Create an axios instance with default configurations
+// Create an axios instance with default configurations 
 const apiConfig = axios.create({
-    baseURL: 'http://localhost:4000',
+    baseURL: 'https://campain-back.onrender.com',
+    // baseURL: 'http://localhost:4000',
     headers: {
       'Content-Type': 'application/json'
     },
@@ -326,6 +327,7 @@ export const addExpense = async (newExpense) => {
 }
 
 export const login = async (data) => {
+  console.log(data)
   try {
     const response = await apiConfig.post('/api/auth/login', data); 
     return response;

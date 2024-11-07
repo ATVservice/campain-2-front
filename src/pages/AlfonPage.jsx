@@ -6,7 +6,6 @@ import { uploadPeople, getPeople,upadateUserDetails ,deleteUser,getAlfonChanges}
 import styles from './alfonPage.module.css';
 import AlfonChanges from "../components/AlfonChanges";
 
-import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import Table from "../components/Table";
@@ -192,7 +191,7 @@ return (
     <Spinner />
   ) : (
     <>
-      {(invalidUploads.length > 0 || errorUploads.length > 0 || succesCount > 0) && (
+      {(invalidUploads?.length > 0 || errorUploads?.length > 0 || succesCount > 0) && (
         <InvalidUploads invalidUploads={invalidUploads} errorUploads={errorUploads} succesCount={succesCount} existingCount={existingCount} newCount={newCount} />
       )}
       {Object.keys(alfonChangesData).length > 0 && (
@@ -217,7 +216,7 @@ return (
         </div>
       </div>
 
-      {rowData.length > 0 && <Table rowData={rowData} setRowData={setRowData} />}
+      {rowData?.length > 0 && <Table rowData={rowData} setRowData={setRowData} />}
     </>
   )}
 </div>

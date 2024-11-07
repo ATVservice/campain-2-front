@@ -39,7 +39,7 @@ function CommitmentDetailsPage() {
     Amount: "",
     Date: "",
     PaymentMethod: "",
-  }); // נתוני התשלום
+  }); 
   const [MemorialDays, setMemorialDays] = useState([]);
   const [allCampainMemorialDates, setAllCampainMemorialDates] = useState([]);
   const [campain, setCampain] = useState({});
