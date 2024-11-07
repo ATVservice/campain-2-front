@@ -217,6 +217,7 @@ function Table({rowData, setRowData}) {
           colId: 'action',
           width: 150,
         },
+        
       ];
       const onRowEditingStarted = (params) => {
         const originalData = { ...params.data }; // Clone the original row data
@@ -306,8 +307,14 @@ function Table({rowData, setRowData}) {
 
             editType="fullRow"
             suppressClickEdit={true}
-            defaultColDef={defaultColDef} 
             onGridReady={onGridReady}
+            defaultColDef={{
+              ...defaultColDef,
+            }}
+            gridOptions={{
+              enableCellTextSelection: true,
+            }}
+                      
 
             
           />
