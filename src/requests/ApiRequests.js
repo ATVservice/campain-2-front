@@ -5,7 +5,7 @@ import { useNavigate ,useLocation} from 'react-router-dom';
 
 // Create an axios instance with default configurations 
 const apiConfig = axios.create({
-    baseURL: 'https://campain-back.onrender.com',
+    baseURL: import.meta.env.VITE_API_BASE_URL,
     // baseURL: 'http://localhost:4000',
     headers: {
       'Content-Type': 'application/json'
