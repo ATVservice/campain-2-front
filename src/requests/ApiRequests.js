@@ -6,13 +6,26 @@ import { useNavigate ,useLocation} from 'react-router-dom';
 // Create an axios instance with default configurations 
 const apiConfig = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
-    // baseURL: 'http://localhost:4000',
     headers: {
       'Content-Type': 'application/json'
     },
     withCredentials: true // Set this globally if you need it for all requests
   });
   
+  apiConfig.interceptors.request.use(
+    (config) =>  {
+      const token = sessionStorage.getItem('token');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      return config;
+    }
+    ,
+    (error) => {
+      return Promise.reject(error);
+    }
+    
+  )
 export const uploadPeople = async (data) => {
   try {
     const response = await apiConfig.post('/api/alfon/upload', data);
@@ -327,7 +340,8 @@ export const addExpense = async (newExpense) => {
 }
 
 export const login = async (data) => {
-  console.log(data)
+  console.log(import.meta.env.VITE_API_BASE_URL)
+  console.log(import.meta.env.ABC)
   try {
     const response = await apiConfig.post('/api/auth/login', data); 
     return response;
