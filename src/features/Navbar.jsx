@@ -9,13 +9,11 @@ const Navbar = () => {
   const { logoutUser } = useAuth();
   const location = useLocation(); // שימוש ב-useLocation כדי לבדוק את הנתיב הנוכחי
 
-  async function LogoutUser() {
+   function LogoutUser() {
     try {
-      const res = await logOut();
-      if (res.status === 200) {
         logoutUser();
       }
-    } catch (error) {
+    catch (error) {
       console.error(error);
     }
   }
