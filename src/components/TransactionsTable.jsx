@@ -115,6 +115,10 @@ function TransactionsTable({ rowsData, fetchTransactions}) {
         domLayout="autoHeight"
         enableRtl={true}
         getRowStyle={getRowStyle}
+        gridOptions={{
+          enableCellTextSelection: true,
+        }}
+
       />
     </div>
   );
