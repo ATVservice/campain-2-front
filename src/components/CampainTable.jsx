@@ -156,6 +156,10 @@ function CampainTable({ rowData }) {
               filterOptions: hebrewFilterOptions,
             },
           }}
+          gridOptions={{
+            enableCellTextSelection: true,
+          }}
+
         />
       )}
     </div>
