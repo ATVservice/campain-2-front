@@ -28,8 +28,9 @@ const Login = () => {
     event.preventDefault();
     try {
       const res = await login(formData);
-      if (res.status === 201 || res.status === 200) {
-        loginUser(res.data.user);
+
+      if(res.status === 201||res.status === 200){
+        loginUser( res.data.token, res.data.user);
         navigate("/menu");
       }
       console.log(res);

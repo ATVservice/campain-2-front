@@ -131,6 +131,10 @@ function AddToMemmorialDayTable({ rowData, onAddMemorialDayToPerson }) {
                 filterOptions: hebrewFilterOptions,
               },
             }}
+            gridOptions={{
+              enableCellTextSelection: true,
+            }}
+
           />
         }
       </div>

@@ -7,7 +7,6 @@ import styles from './alfonPage.module.css';
 import AlfonChanges from "../components/AlfonChanges";
 import { motion } from 'framer-motion';
 
-import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import Table from "../components/Table";
@@ -103,11 +102,6 @@ function AlfonPage() {
     }
   };
 
-
-
-
-
-
   const handleFileUpload = async (e) => {
     setLoading(true); // Start loading spinner
     try {
@@ -183,10 +177,6 @@ function AlfonPage() {
 
     return mergedNeedsUpdate;
   };
-
-
-
-
   return (
     <div className="relative min-h-screen pt-4 pb-2"> {/* Added padding at the top and reduced at the bottom */}
       {loading ? (
@@ -234,7 +224,7 @@ function AlfonPage() {
               הוסף תורם
             </motion.button>
           </div>
-          {rowData.length > 0 && <Table rowData={rowData} setRowData={setRowData} />}
+          {rowData?.length > 0 && <Table rowData={rowData} setRowData={setRowData} />}
         </>
       )}
     </div>
@@ -243,7 +233,6 @@ function AlfonPage() {
 }
 
 export default AlfonPage;
-
 
 
 

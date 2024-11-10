@@ -165,6 +165,10 @@ function AddToCampainTable({rowData,onAddPersonToCampain,searchText}) {
             // headerClass: 'bg-blue-300 text-gray-700',
             minWidth: 100,
           }}
+          gridOptions={{
+            enableCellTextSelection: true,
+          }}
+
         />
       }
     </div>

@@ -263,7 +263,12 @@ function CommitmentTable({rowsData}) {
         filterParams: {
           filterOptions: hebrewFilterOptions, // Custom Hebrew filter options
         },
+        
       }}
+      gridOptions={{
+        enableCellTextSelection: true,
+      }}
+
     />
   </div>
 
