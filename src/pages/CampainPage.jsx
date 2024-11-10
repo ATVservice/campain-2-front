@@ -6,6 +6,8 @@ function CampainPage() {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const campainName = queryParams.get('campainName');
+  const minimumAmountForMemorialDay = queryParams.get('minimumAmountForMemorialDay');
+
   const { campainId } = useParams();
   const navigate = useNavigate();
   const [stats, setStats] = useState({
@@ -95,6 +97,11 @@ function CampainPage() {
           <h2 className="text-xl font-semibold text-gray-700">סך הכל שולם</h2>
           <p className="text-3xl font-bold text-blue-600">{runningNumbers.totalPaid} ₪</p>
         </div>
+        <div className="bg-white shadow-lg p-4 rounded-lg col-span-2 flex justify-center items-center gap-4">
+          <h2 className="text-xl font-semibold text-gray-700">סכום מינימום עבור יום הנצחה בקמפיין</h2>
+          <p className="text-3xl font-bold text-blue-600">{minimumAmountForMemorialDay} ₪</p>
+        </div>
+
       </div>
 
       {/* כפתורים לתחתית הדף */}

@@ -1,10 +1,11 @@
 import { CgDetailsMore } from "react-icons/cg";
-import { useNavigate,useParams } from "react-router-dom";
-import React, { useState, useEffect,useRef } from 'react';
+import { useNavigate, useParams } from "react-router-dom";
+import React, { useState, useEffect, useRef } from 'react';
 import * as XLSX from 'xlsx';
-import { uploadPeople, getPeople,upadateUserDetails ,deleteUser,getAlfonChanges} from '../requests/ApiRequests';
+import { uploadPeople, getPeople, upadateUserDetails, deleteUser, getAlfonChanges } from '../requests/ApiRequests';
 import styles from './alfonPage.module.css';
 import AlfonChanges from "../components/AlfonChanges";
+import { motion } from 'framer-motion';
 
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
@@ -14,7 +15,7 @@ import Spinner from "../components/Spinner";
 import InvalidUploads from "../components/InvalidUploads";
 function AlfonPage() {
   const hebrewToEnglishMapping = {
-     'מזהה אנש': 'AnashIdentifier',
+    'מזהה אנש': 'AnashIdentifier',
     'שם מלא': 'FullNameForLists',
     'שם': 'FirstName',
     'משפחה': 'LastName',
@@ -48,8 +49,8 @@ function AlfonPage() {
 
   const [uploadingData, setUploadingData] = useState([]);
   const [rowData, setRowData] = useState([]);
-  const navigate = useNavigate(); 
-  const [alfonChangesData, setAlfonChangesData] = useState({}); 
+  const navigate = useNavigate();
+  const [alfonChangesData, setAlfonChangesData] = useState({});
   const inputRef = useRef(null);
   const [loading, setLoading] = useState(true);
   const [invalidUploads, setInvalidUploads] = useState([]);
@@ -64,7 +65,7 @@ function AlfonPage() {
       try {
         const response = await getPeople();
         setRowData(response.data.data.people || {});
-  
+
       } catch (error) {
         console.error(error);
       }
@@ -74,18 +75,18 @@ function AlfonPage() {
     };
     fetchData();
   }, []);
-  const handleSubmit = async (newArray, needsUpdate, updatedNeedsUpdate,invalidPeople) => {
+  const handleSubmit = async (newArray, needsUpdate, updatedNeedsUpdate, invalidPeople) => {
     const mergedNeedsUpdate = mergeAndOverride(needsUpdate, updatedNeedsUpdate);
     let combinedArray = [...newArray, ...mergedNeedsUpdate];
     // return
-    
+
     // Now set the uploading data
     setUploadingData(combinedArray);
-    
+
     console.log(invalidPeople);
-  
+
     try {
-      
+
 
       const response = await uploadPeople(combinedArray);
       console.log(response);
@@ -95,16 +96,16 @@ function AlfonPage() {
       setSuccesCount(response.data.successCount || 0);
       setExistingCount(response.data.updatedDocCount || 0);
       setNewCount(response.data.newDocCount || 0);
-      
+
 
     } catch (error) {
       console.error(error);
     }
-   };
+  };
 
 
-  
-  
+
+
 
 
   const handleFileUpload = async (e) => {
@@ -117,22 +118,22 @@ function AlfonPage() {
       const reader = new FileReader();
       reader.onload = async (event) => {
         const arrayBuffer = event.target.result;
-  
+
         // Using setTimeout to allow UI updates
         setTimeout(async () => {
           const workbook = XLSX.read(arrayBuffer, { type: 'array' });
           const sheetName = workbook.SheetNames[0];
           const sheet = workbook.Sheets[sheetName];
           let json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-  
+
           // Filter out any rows that are entirely empty or contain only empty strings
           json = json.filter(row =>
             row.some(cell => cell !== null && cell !== undefined && cell !== '')
           );
           console.log(json);
-  
+
           setUploadingData(json);
-  
+
           const headers = json[0];
           const rows = json;
           const mappedData = rows.slice(1, rows.length).map(row => {
@@ -146,12 +147,12 @@ function AlfonPage() {
             return mappedRow;
           });
           console.log(mappedData);
-  
+
           try {
             const response = await getAlfonChanges(mappedData);
             setAlfonChangesData(response.data || []);
             console.log(response);
-  
+
           } catch (error) {
             console.error(error);
           }
@@ -164,13 +165,13 @@ function AlfonPage() {
       setLoading(false); // Stop loading spinner on error
     }
   };
-  
+
   const mergeAndOverride = (needsUpdate, updatedNeedsUpdate) => {
     console.log(updatedNeedsUpdate);
-    
+
     // Create a map of updatedDocs for quick lookup by AnashIdentifier
     const updatedDocsMap = new Map(updatedNeedsUpdate.map(doc => [doc.AnashIdentifier, doc]));
-    
+
     const mergedNeedsUpdate = needsUpdate.reduce((acc, needsUpdateObj) => {
       const updateObj = updatedDocsMap.get(needsUpdateObj.AnashIdentifier);
       if (updateObj) {
@@ -179,49 +180,66 @@ function AlfonPage() {
       }
       return acc;
     }, []);
-      
+
     return mergedNeedsUpdate;
   };
-   
-      
 
 
-return (
-  <div className="relative min-h-screen">
-  {loading ? (
-    <Spinner />
-  ) : (
-    <>
-      {(invalidUploads.length > 0 || errorUploads.length > 0 || succesCount > 0) && (
-        <InvalidUploads invalidUploads={invalidUploads} errorUploads={errorUploads} succesCount={succesCount} existingCount={existingCount} newCount={newCount} />
-      )}
-      {Object.keys(alfonChangesData).length > 0 && (
-        <AlfonChanges data={alfonChangesData} handelSubmit={handleSubmit}/>
-      )}
 
-      <input type="file" onChange={handleFileUpload} ref={inputRef} id="file" />
 
-      <div>
-        {uploadingData.length > 0 && (
-          <div>
-            <button onClick={handleSubmit}>Submit</button>
+  return (
+    <div className="relative min-h-screen pt-4 pb-2"> {/* Added padding at the top and reduced at the bottom */}
+      {loading ? (
+        <Spinner />
+      ) : (
+        <>
+          {(invalidUploads.length > 0 || errorUploads.length > 0 || succesCount > 0) && (
+            <InvalidUploads
+              invalidUploads={invalidUploads}
+              errorUploads={errorUploads}
+              succesCount={succesCount}
+              existingCount={existingCount}
+              newCount={newCount}
+            />
+          )}
+          {Object.keys(alfonChangesData).length > 0 && (
+            <AlfonChanges data={alfonChangesData} handelSubmit={handleSubmit} />
+          )}
+          <div className="flex items-center mb-2 space-x-4"> {/* Space between buttons */}
+            {/* Hidden file input */}
+            <input
+              type="file"
+              onChange={handleFileUpload}
+              ref={inputRef}
+              id="file"
+              className="hidden"
+            />
+            {/* Custom file input button with Framer Motion */}
+            <motion.label
+              htmlFor="file"
+              className="cursor-pointer bg-gradient-to-r from-purple-600 to-purple-800 text-white font-bold py-2 px-6 rounded-[10%] shadow-lg hover:shadow-2xl transform transition-transform duration-300"
+              style={{ marginRight: '16px' }} // You can set a specific pixel value for more control
+              whileHover={{ scale: 1.1, backgroundColor: '#6B46C1' }}
+              whileTap={{ scale: 0.9 }}
+            >
+              בחר קובץ
+            </motion.label>
+            {/* Added margin left to the button to create space from the file input button */}
+            <motion.button
+              className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold py-2 px-6 rounded-[10%] shadow-lg hover:shadow-2xl transform transition-transform duration-300" // Remove margin left here to keep consistent spacing
+              onClick={() => navigate('/add-person')}
+              whileHover={{ scale: 1.1, backgroundColor: '#2563EB' }} // Change to a darker blue on hover
+              whileTap={{ scale: 0.9 }} // Scale effect on tap
+            >
+              הוסף תורם
+            </motion.button>
           </div>
-        )}
-        <div>
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            onClick={() => navigate('/add-person')}
-          >
-            הוסף תורם
-          </button>
-        </div>
-      </div>
+          {rowData.length > 0 && <Table rowData={rowData} setRowData={setRowData} />}
+        </>
+      )}
+    </div>
+  );
 
-      {rowData.length > 0 && <Table rowData={rowData} setRowData={setRowData} />}
-    </>
-  )}
-</div>
-);
 }
 
 export default AlfonPage;

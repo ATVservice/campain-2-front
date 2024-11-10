@@ -283,14 +283,14 @@ function CommitmentDetailsPage() {
           setCommitmentDetails(commitmentDetails || {});
           setPayments(Array.isArray(payments) ? payments : [payments]);
           setMemorialDays(commitmentDetails.MemorialDays || []);
-          
-          setInitialMemorialDayLength(commitmentDetails.MemorialDays?.length||0);
+
+          setInitialMemorialDayLength(commitmentDetails.MemorialDays?.length || 0);
         }
       } catch (error) {
         console.error("Error fetching commitment details:", error);
         toast.error("שגיאה בטעינת נתוני ההתחייבות");
       }
-      if (!commitmentRes.data|| !commitmentRes.data.commitmentDetails.CampainName) {
+      if (!commitmentRes.data || !commitmentRes.data.commitmentDetails.CampainName) {
         return;
       }
       try {
@@ -329,7 +329,7 @@ function CommitmentDetailsPage() {
       const response = await deletePayment(paymentId); // קרא ל-API למחיקת תשלום
       if (response.status === 200) {
         toast.success("התשלום נמחק בהצלחה!", {
-          onClose: () => window.location.reload(),autoClose: 3000
+          onClose: () => window.location.reload(), autoClose: 3000
         });
         window.location.reload();
       } else {
@@ -342,7 +342,7 @@ function CommitmentDetailsPage() {
   };
 
   const handleDateChange = (index, memorialDate) => {
-    
+
     setMemorialDays((prevMemorialDays) => {
       const newMemorialDays = [...prevMemorialDays];
       newMemorialDays[index] = {
@@ -367,10 +367,7 @@ function CommitmentDetailsPage() {
     if (
       MemorialDays.length === 0 ||
       MemorialDays[MemorialDays.length - 1].hasOwnProperty("date")
-    ) 
-    
-    
-    {
+    ) {
       // Handle the case where there are no memorial days, or the last one doesn't have a "date" property
       setMemorialDays([...MemorialDays, {}]);
     }
@@ -398,13 +395,13 @@ function CommitmentDetailsPage() {
       if (isTheSameDate(day.date, new Date(allCampainMemorialDates[i]))) {
         return false;
       }
-    for (let i = 0; i < MemorialDays.length; i++) {
-      if (
-        isTheSameDate(new Date(MemorialDays[i].date), day.date)
-      ) {
-        return false;
+      for (let i = 0; i < MemorialDays.length; i++) {
+        if (
+          isTheSameDate(new Date(MemorialDays[i].date), day.date)
+        ) {
+          return false;
+        }
       }
-    }
 
     }
 
@@ -431,7 +428,7 @@ function CommitmentDetailsPage() {
               name="AnashIdentifier"
               value={commitmentDetails.AnashIdentifier || ""}
               onChange={handleChange}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded"
+              className="mt-1 block w-full p-2 border border-gray-300 rounded bg-gray-200 focus:outline-none"
               readOnly
             />
           </label>
@@ -442,7 +439,7 @@ function CommitmentDetailsPage() {
               name="PersonID"
               value={commitmentDetails.PersonID || ""}
               onChange={handleChange}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded"
+              className="mt-1 block w-full p-2 border border-gray-300 rounded bg-gray-200 focus:outline-none"
               readOnly
             />
           </label>
@@ -453,7 +450,7 @@ function CommitmentDetailsPage() {
               name="FirstName"
               value={commitmentDetails.FirstName || ""}
               onChange={handleChange}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded"
+              className="mt-1 block w-full p-2 border border-gray-300 rounded bg-gray-200 focus:outline-none"
               readOnly
             />
           </label>
@@ -464,7 +461,7 @@ function CommitmentDetailsPage() {
               name="LastName"
               value={commitmentDetails.LastName || ""}
               onChange={handleChange}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded"
+              className="mt-1 block w-full p-2 border border-gray-300 rounded bg-gray-200 focus:outline-none"
               readOnly
             />
           </label>
@@ -475,7 +472,7 @@ function CommitmentDetailsPage() {
               name="CommitmentAmount"
               value={commitmentDetails.CommitmentAmount || ""}
               onChange={handleChange}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded"
+              className="mt-1 block w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </label>
           <label>
@@ -485,7 +482,7 @@ function CommitmentDetailsPage() {
               name="AmountPaid"
               value={commitmentDetails.AmountPaid || 0}
               onChange={handleChange}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded"
+              className="mt-1 block w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </label>
           <label>
@@ -495,7 +492,7 @@ function CommitmentDetailsPage() {
               name="AmountRemaining"
               value={commitmentDetails.AmountRemaining || 0}
               onChange={handleChange}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded"
+              className="mt-1 block w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </label>
           <label>
@@ -505,7 +502,7 @@ function CommitmentDetailsPage() {
               name="NumberOfPayments"
               value={commitmentDetails.NumberOfPayments || ""}
               onChange={handleChange}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded"
+              className="mt-1 block w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </label>
           <label>
@@ -515,7 +512,7 @@ function CommitmentDetailsPage() {
               name="PaymentsMade"
               value={commitmentDetails.PaymentsMade || 0}
               onChange={handleChange}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded"
+              className="mt-1 block w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </label>
           <label>
@@ -525,7 +522,7 @@ function CommitmentDetailsPage() {
               name="PaymentsRemaining"
               value={commitmentDetails.PaymentsRemaining || 0}
               onChange={handleChange}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded"
+              className="mt-1 block w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </label>
           <label>
@@ -535,7 +532,7 @@ function CommitmentDetailsPage() {
               name="Fundraiser"
               value={commitmentDetails.Fundraiser || ""}
               onChange={handleChange}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded"
+              className="mt-1 block w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </label>
           <label>
@@ -544,7 +541,7 @@ function CommitmentDetailsPage() {
               name="PaymentMethod"
               value={commitmentDetails.PaymentMethod || ""}
               onChange={handleChange}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded"
+              className="mt-1 block w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             >
               <option value="">בחר אופן תשלום</option>
@@ -563,7 +560,7 @@ function CommitmentDetailsPage() {
               name="Notes"
               value={commitmentDetails.Notes || ""}
               onChange={handleChange}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded"
+              className="mt-1 block w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </label>
           <label>
@@ -573,7 +570,7 @@ function CommitmentDetailsPage() {
               name="ResponseToFundraiser"
               value={commitmentDetails.ResponseToFundraiser || ""}
               onChange={handleChange}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded"
+              className="mt-1 block w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </label>
           {commitmentDetails.CampainName && (
@@ -585,7 +582,7 @@ function CommitmentDetailsPage() {
                   type="text"
                   value={commitmentDetails.CampainName || ""}
                   onChange={handleChange}
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded"
+                  className="mt-1 block w-full p-2 border border-gray-300 rounded bg-gray-200 focus:outline-none"
                   readOnly
                 />
               </label>
@@ -610,7 +607,7 @@ function CommitmentDetailsPage() {
                   <span>
                     {Math.floor(
                       commitmentDetails.CommitmentAmount /
-                        campain.minimumAmountForMemorialDay
+                      campain.minimumAmountForMemorialDay
                     ) - MemorialDays.length}
                   </span>
                 </p>
@@ -632,7 +629,7 @@ function CommitmentDetailsPage() {
                       </button>
                       <label>
                         יום הנצחה:
-                        {memorialDay.date?'':<p className="text-red-500 text-sm">אנא בחר תאריך הנצחה</p>}
+                        {memorialDay.date ? '' : <p className="text-red-500 text-sm">אנא בחר תאריך הנצחה</p>}
                         <ReactJewishDatePicker
                           value={
                             memorialDay.date
@@ -641,7 +638,7 @@ function CommitmentDetailsPage() {
                           }
                           onClick={(day) => handleDateChange(index, day)}
                           isHebrew
-                          className="mt-2 block w-full p-2 border border-gray-300 rounded"
+                          className="mt-2 block w-full p-2 border border-gray-300 rounded bg-gray-200 focus:outline-none"
                           canSelect={(day) => allowedSelectionRange(day)}
                         />
                       </label>
@@ -651,7 +648,7 @@ function CommitmentDetailsPage() {
                           name="Commeration"
                           value={memorialDay.Commeration || ""}
                           onChange={(e) => handelCommartionChange(index, e)}
-                          className="mt-1 block w-full p-2 border border-gray-300 rounded"
+                          className="mt-1 block w-full p-2 border border-gray-300 rounded focus:outline-none"
                           rows="3" // You can adjust the number of rows as needed
                         ></textarea>
                       </label>
@@ -661,7 +658,6 @@ function CommitmentDetailsPage() {
             </>
           )}
         </div>
-
         <button
           type="submit"
           className="m-4 p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
