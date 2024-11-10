@@ -130,7 +130,7 @@ function UserDetailsPage() {
             name="AnashIdentifier"
             value={userDetails.AnashIdentifier || ''}
             onChange={handleChange}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded"
+            className="mt-1 block w-full p-2 border border-gray-300 rounded bg-gray-200 focus:outline-none"
             readOnly
           />
         </label>

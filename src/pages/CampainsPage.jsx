@@ -84,7 +84,7 @@ function CampainsPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4 mb-6">
         {campains.map((campain) => (
           <button
-            onClick={() => navigate(`/campain/${campain._id}?campainName=${encodeURIComponent(campain.CampainName)}`)}
+          onClick={() => navigate(`/campain/${campain._id}?campainName=${encodeURIComponent(campain.CampainName)}&minimumAmountForMemorialDay=${campain.minimumAmountForMemorialDay}`)}
             className="p-3 bg-blue-200 text-blue-900 hover:bg-blue-300 transition-colors rounded-lg shadow-md"
             key={campain._id}
           >
