@@ -36,9 +36,10 @@ export const uploadPeople = async (data) => {
   }
 };
 
-export const getPeople = async () => {
+export const getPeople = async (isActive) => {
+  console.log(isActive);
   try {
-    const response = await apiConfig.get('/api/alfon');
+    const response = await apiConfig.get(`/api/alfon?isActive=${isActive}`);
     return response;
   } catch (error) {
     console.log(error);
@@ -179,7 +180,7 @@ export const deleteUser= async (AnashIdentifier) => {
     const response = await apiConfig.delete(`/api/alfon/delete-user/${AnashIdentifier}`);
     return response;
   } catch (error) {
-    console.log(error);
+    throw error
   }
 }
 export const addCampain= async (data) => {
