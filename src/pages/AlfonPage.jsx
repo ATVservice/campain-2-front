@@ -25,7 +25,7 @@ function AlfonPage() {
     'קומה': 'floor',
     'מיקוד': 'zipCode',
     'עיר': 'City',
-    'נייד 1 ': 'MobilePhone',
+    'נייד 1': 'MobilePhone',
     'נייד בבית 1': 'MobileHomePhone',
     'בית 1': 'HomePhone',
     'דוא"ל': 'Email',
@@ -43,6 +43,7 @@ function AlfonPage() {
     'שדה חופשי': 'FreeFieldsToFillAlone',
     'שדה חופשי 2': 'AnotherFreeFieldToFillAlone',
     'הערות אלפון': 'PhoneNotes',
+    'דרגה': 'Rank',
   };
 
 
@@ -57,12 +58,15 @@ function AlfonPage() {
   const [succesCount, setSuccesCount] = useState(0);
   const [existingCount, setExistingCount] = useState(0);
   const [newCount, setNewCount] = useState(0);
+  const [showActivePeople, setShowActivePeople] = useState(true);
 
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await getPeople();
+        setLoading(true);
+        const response = await getPeople(showActivePeople);
+
         setRowData(response.data.data.people || {});
 
       } catch (error) {
@@ -73,8 +77,9 @@ function AlfonPage() {
       }
     };
     fetchData();
-  }, []);
+  }, [showActivePeople]);
   const handleSubmit = async (newArray, needsUpdate, updatedNeedsUpdate, invalidPeople) => {
+    setAlfonChangesData([]);
     const mergedNeedsUpdate = mergeAndOverride(needsUpdate, updatedNeedsUpdate);
     let combinedArray = [...newArray, ...mergedNeedsUpdate];
     // return
@@ -85,6 +90,7 @@ function AlfonPage() {
     console.log(invalidPeople);
 
     try {
+      setLoading(true);
 
 
       const response = await uploadPeople(combinedArray);
@@ -99,6 +105,9 @@ function AlfonPage() {
 
     } catch (error) {
       console.error(error);
+    }
+    finally {
+      setLoading(false);
     }
   };
 
@@ -145,12 +154,16 @@ function AlfonPage() {
           try {
             const response = await getAlfonChanges(mappedData);
             setAlfonChangesData(response.data || []);
+            setLoading(false)
             console.log(response);
 
           } catch (error) {
             console.error(error);
           }
-          setLoading(false); // Stop loading spinner after processing
+          finally {
+            
+            setLoading(false); // Stop loading spinner after processing
+          }
         }, 0);
       };
       reader.readAsArrayBuffer(file);
@@ -177,6 +190,9 @@ function AlfonPage() {
 
     return mergedNeedsUpdate;
   };
+  if(loading){
+    return <Spinner />
+  }
   return (
     <div className="relative min-h-screen pt-4 pb-2"> {/* Added padding at the top and reduced at the bottom */}
       {loading ? (
@@ -224,7 +240,7 @@ function AlfonPage() {
               הוסף תורם
             </motion.button>
           </div>
-          {rowData?.length > 0 && <Table rowData={rowData} setRowData={setRowData} />}
+          {rowData?.length > 0 && <Table rowData={rowData} setRowData={setRowData} setShowActivePeople={setShowActivePeople} showActivePeople={showActivePeople} />}
         </>
       )}
     </div>
