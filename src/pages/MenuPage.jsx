@@ -17,7 +17,7 @@ const MenuPage = () => {
         קמפיינים
       </Link>
       <Link
-        to="/commitment"
+        to="/commitments"
         className="bg-blue-200 text-blue-900 text-center p-14 mx-2 rounded-lg shadow-md hover:bg-blue-300 transition-all h-40 w-full md:w-1/3 lg:w-1/4 text-2xl"
       >
         התחייבויות ותשלומים

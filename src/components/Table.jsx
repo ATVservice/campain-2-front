@@ -182,7 +182,7 @@ function Table({rowData, setRowData ,setShowActivePeople ,showActivePeople}) {
         {
           headerName: 'פעיל',
           field: 'isActive',
-          filter: true,
+          // filter: true,
           editable: true,
          
           width: 100,

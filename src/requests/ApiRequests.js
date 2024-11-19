@@ -69,20 +69,23 @@ export const uploadCommitment = async (data) => {
 export const getCommitment = async () => {
   try {
     const response = await apiConfig.get('/api/commitment'); 
+    console.log(response);
     return response;
   } catch (error) {
     console.log(error);
   }
 }
 
-export const getCommitmentsByCampaign = async (campainName) => {
+export const getCommitmentsByCampaign = async (campaignName) => { // Fixed "campainName" typo
   try {
-    const response = await apiConfig.get(`/api/commitment/getCommitmentsByCampaign/${campainName}`); 
-    return response;
+    console.log(campaignName);
+    const response = await apiConfig.get(`/api/commitment/getCommitmentsByCampaign?campaignName=${encodeURIComponent(campaignName)}`); 
+    return response.data; // It's common to return `response.data`, not the full response object
   } catch (error) {
-    console.log(error);
+    console.error("Error fetching commitments:", error); // Improved error logging
+    throw error; // Rethrow the error to handle it where the function is called
   }
-}
+};
 
 export const uploadPayment = async (paymentData) => {
   try {
@@ -138,6 +141,7 @@ export const getCommitmentDetails = async (_id) => {
     return response.data;
   } catch (error) {
     console.log(error);
+    throw error;
   }
 };
 
@@ -152,12 +156,21 @@ export const deleteCommitment = async (commitmentId) => {
   }
 };
 
-export const updateCommitmentDetails = async (commitmentId, updatedData) => {
+export const updateCommitmentDetails = async (commitment) => {
   try {
-    const response = await apiConfig.post(`/api/commitment/update-commitment-details/${commitmentId}`, updatedData);
+    const response = await apiConfig.post(`/api/commitment/update-commitment-details`, commitment);
     return response;
   } catch (error) {
     console.error('Error updating commitment:', error);
+    throw error;
+  }
+};
+export const uploadCommitmentPayment = async (payment) => {
+  try {
+    const response = await apiConfig.post(`/api/commitment/upload-commitment-payment`, payment);
+    return response;
+  } catch (error) {
+    console.error(error);
     throw error;
   }
 };
@@ -262,10 +275,17 @@ export const getCommitmentByAnashAndCampain= async (AnashIdentifier, CampainName
     throw error
   }
 }
-export const uploadCommitmentPayment = async (data) => {
-  console.log(data)
+export const reviewCommitmentsPayments = async (data) => {
   try {
-    const response = await apiConfig.post(`/api/commitment/upload-commitment-payment`,data);
+    const response = await apiConfig.post(`/api/commitment/review-commitment-payments`,data);
+    return response;
+  } catch (error) {
+    throw error
+  }
+}
+export const uploadCommitmentsPayments = async (data) => {
+  try {
+    const response = await apiConfig.post(`/api/commitment/upload-commitment-payments`,data);
     return response;
   } catch (error) {
     throw error
@@ -413,6 +433,24 @@ export const updateManegerDetails = async (data) => {
     throw error
   }
 }
+export const reviewCommitments = async (data) => {
+  try {
+    const response = await apiConfig.post(`/api/commitment/review-commitments`, data); 
+    return response;
+  } catch (error) {
+    throw error
+  }
+}
+export const uploadCommitments = async (data) => {
+  try {
+    const response = await apiConfig.post(`/api/commitment/upload-commitments`, data); 
+    return response;
+  } catch (error) {
+    throw error
+  }
+}
+
+
  
 
 
