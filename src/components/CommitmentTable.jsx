@@ -148,8 +148,8 @@ function CommitmentTable({rowsData}) {
         { 
           headerName: 'אופן תשלום', 
           field: 'PaymentMethod', 
-          minWidth: 90, 
-          maxWidth: 100, 
+          minWidth: 150, 
+          maxWidth: 150, 
           headerClass: 'multi-line-header', 
           ...commonColumnProps 
         },
@@ -158,7 +158,7 @@ function CommitmentTable({rowsData}) {
           field: 'Notes', 
           minWidth: 200, 
           maxWidth: 250, 
-          flex: 1.5, 
+          flex: 1,
           ...commonColumnProps 
         }
       ];
@@ -196,6 +196,9 @@ function CommitmentTable({rowsData}) {
           align-items: center;
           height: 100%;
         }
+          .ag-root-wrapper {
+  z-index: 0; 
+}
       `;
       
       const styleSheet = document.createElement("style");
@@ -231,48 +234,56 @@ function CommitmentTable({rowsData}) {
         overflowX: 'hidden',
         margin: '0 auto',
         width: '98vw',
+        position: 'relative', // Add this
+      };
+      const searchStyle = {
+        position: 'relative',
+        zIndex: 2,
+        marginBottom: '8px',
       };
     
-  return (
-
-    <div className="ag-theme-alpine" style={gridStyle}>
-    <input
-          type="text"
-          placeholder="חפש..."
-          value={searchText}
-          onChange={onSearchChange}
-          className="mb-2 p-2 border rounded"
-        />
-
-    <AgGridReact
-      columnDefs={columns}
-      rowData={rowsData}
-      pagination={true}
-      paginationPageSize={50}
-      domLayout="normal"
-      enableRtl={true}
-      onGridReady={onGridReady}
-      quickFilterText={searchText}
-      defaultColDef={{
-        minWidth: 50,
-        maxWidth: 300,
-        resizable: true,
-        sortable: true,
-        filter: true,
-        editable: false,
-        filterParams: {
-          filterOptions: hebrewFilterOptions, // Custom Hebrew filter options
-        },
+    
         
-      }}
-      gridOptions={{
-        enableCellTextSelection: true,
-      }}
-
-    />
-  </div>
-
-  )
-}
+      return (
+        <div style={{ position: 'relative' }}> {/* Wrapper with stacking context */}
+          <input
+            type="text"
+            placeholder="חפש..."
+            value={searchText}
+            onChange={onSearchChange}
+            className="mb-2 p-2 border rounded"
+            style={searchStyle}
+          />
+          
+          <div className="ag-theme-alpine" style={gridStyle}>
+            <AgGridReact
+              columnDefs={columns}
+              rowData={rowsData}
+              pagination={true}
+              paginationPageSize={50}
+              domLayout="normal"
+              enableRtl={true}
+              onGridReady={onGridReady}
+              quickFilterText={searchText}
+              defaultColDef={{
+                minWidth: 50,
+                maxWidth: 300,
+                resizable: true,
+                sortable: true,
+                filter: true,
+                editable: false,
+                filterParams: {
+                  filterOptions: hebrewFilterOptions,
+                },
+              }}
+              gridOptions={{
+                enableCellTextSelection: true,
+              }}
+              suppressRowTransform={true}
+            />
+          </div>
+        </div>
+      );
+    };
 
 export default CommitmentTable

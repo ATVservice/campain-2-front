@@ -32,7 +32,7 @@ const Navbar = () => {
             <Link to="/campains" className="text-white text-lg font-semibold transition duration-300 ease-in-out transform hover:scale-110 hover:text-gray-300">
               קמפיינים
             </Link>
-            <Link to="/commitment" className="text-white text-lg font-semibold transition duration-300 ease-in-out transform hover:scale-110 hover:text-gray-300">
+            <Link to="/commitments" className="text-white text-lg font-semibold transition duration-300 ease-in-out transform hover:scale-110 hover:text-gray-300">
               התחייבויות ותשלומים
             </Link>
             <Link to="/reports" className="text-white text-lg font-semibold transition duration-300 ease-in-out transform hover:scale-110 hover:text-gray-300">

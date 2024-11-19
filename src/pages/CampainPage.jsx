@@ -34,6 +34,7 @@ function CampainPage() {
 
       // סכימה של מספר האנשים בקמפיין
       const peopleInCampain = peopleData.length;
+      // console.log(peopleInCampain);
 
       // עדכון הסטטיסטיקות ב-state
       setStats({
@@ -119,7 +120,7 @@ function CampainPage() {
           רשימת אנשים בקמפיין
         </button>
         <button
-          onClick={() => navigate(`/campaign-commitments/${campainName}`)}
+          onClick={() => navigate(`/commitments/${campainName}`)}
           className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-all"
         >
           רשימת התחייבויות בקמפיין
