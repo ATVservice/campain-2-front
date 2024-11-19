@@ -141,26 +141,34 @@ function Table({rowData, setRowData}) {
           headerName: 'פרטים מלאים',
           field: 'userDetails',
           editable: false,
-          cellRenderer: (params) =>
-            
-            {
+          cellRenderer: (params) => {
             const handleDetailsClick = () => {
-              const AnashIdentifier = params.data.AnashIdentifier; // Replace 'id' with the actual field name for the user ID
+              const AnashIdentifier = params.data.AnashIdentifier; // החלף לשם השדה המתאים עבור מזהה המשתמש
               navigate(`/user-details/${AnashIdentifier}`);
             };
-      
+        
             return (
-              <button onClick={() => handleDetailsClick()}>
+              <div
+                onClick={() => handleDetailsClick()}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '100%',
+                  height: '100%',
+                  cursor: 'pointer',
+                }}
+              >
                 <CgDetailsMore style={{ fontSize: '20px' }} />
-              </button>
-            );  
+              </div>
+            );
           },
           width: 70,
           headerComponent: CustomHeader,
           headerComponentParams: {
-            displayName: 'פרטים<br>מלאים'
-          }
-        },
+            displayName: 'פרטים<br>מלאים',
+          },
+        },        
         
         { headerName: 'מזהה אנש', field: 'AnashIdentifier', editable: false, sortable: true, filter: true,width: 120 },
         { headerName: 'שם', field: 'FirstName', editable: true, sortable: true, filter: true },

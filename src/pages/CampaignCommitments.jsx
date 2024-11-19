@@ -431,7 +431,7 @@ function CampaignCommitments() {
 
     return (
         <div className="commitment-page relative">
-            <h1>התחייבויות בקמפיין {campainName}</h1>
+            <h1 className="text-2xl font-semibold text-center mb-6">התחייבויות ב{campainName}</h1>
             <div className="pr-2 py-2 flex space-x-2">
                 <button
                     onClick={handleAddCommitmentClick}

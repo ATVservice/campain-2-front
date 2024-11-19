@@ -118,7 +118,7 @@ function peopleInCampain() {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      <h1 className="text-2xl font-semibold text-center mb-6">ניהול קמפיין</h1>
+      <h1 className="text-2xl font-semibold text-center mb-6">ניהול {campainName}</h1>
 
       <div className="flex items-center mb-6 gap-4">
         <input
@@ -160,7 +160,7 @@ function peopleInCampain() {
         <div>
           <h2 className="text-lg font-medium mb-4">אנשים בקמפיין</h2>
           {peopleInCampain.length > 0 ? (
-            <CampainTable rowData={peopleInCampain} />
+            <CampainTable rowData={peopleInCampain} campainName={campainName} />
           ) : (
             <p className="text-gray-500">אין אנשים בקמפיין כרגע.</p>
           )}

@@ -12,6 +12,7 @@ import { constructFrom } from "date-fns";
 function CommitmentPage() {
   const hebrewToEnglishMapping = {
     'מזהה אנש': 'AnashIdentifier',
+    'הערות': 'AnashIdentifier',
     'מספר זהות': 'PersonID',
     'שם': 'FirstName',
     'משפחה': 'LastName',
@@ -23,7 +24,7 @@ function CommitmentPage() {
     'תשלומים שנותרו': 'PaymentsRemaining',
     'מתרים': 'Fundraiser',
     'אופן תשלום': 'PaymentMethod',
-    'הערות': 'Notes',
+    //'הערות': 'Notes',
     'תשובה למתרים': 'ResponseToFundraiser',
     'יום הנצחה': 'MemorialDay',
     'הנצחה': 'Commemoration',

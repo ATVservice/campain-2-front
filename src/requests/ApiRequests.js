@@ -225,6 +225,21 @@ export const addPersonToCampain= async (data) => {
     console.log(error);
   }
 }
+
+export const deletePersonFromCampain= async (AnashIdentifier, campainName) => {
+  try {
+    const response = await apiConfig.delete(`/api/campain/delete-person-from-campain/${AnashIdentifier}/${campainName}`);
+    return response;
+  } catch (error) {
+    // במקרה של שגיאה, נחזיר את השגיאה עם הודעת שגיאה אם יש
+    if (error.response && error.response.data) {
+      return error.response.data;
+    } else {
+      // אם אין שגיאה ספציפית, מחזירים שגיאה כלשהי
+      return { message: 'שגיאה בלתי צפויה' };
+    }
+  }
+}
 export const addPeopleToCampain= async (data) => {
   try {
     const response = await apiConfig.post(`/api/campain/add-people-to-campain`,data);

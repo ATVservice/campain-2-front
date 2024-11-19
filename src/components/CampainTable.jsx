@@ -4,6 +4,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
+import { deletePersonFromCampain } from '../requests/ApiRequests';
+import { AiOutlineDelete } from 'react-icons/ai';
+import { toast } from 'react-toastify';
+
 
 
 function CampainTable({ rowData }) {
@@ -23,16 +27,50 @@ function CampainTable({ rowData }) {
     'טל בית': 'HomePhone',
     'פעיל': 'isActive',
   };
+
+
   const ActionCellRenderer = (props) => {
-    // const isCurrentRowEditing = props.api.getEditingCells().some((cell) => cell.rowIndex === props.node.rowIndex);
+    const { api, node } = props;
+    const { AnashIdentifier, FirstName, LastName } = props.data; // מזהה האנ"ש
+    const campainName = props.context.campainName; // קבלת שם הקמפיין מהקונטקסט
+
+    const handleDelete = async () => {
+      const personName = `${node.data.FirstName} ${node.data.LastName}`; // שליפת שם מלא מהנתונים
+      const isConfirmed = window.confirm(
+        `האם אתה בטוח שברצונך למחוק את ${personName} (${AnashIdentifier}) מהקמפיין ${campainName}?`
+      );
+    
+      if (isConfirmed) {
+        try {
+          const result = await deletePersonFromCampain(AnashIdentifier, campainName);
+    
+          // אם התגובה מכילה את הודעת השגיאה מהשרת
+          if (result && result.message) {
+            toast.error(result.message);  // מציג את הודעת השגיאה שהשרת מחזיר
+          } else if (result && result.status === 200) {
+            // מחיקת הנתונים מהטבלה
+            api.applyTransaction({ remove: [node.data] });
+    
+            // הודעת הצלחה
+            toast.success(`האנ"ש ${personName} (${AnashIdentifier}) נמחק בהצלחה מ${campainName}`);
+          }הקמפ
+        } catch (error) {
+          console.error(error);
+          // אם קרתה שגיאה בלתי צפויה בקריאה ל־API
+          toast.error('שגיאה בלתי צפויה במחיקה.');
+        }
+      }
+    };
+    
 
     return (
-      <div style={{ display: 'flex', gap: '15px' }}>
-        {/* <button className="action-button update border-2 p-1 w-[100px]" onClick={() => addToCampain(props.api, props.node)}>הוסף</button> */}
-      </div>
+      <button
+        className="action-button delete p-1 px-2 text-xl bg-red-100 rounded-sm"
+        onClick={handleDelete}
+      >
+        <AiOutlineDelete />
+      </button>
     );
-
-
   };
 
 
@@ -63,6 +101,8 @@ function CampainTable({ rowData }) {
   };
 
 
+
+
   const columns = [
     {
       headerName: 'פרטים מלאים',
@@ -70,21 +110,31 @@ function CampainTable({ rowData }) {
       editable: false,
       cellRenderer: (params) => {
         const handleDetailsClick = () => {
-          const AnashIdentifier = params.data.AnashIdentifier; // Replace 'id' with the actual field name for the user ID
+          const AnashIdentifier = params.data.AnashIdentifier;
           navigate(`/user-details/${AnashIdentifier}`);
         };
 
         return (
-          <button onClick={() => handleDetailsClick()}>
+          <div
+            onClick={() => handleDetailsClick()}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '100%',
+              height: '100%',
+              cursor: 'pointer',
+            }}
+          >
             <CgDetailsMore style={{ fontSize: '20px' }} />
-          </button>
+          </div>
         );
       },
       width: 70,
       headerComponent: CustomHeader,
       headerComponentParams: {
-        displayName: 'פרטים<br>מלאים'
-      }
+        displayName: 'פרטים<br>מלאים',
+      },
     },
 
     { headerName: 'מזהה אנש', field: 'AnashIdentifier', editable: false, sortable: true, filter: true, width: 120 },
@@ -100,6 +150,13 @@ function CampainTable({ rowData }) {
       sortable: true,
       filter: true,
       width: 120,
+    },
+    {
+      headerName: 'מחיקה',
+      cellRenderer: ActionCellRenderer,
+      editable: false,
+      colId: 'action',
+      width: 80,
     }
     // {
     //   headerName: 'הוספה לקמפיין',
@@ -148,6 +205,7 @@ function CampainTable({ rowData }) {
           paginationPageSizeSelector={pageSizeOptions} // this property is not a valid AG Grid property
           domLayout="autoHeight" // Use autoHeight layout to adjust grid height automatically
           enableRtl={true}
+          context={{ campainName: useParams().campainName }}
           //onGridReady={onGridReady}
           // quickFilterText={searchText} 
           suppressClickEdit={true}
