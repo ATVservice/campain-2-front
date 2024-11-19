@@ -78,7 +78,7 @@ function CampainPage() {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      <h1 className="text-2xl font-semibold text-center mb-6">ניהול קמפיין {campainName}</h1>
+      <h1 className="text-2xl font-semibold text-center mb-6">ניהול {campainName}</h1>
 
       {/* הצגת מספרים רצים */}
       <div className="grid grid-cols-2 gap-8 text-center mb-6">

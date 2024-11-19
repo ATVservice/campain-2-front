@@ -429,6 +429,7 @@
 //         setSelectedRowData(rowData);
 //       };
 
+
 //     return (
 //         <div className="commitment-page relative">
 //             <h1>התחייבויות בקמפיין {campainName}</h1>
@@ -466,6 +467,7 @@
 //                     setRowData={setRowsData} campainName={campainName}
 //                 />
 //             )}
+
 
 //             {isFormOpen && (
 //                 <CommitmentForm

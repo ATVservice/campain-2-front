@@ -55,7 +55,7 @@ function AddPersonPage() {
       setIsLoading(true);
       const response = await addPerson(userDetails); // Add await if addPerson is an async function
       console.log(response);
-      toast.success('הוספה בוצעה בהצדסדלחה', {
+      toast.success('הוספה בוצעה בהצלחה', {
         onClose: () => setIsLoading(false),
       });
       setTimeout(() => {

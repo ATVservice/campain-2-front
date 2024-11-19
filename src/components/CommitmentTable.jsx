@@ -72,16 +72,26 @@ function CommitmentTable({rowsData}) {
               const _id = params.data._id;
               navigate(`/commitment-details/${_id}`);
             };
-      
+        
             return (
-              <button onClick={() => handleDetailsClick()}>
+              <div
+                onClick={() => handleDetailsClick()}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '100%',
+                  height: '100%',
+                  cursor: 'pointer',
+                }}
+              >
                 <CgDetailsMore style={{ fontSize: '20px' }} />
-              </button>
+              </div>
             );
           },
-          width: 100, 
-          headerClass: 'multi-line-header'
-        },
+          width: 100,
+          headerClass: 'multi-line-header',
+        },        
         { 
           headerName: 'מזהה אנש', 
           field: 'AnashIdentifier', 
