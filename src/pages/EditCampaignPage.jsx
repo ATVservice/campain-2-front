@@ -89,6 +89,7 @@ function EditCampaignPage() {
           className="border-2 p-2 w-full rounded-md focus:outline-none focus:border-blue-500"
           value={campainData.minimumAmountForMemorialDay}
           onChange={handleInputChange}
+          
         />
       </div>
 

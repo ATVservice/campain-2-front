@@ -12,13 +12,14 @@ import { GrUpdate } from "react-icons/gr";
 import { MdOutlineCancel } from "react-icons/md";
 
 
-function Table({rowData, setRowData}) {
+function Table({rowData, setRowData ,setShowActivePeople ,showActivePeople}) {
 
     const navigate = useNavigate();
     const [originalRowData, setOriginalRowData] = useState({});
     const [searchText, setSearchText] = useState('');
     const [gridApi, setGridApi] = useState(null);
     const [isFilterApplied, setIsFilterApplied] = useState(false);
+
 
     
     
@@ -71,12 +72,14 @@ function Table({rowData, setRowData}) {
               const originalRowData = node.data;
               try {
                 const res = await deleteUser(originalRowData.AnashIdentifier);
-                console.log(res);
+               
+                console.log('res');
                 api.applyTransaction({
                   remove: [node.data]
                 });
               } catch (error) {
                 console.error(error);
+                console.log('error');
               }
             }
               break;
@@ -187,7 +190,7 @@ function Table({rowData, setRowData}) {
         {
           headerName: 'פעיל',
           field: 'isActive',
-          filter: true,
+          // filter: true,
           editable: true,
          
           width: 100,
@@ -297,6 +300,14 @@ function Table({rowData, setRowData}) {
         className="m-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-sky-100" 
 
       />
+      <label htmlFor="activeFilter" className="text-gray-600 text-md font-medium mr-4 border-b-2 "><span>הצג פעילים</span></label>
+      <input
+      id="activeFilter"
+        type="checkbox"
+        checked={showActivePeople}
+        onChange={()=> setShowActivePeople(!showActivePeople)}
+        className="m-2 border border-gray-300 rounded-sm focus:outline-none w-4 h-4 focus:ring-2 focus:ring-sky-100"
+      />
 
       <div className="ag-theme-alpine" style={gridStyle}>
         
@@ -315,7 +326,7 @@ function Table({rowData, setRowData}) {
 
             editType="fullRow"
             suppressClickEdit={true}
-            onGridReady={onGridReady}
+            // onGridReady={onGridReady}
             defaultColDef={{
               ...defaultColDef,
             }}

@@ -11,6 +11,8 @@ import { max } from "date-fns";
 
 function AddToCampainTable({rowData,onAddPersonToCampain,searchText}) {
 
+  function AddToCampainTable({rowData,onAddPersonToCampain,searchText}) {
+
     const navigate = useNavigate();
       
     
@@ -27,7 +29,6 @@ function AddToCampainTable({rowData,onAddPersonToCampain,searchText}) {
         'פעיל': 'isActive',
       };
       const ActionCellRenderer = (props) => {
-        // const isCurrentRowEditing = props.api.getEditingCells().some((cell) => cell.rowIndex === props.node.rowIndex);
     
             return (
                 <div style={{ display: 'flex', gap: '15px' }}>
@@ -173,6 +174,8 @@ function AddToCampainTable({rowData,onAddPersonToCampain,searchText}) {
       }
     </div>
   );
+}
+
 }
 
 export default AddToCampainTable

@@ -290,6 +290,23 @@ function UserProfile() {
                 required
               />
             </div>
+            <div className="flex flex-col space-y-1 mt-2">
+              <label htmlFor="role" className="text-gray-600 text-sm">
+                דרגה:
+              </label>
+              <select
+                id="role"
+                className="border rounded p-2 text-right text-sm outline-none focus:ring focus:ring-blue-300"
+                name="role"
+                value={newUser.role}
+                onChange={handleNewUserInputChange}
+                required
+              >
+                <option value="Admin">אדמין</option>
+                <option value="User">משתמש בסיסי</option>
+                <option value="Guest">אורח</option>
+              </select>
+            </div>
             <button
               type="submit"
               className="w-full bg-blue-500 text-white font-medium text-sm py-2 rounded hover:bg-blue-600 transition duration-150"

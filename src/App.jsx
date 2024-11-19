@@ -12,14 +12,14 @@ import Navbar from "./features/Navbar";
 import AlfonPage from "./pages/AlfonPage";
 import LoginPage from "./pages/LoginPage";
 import MenuPage from "./pages/MenuPage";
-import CommitmentPage from "./pages/commitmentPage";
+// import CommitmentPage from "./pages/commitmentPage";
 import UserDetailsPage from "./pages/UserDetailsPage";
-import CommitmentDetailsPage from "./pages/CommitmentDetailsPage";
+// import CommitmentDetailsPage from "./pages/CommitmentDetailsPage";
 import CampainsPage from "./pages/CampainsPage";
 import MemorialBoard from "./pages/MemorialBoard";
 import CampainPage from "./pages/CampainPage";
 import PeopleInCampain from "./pages/peopleInCampain";
-import CampaignCommitments from "./pages/CampaignCommitments";
+// import CampaignCommitments from "./pages/CampaignCommitments";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AddPersonPage from "./pages/AddPersonPage";
@@ -34,7 +34,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import UserProfile from "./pages/UserProfile";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
-
+import CommitmentPage2 from "./pages/CommitmentPage2";
+import CommitmentDetailsPage2 from "./pages/CommitmentDetailsPage2";
 Modal.setAppElement("#root");
 
 // Custom component to handle showing Navbar conditionally
@@ -63,19 +64,26 @@ const App = () => {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password/:token" element={<ResetPassword />} />
+              
+                
 
 
                 <Route element={<ProtectedRoute />}>
                   <Route path="/alfon" element={<AlfonPage />} />
                   <Route path="/menu" element={<MenuPage />} />
-                  <Route path="/commitment" element={<CommitmentPage />} />
+                  {/* <Route path="/commitment" element={<CommitmentPage />} /> */}
+                  <Route path="/commitments/:campainName?" element={<CommitmentPage2 />} />
                   <Route
                     path="/user-details/:AnashIdentifier"
                     element={<UserDetailsPage />}
                   />
-                  <Route
+                  {/* <Route
                     path="/commitment-details/:commitmentId"
                     element={<CommitmentDetailsPage />}
+                  /> */}
+                  <Route
+                    path="/commitment-details/:commitmentId"
+                    element={<CommitmentDetailsPage2 />}
                   />
                   <Route path="/campains" element={<CampainsPage />} />
                   <Route path="/memorial-Board" element={<MemorialBoard />} />
@@ -84,10 +92,10 @@ const App = () => {
                     path="/PeopleInCampain/:campainName"
                     element={<PeopleInCampain />}
                   />
-                  <Route
+                  {/* <Route
                     path="/campaign-commitments/:campainName"
                     element={<CampaignCommitments />}
-                  />
+                  /> */}
                   <Route path="/add-person" element={<AddPersonPage />} />
                   <Route path="/memorial-day-2" element={<MemorialDay2 />} />
                   <Route
