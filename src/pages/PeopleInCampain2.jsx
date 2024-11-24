@@ -7,6 +7,7 @@ import {
   addPersonToCampain,
   reviewBefourAddPeopleToCampain,
   addPeopleToCampain,
+  deletePersonFromCampain,
 } from "../requests/ApiRequests";
 import AddToCampainTable from "../components/AddToCampainTable";
 import CampainTable from "../components/CampainTable";
@@ -33,36 +34,45 @@ function PeopleInCampain2() {
   const [invalidPeople, setInvalidPeople] = useState([]);
   const fetchCampainPeople = async () => {
     try {
+      setLoading(true);
       const response = await getCampainPeople(campainName);
-      console.log(response);
       setPeopleInCampain(response.data);
     } catch (error) {
-      console.error(error);
+      console.error("Error fetching campaign people:", error);
+    }
+    finally {
+      setLoading(false);
     }
   };
+  
   const fetchPeopleNotInCampain = async () => {
     try {
+      console.log(campainName);
       const response = await getPeopleNotInCampain(campainName);
       console.log(response);
       setPeopleNotInCampain(response.data);
     } catch (error) {
-      console.error(error);
+      console.error("Error fetching people not in campaign:", error);
     }
   };
+  
   useEffect(() => {
     const fetchData = async () => {
-      try {
+      try
+      {
+        const response = await fetchPeopleNotInCampain();
+        console.log('e');
         await fetchCampainPeople();
-        await fetchPeopleNotInCampain();
-      } catch (error) {
-        console.error(error);
+        console.log(response);
+        
+      }
+      catch (error) {
+        console.error("Error fetching data:", error);
       }
     };
-
-    fetchData(); // Call the async function
-  }, []); // Empty dependency array ensures the effect runs only once
-
-  const handleFileUpload = async (e) => {
+    fetchData();
+  }, []); // Dependency array ensures this runs only once
+    const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     const reader = new FileReader();
     reader.onload = async (event) => {
@@ -116,7 +126,8 @@ function PeopleInCampain2() {
       const response = await addPeopleToCampain(campainName, validPeople);
       if (response.status === 200) {
         console.log(response.data);
-        await Promise.all([fetchCampainPeople(), fetchPeopleNotInCampain()]);
+        fetchPeopleNotInCampain()
+        fetchCampainPeople();
         toast.success("נוספו אנשים לקמפיין בהצלחה");
       } else {
         throw new Error("Failed to add people to the campaign");
@@ -131,12 +142,12 @@ function PeopleInCampain2() {
       setLoading(false);
     }
   };
-    async function onAddPersonToCampain(AnashIdentifier) {
+  async function onAddPersonToCampain(AnashIdentifier) {
     try {
       setLoading(true);
       await addPersonToCampain({ campainName, AnashIdentifier });
-      await fetchCampainPeople();
-      await fetchPeopleNotInCampain();
+       fetchCampainPeople();
+       fetchPeopleNotInCampain();
       toast.success("תורם נוסף לקמפיין בהצלחה");
     } catch (error) {
       console.error("Error adding person to campaign:", error);
@@ -144,20 +155,20 @@ function PeopleInCampain2() {
       setLoading(false);
     }
   }
-  function onDeletePersonFromCampain(AnashIdentifier) {
-    setPeopleNotInCampain((prevPeopleNotInCampain) => [
-      ...prevPeopleNotInCampain,
-      peopleInCampain.find(
-        (person) => person.AnashIdentifier === AnashIdentifier
-      ),
-    ]);
-    setPeopleInCampain((prevPeopleInCampain) =>
-      prevPeopleInCampain.filter(
-        (person) => person.AnashIdentifier !== AnashIdentifier
-      )
-    );
+  async function onDeletePersonFromCampain(AnashIdentifier) {
+    try {
+      setLoading(true);
+      await deletePersonFromCampain({ campainName, AnashIdentifier });
+      await fetchCampainPeople();
+      await fetchPeopleNotInCampain();
+      toast.success("תורם הוסר מהקמפיין בהצלחה");
+    } catch (error) {
+      console.error("Error deleting person from campaign:", error);
+    } finally {
+      setLoading(false);
+    }
   }
-  if(loading)
+    if(loading)
     return <Spinner />
 
   return (
