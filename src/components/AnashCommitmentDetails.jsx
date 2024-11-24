@@ -218,8 +218,8 @@ function AnashCommitmentDetails({
 
   return (
     <div>
-      <form className="max-w-7xl mx-auto p-3">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-[20px] border border-sky-200 p-3 rounded">
+      <form className="max-w-[95vw] mx-auto p-3">
+        <div className="grid grid-cols-1 md:grid-cols-6 gap-[20px] border border-sky-200 p-3 rounded">
           <label>
             מזהה אנש:
             <input
@@ -322,6 +322,17 @@ function AnashCommitmentDetails({
               type="number"
               name="PaymentsRemaining"
               value={commitmentForm.PaymentsRemaining ?? ''}
+              onChange={handleChange}
+              className="mt-1 block w-full p-2 border border-gray-300  bg-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              readOnly
+            />
+          </label>
+          <label>
+             תשלום חודשי:
+            <input
+              type="number"
+              name="MonthlyPayment"
+              value={(commitmentForm.CommitmentAmount/commitmentForm.NumberOfPayments)||''}
               onChange={handleChange}
               className="mt-1 block w-full p-2 border border-gray-300  bg-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               readOnly
