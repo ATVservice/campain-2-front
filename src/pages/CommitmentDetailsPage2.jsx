@@ -1,11 +1,12 @@
 import React ,{ useState,useEffect,useRef} from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import AnashCommitmentDetails from '../components/AnashCommitmentDetails'
-import {getCommitmentDetails,getCampainByName,getAllMemorialDates,updateCommitmentDetails,uploadCommitmentPayment,deletePayment,deleteCommitment} from '../requests/ApiRequests'
+import {getCommitmentDetails,getCampainByName,getAllMemorialDates,updateCommitmentDetails,uploadCommitmentPayment,deletePayment,deleteCommitment,validateUserPassword} from '../requests/ApiRequests'
 import AnashPaymentsDetails from '../components/AnashPaymentsDetails'
 import PaymentForm from '../components/PaymentForm'
-import { set } from 'date-fns'
 import { toast } from 'react-toastify'
+import PasswordConfirmationModal from '../components/PasswordConfirmationModal'
+import Spinner from '../components/Spinner'
 
 function CommitmentDetailsPage2() {
 
@@ -16,8 +17,11 @@ function CommitmentDetailsPage2() {
     const [allCampainMemorialDates, setAllCampainMemorialDates] = useState([]);
     const [commitmentPayments, setCommitmentPayments] = useState([]);
     const [showPaymentForm, setShowPaymentForm] = useState(false);
+    const [commitmentAmountBefourChange, setCommitmentAmountBefourChange] = useState(0);
+    const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+    const [password, setPassword] = useState('');
+  
     const navigate = useNavigate();
-    
 
     useEffect(() => {
       const fetchCommitmentDetails = async () => {
@@ -25,6 +29,7 @@ function CommitmentDetailsPage2() {
   
           try {
               setIsLoading(true); // Start loading
+              console.log('e');
   
               // Fetch commitment details
               const commitmentRes = await getCommitmentDetails(commitmentId);
@@ -33,6 +38,7 @@ function CommitmentDetailsPage2() {
               const commitmentPayments = commitmentRes.data.payments;
               setCommitmentForm(commitmentData);
               setCommitmentPayments(commitmentPayments);
+              setCommitmentAmountBefourChange(commitmentData.CommitmentAmount);
   
               // Fetch campaign details
               const campainRes = await getCampainByName(commitmentData.CampainName);
@@ -58,9 +64,11 @@ function CommitmentDetailsPage2() {
 
   const submitCommitmentUpdate = async () => {
     try {
+      setIsLoading(true);
       const response = await updateCommitmentDetails(commitmentForm);
       if (response && response.status === 200) {
         setCommitmentForm(response.data.updatedCommitment);
+        setCommitmentAmountBefourChange(response.data.updatedCommitment.CommitmentAmount);
         toast.success( 'התחייבות עודכנה בהצלחה');
         
       }
@@ -70,6 +78,9 @@ function CommitmentDetailsPage2() {
       console.error("Error updating commitment:", error.response.data.message);
       toast.error(error.response.data.message);
     }
+    finally {
+      setIsLoading(false);
+    }
 
 
     
@@ -77,7 +88,7 @@ function CommitmentDetailsPage2() {
 
   const UploadCommitmentPayment = async (paymentData) => {
     try {
-        console.log(paymentData);
+      setIsLoading(true);
       const response = await uploadCommitmentPayment(paymentData);
       if (response && response.status === 200) {
         console.log(console.log(response.data.newPayment));
@@ -94,6 +105,9 @@ function CommitmentDetailsPage2() {
       console.error("Error updating commitment:", error.response.data.message);
       toast.error(error.response.data.message);
     }
+    finally {
+      setIsLoading(false);
+    }
   };
   const handelAddPayment = () => {
     setShowPaymentForm(true);
@@ -102,6 +116,7 @@ function CommitmentDetailsPage2() {
 
 const handelDeleteCommitment = async () => {
     try {
+      setIsLoading(true);
       const response = await deleteCommitment(commitmentForm._id);
       if (response && response.status === 200) {
         console.log(response.data.message);
@@ -117,18 +132,39 @@ const handelDeleteCommitment = async () => {
       console.error("Error updating commitment:", error);
       toast.error(error.response.data.message);
     }
+    finally {
+      setIsLoading(false);
+    }
     
 
 };
+const handleValidatePassword = async (e) => {
+    e.preventDefault();
+    try {
+      setIsLoading(true);
+      const res = await validateUserPassword(password);
+      console.log(res);
+      if (res.status === 200) {
+        setShowConfirmationModal(false);
+        await handelDeleteCommitment();
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.response.data.message);
+    }
+    finally {
+      setPassword('');
+      setIsLoading(false);
+    }
+  };
 
   
-    if(isLoading ){
-        return (
-                <p>Loading...</p>
-        )
-    }
+if(isLoading) {
+  {
 
-
+    return <div><Spinner /></div>
+  }
+}
 
   return (
     <div>
@@ -140,19 +176,29 @@ const handelDeleteCommitment = async () => {
         <button className="px-4 py-2 bg-blue-500 text-white rounded" onClick={submitCommitmentUpdate}>
             עדכן התחייבות
         </button>
-        <button className="px-4 py-2 bg-red-500 text-white rounded" onClick={handelDeleteCommitment}>
+        <button className="px-4 py-2 bg-red-500 text-white rounded" onClick={() => setShowConfirmationModal(true)}>
             מחק התחייבות
         </button>
 
 
         </div>
 
+        {showConfirmationModal && (
+            <PasswordConfirmationModal
+                isOpen={showConfirmationModal}
+                onClose={() => setShowConfirmationModal(false)}
+                onSubmit={handleValidatePassword}
+                password={password}
+                setPassword={setPassword}
+            />
+        )}
+
         {showPaymentForm && (
             <PaymentForm onSubmit={UploadCommitmentPayment} onClose={() => setShowPaymentForm(false)} campainName={campain.CampainName} anashIdentifier={commitmentForm.AnashIdentifier}/>
         )}
 
         <AnashCommitmentDetails commitmentForm={commitmentForm} setCommitmentForm={setCommitmentForm}
-         campain={campain} allCampainMemorialDates={allCampainMemorialDates}/>
+         campain={campain} allCampainMemorialDates={allCampainMemorialDates} commitmentAmountBefourChange={commitmentAmountBefourChange}/>
         <AnashPaymentsDetails commitmentPayments={commitmentPayments} 
         setCommitmentPayments={setCommitmentPayments} setCommitmentForm={setCommitmentForm}/>
 

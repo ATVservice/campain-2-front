@@ -6,14 +6,8 @@ import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { MdDownloadDone } from "react-icons/md";
 import { TiDeleteOutline } from "react-icons/ti";
-import { m } from 'framer-motion';
 
 
-// const addToCampain = async (api, node) => {
-//   const {AnashIdentifier} = node.data
-
-//   onAddPersonToCampain(AnashIdentifier);
-// };
 
 
 function SearchCommitmmentTable({rowData,searchText ,onSelectRow,onUnselectRow}) {

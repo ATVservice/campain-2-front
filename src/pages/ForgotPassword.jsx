@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { forgotPassword } from '../requests/ApiRequests';
+import Spinner from '../components/Spinner';
 
 const ForgotPassword = () => {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         try {
+            setLoading(true);
             const response = await forgotPassword({ username, email });
 
             console.log(response);
@@ -20,7 +23,13 @@ const ForgotPassword = () => {
         } catch (error) {
             setMessage(error.response.data.message);
         }
+        finally {
+            setLoading(false);
+        }
     };
+    if(loading) {
+        return <Spinner />;
+    }
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">

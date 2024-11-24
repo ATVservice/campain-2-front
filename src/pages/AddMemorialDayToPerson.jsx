@@ -4,7 +4,7 @@ import AddToMemmorialDayTable from '../components/AddToMemmorialDayTable';
 import { HDate, gematriya, months } from '@hebcal/hdate';
 import { AddMemorialDay,GetEligblePeopleToMemmorialDay } from '../requests/ApiRequests';
 import { toast } from 'react-toastify';
-import { set } from 'date-fns';
+import Spinner from '../components/Spinner';
 
 
 function AddMemorialDayToPerson() {
@@ -61,12 +61,14 @@ function AddMemorialDayToPerson() {
           toast.success('הנצחה נוספה בהצלחה', {
             autoClose: 1000,
           });
-          setIsLoading(false);
+          navigate(`/memorial-day-details?CampainName=${data.CampainName}&date=${data.MemorialDay.date}
+            &anashidentifier=${data.AnashIdentifier}&commartion=${data.MemorialDay.Commeration||""}` )
+            setIsLoading(false);
         }
         console.log(response);
       } catch (error) {
         console.log(error);
-        toast.error(error.message?error.message:'שגיאה בהוספת הנצחה', {
+        toast.error(error.response.data.message, {
           autoClose: 1000,
         });
       }
@@ -74,6 +76,10 @@ function AddMemorialDayToPerson() {
         setIsLoading(false);
       }
 
+     }
+     if(isLoading)
+     {
+      return <Spinner />
      }
     
     return (

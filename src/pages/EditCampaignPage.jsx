@@ -1,85 +1,249 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { toast } from 'react-toastify';
-//import { getCampaignDetails, updateCampaign } from '../requests/ApiRequests';
-
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import {
+  getCampainByName,
+  editCampainDetails,
+  reviewDeletedMemorialDays,
+} from "../requests/ApiRequests"; // Ensure updateCampaign is implemented
+import DeletedMemorialDaysModal from "../components/DeletedMemorialDaysModal";
+import { HDate, gematriya, months } from "@hebcal/core";
+import { ReactJewishDatePicker } from "react-jewish-datepicker";
+import "react-jewish-datepicker/dist/index.css";
+import HebrewDatePicker from "../components/HebrewDatePicker";
+import Spinner from "../components/Spinner";
 function EditCampaignPage() {
-  const { campainName } = useParams();
-  const [campainData, setCampainData] = useState({
-    CampainName: '',
-    start: '',
-    end: '',
-    minimumAmountForMemorialDay: 0,
-  });
+  let { campainName } = useParams();
+  const [campainData, setCampainData] = useState(null); // Original data
+  const [editedCampainData, setEditedCampainData] = useState({}); // User-edited data
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const [showDeletedModal, setShowDeletedModal] = useState(false);
+  const [deletedMemorialDays, setDeletedMemorialDays] = useState([]);
 
+  // Fetch campaign details on mount
   useEffect(() => {
     const fetchCampaignDetails = async () => {
       try {
-        //const response = await getCampaignDetails(campainName);
-        setCampainData(response.data);
+        setIsLoading(true);
+        const response = await getCampainByName(campainName);
+        console.log(response);
+        const campaign = response.data.data.campain;
+        setCampainData(campaign);
+        setEditedCampainData(campaign);
       } catch (error) {
-        toast.error('שגיאה בטעינת נתוני הקמפיין');
+        console.log(error);
+        toast.error("שגיאה בטעינת נתוני הקמפיין");
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchCampaignDetails();
-  }, [campainName]);
+  }, []);
 
+  // Handle input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setCampainData({ ...campainData, [name]: value });
+    setEditedCampainData((prevData) => ({ ...prevData, [name]: value }));
   };
-
-  const handleSave = async () => {
-    try {
-      //await updateCampaign(campainName, campainData);
-      toast.success('השינויים נשמרו בהצלחה');
-      navigate(`/campaign/${campainName}`);
-    } catch (error) {
-      toast.error('שגיאה בשמירת השינויים');
+  const handleDateChange = (key, day) => {
+    console.log("Selected day:", day); // Check the structure of the day object
+    setEditedCampainData((prevData) => ({ ...prevData, [key]: day.date }));
+    if (key === "startDate") {
+      const startHebrewDate = new HDate(new Date(day.date));
+      setEditedCampainData((prevData) => ({
+        ...prevData,
+        hebrewStartDate: startHebrewDate.renderGematriya(),
+      }));
+    } else if (name === "endDate") {
+      const endHebrewDate = new HDate(new Date(day.date));
+      setEditedCampainData((prevData) => ({
+        ...prevData,
+        hebrewEndDate: endHebrewDate.renderGematriya(),
+      }));
     }
   };
 
-  const handleCancel = () => {
-    navigate(`/campaign/${campainName}`);
+  // Validate edited data
+  const validateData = () => {
+    if (!editedCampainData.CampainName) {
+      toast.error("שם הקמפיין הוא שדה חובה");
+      return false;
+    }
+    if (
+      new Date(editedCampainData.startDate) >=
+      new Date(editedCampainData.endDate)
+    ) {
+      toast.error("תאריך התחלה צריך להיות לפני תאריך סיום");
+      return false;
+    }
+    return true;
   };
+
+  // Save changes
+  const handleSave = async () => {
+    if (!validateData()) return;
+
+    // Identify changed fields
+    const updatedFields = {};
+    for (const key in editedCampainData) {
+      if (editedCampainData[key] !== campainData[key]) {
+        updatedFields[key] = editedCampainData[key];
+      }
+    }
+
+    if (Object.keys(updatedFields).length === 0) {
+      toast.info("אין שינויים לשמור");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const response = await reviewDeletedMemorialDays(
+        editedCampainData,
+        campainData._id
+      ); // Backend request
+      if (response.data.deletedMemorialDays?.length > 0) {
+        setDeletedMemorialDays(response.data.deletedMemorialDays);
+        setShowDeletedModal(true);
+      } else {
+        console.log("e");
+        console.log(editedCampainData);
+        await editCampainDetails(
+          editedCampainData,
+          deletedMemorialDays,
+          campainData._id
+        ); // Backend request
+        setCampainData(editedCampainData);
+        navigate(`/edit-campaign/${editedCampainData.CampainName}`);
+        toast.success("השינויים נשמרו בהצלחה");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error(error.response.data.message);
+    }
+    finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Cancel changes
+  const handleCancel = () => {
+    setEditedCampainData(campainData);
+    setDeletedMemorialDays([]);
+  };
+  const handelEditCampainDetails = async () => {
+    setDeletedMemorialDays([]);
+    setShowDeletedModal(false);
+    try {
+      setIsLoading(true);
+      const response = await editCampainDetails(
+        editedCampainData,
+        deletedMemorialDays,
+        campainData._id
+      ); // Backend request
+      setCampainData(editedCampainData);
+      console.log(response);
+      navigate(`/edit-campaign/${editedCampainData.CampainName}`);
+      toast.success("השינויים נשמרו בהצלחה");
+    } catch (error) {
+      console.error(error);
+      toast.error(error.response.data.message);
+    }
+    finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isLoading) {
+    return <Spinner />;
+  }
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-lg max-w-md mx-auto mt-6">
-      <h2 className="text-xl font-semibold mb-4 text-blue-700">עריכת קמפיין {campainName}</h2>
-      
+      <h2 className="text-xl font-semibold mb-4 text-blue-700">
+        עריכת קמפיין {campainName}
+      </h2>
+      {/* <HebrewDatePicker/> */}
+
       <div className="mb-4">
         <input
           type="text"
           name="CampainName"
           placeholder="שם הקמפיין"
           className="border-2 p-2 w-full rounded-md focus:outline-none focus:border-blue-500"
-          value={campainData.CampainName}
+          value={editedCampainData.CampainName || ""}
+          onChange={handleInputChange}
+        />
+      </div>
+      
+      <div className="mb-4 flex flex-col gap-4">
+        <div>
+        <span className="mb-1 text-blue-700">תאריך התחלה:</span>
+        <ReactJewishDatePicker
+            key="startDatePicker" // Unique key for the first date picker
+            onClick={(day) => handleDateChange("startDate", day)}
+            isHebrew
+            className="mt-2"
+            value={new Date(editedCampainData.startDate)}
+          />
+        </div>
+        <div>
+        <span className="mb-1 text-blue-700">תאריך סיום:</span>
+
+          <ReactJewishDatePicker
+            key="endDatePicker" // Unique key for the second date picker
+            onClick={(day) => handleDateChange("endDate", day)}
+            isHebrew
+            className="mt-2"
+            value={new Date(editedCampainData.endDate)}
+          />
+        </div>
+      </div>
+
+      {/* <div className="mb-4">
+        <div className="flex justify-between">
+          <span className="mb-1 text-blue-700">תאריך התחלה:</span>
+          <span className="bg-blue-100 text-blue-800 text-md font-semibold mr-2 px-2.5 py-0.5 rounded">
+            {editedCampainData.hebrewStartDate}
+          </span>
+        </div>
+        <input
+          type="date"
+          name="startDate"
+          className="border-2 p-2 w-full rounded-md focus:outline-none focus:border-blue-500"
+          value={
+            editedCampainData.startDate
+              ? new Date(editedCampainData.startDate)
+                  .toISOString()
+                  .split("T")[0]
+              : ""
+          }
           onChange={handleInputChange}
         />
       </div>
 
       <div className="mb-4">
-        <p className="mb-1 text-blue-700">תאריך התחלה:</p>
+        <div className="flex justify-between">
+          <span className="mb-1 text-blue-700">תאריך סיום:</span>
+          <span className="bg-blue-100 text-blue-800 text-md font-semibold mr-2 px-2.5 py-0.5 rounded">
+            {editedCampainData.hebrewEndDate}
+          </span>
+        </div>
         <input
           type="date"
-          name="start"
+          name="endDate"
           className="border-2 p-2 w-full rounded-md focus:outline-none focus:border-blue-500"
-          value={campainData.start}
+          value={
+            editedCampainData.endDate
+              ? new Date(editedCampainData.endDate)
+                  .toISOString()
+                  .split("T")[0]
+              : ""
+          }
           onChange={handleInputChange}
         />
-      </div>
-
-      <div className="mb-4">
-        <p className="mb-1 text-blue-700">תאריך סיום:</p>
-        <input
-          type="date"
-          name="end"
-          className="border-2 p-2 w-full rounded-md focus:outline-none focus:border-blue-500"
-          value={campainData.end}
-          onChange={handleInputChange}
-        />
-      </div>
+      </div> */}
 
       <div className="mb-4">
         <p className="mb-1 text-blue-700">סכום מינימלי ליום הנצחה:</p>
@@ -87,9 +251,9 @@ function EditCampaignPage() {
           type="number"
           name="minimumAmountForMemorialDay"
           className="border-2 p-2 w-full rounded-md focus:outline-none focus:border-blue-500"
-          value={campainData.minimumAmountForMemorialDay}
+          value={editedCampainData.minimumAmountForMemorialDay || ""}
           onChange={handleInputChange}
-          
+          readOnly
         />
       </div>
 
@@ -107,6 +271,14 @@ function EditCampaignPage() {
           בטל
         </button>
       </div>
+      {showDeletedModal && (
+        <DeletedMemorialDaysModal
+          isOpen={showDeletedModal}
+          onClose={() => setShowDeletedModal(false)}
+          onSubmit={handelEditCampainDetails}
+          deletedMemorialDays={deletedMemorialDays}
+        />
+      )}
     </div>
   );
 }

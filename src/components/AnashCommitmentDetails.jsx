@@ -2,21 +2,18 @@ import React, { useState, useEffect,forwardRef } from "react";
 import { ReactJewishDatePicker } from "react-jewish-datepicker";
 import "react-jewish-datepicker/dist/index.css";
 import { BiShekel } from "react-icons/bi";
-import { set } from "date-fns";
 import { toast } from "react-toastify";
 
-// import {
-//   dontSelectOutOfRange,
-//   addDates,
-//   subtractDates,
-// } from "jewish-dates-core";
 
 function AnashCommitmentDetails({
   commitmentForm = {},
   setCommitmentForm = () => {},
   campain = {},
   allCampainMemorialDates = [],
+  commitmentAmountBefourChange = 0
 }) {
+  // console.log(cam);
+  // console.log(commitmentForm);
   const [memorialDaysToDisplay, setMemorialDaysToDisplay] = useState([
     ...(commitmentForm?.MemorialDays ?? []),
   ]);
@@ -46,6 +43,14 @@ function AnashCommitmentDetails({
     
   const handleChange = (e) => {
     const { name, value } = e.target;
+    if(name === "CommitmentAmount" || name === "AmountPaid" || name === "NumberOfPayments" || name === "PaymentsMade" || name === "AmountRemaining" || name === "PaymentsRemaining")
+    {
+      const parsedValue = parseFloat(value);
+      if ((isNaN(parsedValue) || parsedValue < 0) && value !== "")  {
+        toast.error("Please enter a valid number.");
+        return;
+      }
+    }
   
     setCommitmentForm((prevCommitmentForm) =>
       calculateUpdatedForm(prevCommitmentForm, name, value)
@@ -194,9 +199,10 @@ function AnashCommitmentDetails({
   }
 
   const AddMemorialDay = () => {
+    console.log(commitmentAmountBefourChange);
     const remainingMemorialDays =
       Math.floor(
-        commitmentForm.CommitmentAmount / campain.minimumAmountForMemorialDay
+        commitmentAmountBefourChange / campain.minimumAmountForMemorialDay
       ) - memorialDaysToDisplay.length;
 
     if (remainingMemorialDays <= 0) {
@@ -263,7 +269,7 @@ function AnashCommitmentDetails({
             <input
               type="number"
               name="CommitmentAmount"
-              value={commitmentForm.CommitmentAmount || ""}
+              value={commitmentForm.CommitmentAmount ?? ""}
               onChange={handleChange}
               className="mt-1 block w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -273,9 +279,10 @@ function AnashCommitmentDetails({
             <input
               type="number"
               name="AmountPaid"
-              value={commitmentForm.AmountPaid || 0}
+              value={commitmentForm.AmountPaid ?? ''}
               onChange={handleChange}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="mt-1 block w-full p-2 border border-gray-200 bg-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              readOnly
             />
           </label>
           <label>
@@ -283,9 +290,9 @@ function AnashCommitmentDetails({
             <input
               type="number"
               name="AmountRemaining"
-              value={commitmentForm.AmountRemaining || 0}
+              value={commitmentForm.AmountRemaining ?? ''}
               readOnly // Make it read-only since it's a calculated field
-              className="mt-1 block w-full p-2 border border-gray-300 rounded bg-gray-100" // Add some visual indication it's not editable
+              className="mt-1 block w-full p-2 border border-gray-200 rounded bg-gray-200" // Add some visual indication it's not editable
             />{" "}
           </label>
           <label>
@@ -293,9 +300,9 @@ function AnashCommitmentDetails({
             <input
               type="number"
               name="NumberOfPayments"
-              value={commitmentForm.NumberOfPayments || 0}
+              value={commitmentForm.NumberOfPayments ?? ''}
               onChange={handleChange}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="mt-1 block w-full p-2 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </label>
           <label>
@@ -303,9 +310,10 @@ function AnashCommitmentDetails({
             <input
               type="number"
               name="PaymentsMade"
-              value={commitmentForm.PaymentsMade || 0}
+              value={commitmentForm.PaymentsMade ?? ''}
               onChange={handleChange}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="mt-1 block w-full p-2 border border-gray-300 bg-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              readOnly
             />
           </label>
           <label>
@@ -313,7 +321,7 @@ function AnashCommitmentDetails({
             <input
               type="number"
               name="PaymentsRemaining"
-              value={commitmentForm.PaymentsRemaining || 0}
+              value={commitmentForm.PaymentsRemaining ?? ''}
               onChange={handleChange}
               className="mt-1 block w-full p-2 border border-gray-300  bg-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               readOnly

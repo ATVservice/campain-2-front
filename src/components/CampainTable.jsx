@@ -10,7 +10,8 @@ import { toast } from 'react-toastify';
 
 
 
-function CampainTable({ rowData }) {
+function CampainTable({ rowData, onDeletePersonFromCampain ,searchInText}) {
+  console.log(rowData);
   const [gridApi, setGridApi] = useState(null);
   const navigate = useNavigate();
 
@@ -44,20 +45,12 @@ function CampainTable({ rowData }) {
         try {
           const result = await deletePersonFromCampain(AnashIdentifier, campainName);
     
-          // אם התגובה מכילה את הודעת השגיאה מהשרת
-          if (result && result.message) {
-            toast.error(result.message);  // מציג את הודעת השגיאה שהשרת מחזיר
-          } else if (result && result.status === 200) {
-            // מחיקת הנתונים מהטבלה
-            api.applyTransaction({ remove: [node.data] });
-    
-            // הודעת הצלחה
-            toast.success(`האנ"ש ${personName} (${AnashIdentifier}) נמחק בהצלחה מ${campainName}`);
-          }הקמפ
+          toast.success(`האנ"ש ${personName} (${AnashIdentifier}) נמחק בהצלחה מ${campainName}`);
+          onDeletePersonFromCampain(AnashIdentifier);
         } catch (error) {
           console.error(error);
-          // אם קרתה שגיאה בלתי צפויה בקריאה ל־API
-          toast.error('שגיאה בלתי צפויה במחיקה.');
+          toast.error(error.response.data?.message||'שגיאה במחיקת אנשי קמפיין');
+
         }
       }
     };
@@ -206,8 +199,7 @@ function CampainTable({ rowData }) {
           domLayout="autoHeight" // Use autoHeight layout to adjust grid height automatically
           enableRtl={true}
           context={{ campainName: useParams().campainName }}
-          //onGridReady={onGridReady}
-          // quickFilterText={searchText} 
+          quickFilterText={searchInText}
           suppressClickEdit={true}
           defaultColDef={{
             filterParams: {

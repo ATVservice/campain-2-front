@@ -6,43 +6,65 @@ import "react-toastify/dist/ReactToastify.css";
 import { reviewCommitmentsPayments,uploadCommitmentsPayments } from "../requests/ApiRequests";
 import ReviewPaymentsModal from "./ReviewPaymentsModal";
 import PaymentForm from "./PaymentForm";
+import Spinner from "./Spinner";
 
 
 
 function Payments() {
   const hebrewToEnglishMapping = {
-    "מזהה אנש": "AnashIdentifier",
+    "הערות": "AnashIdentifier",
     "מספר זהות": "PersonID",
-    שם: "FirstName",
-    משפחה: "LastName",
+    'שם': "FirstName",
+    'משפחה': "LastName",
     "סכום התחייבות": "CommitmentAmount",
     "סכום שולם": "AmountPaid",
     "סכום שנותר": "AmountRemaining",
     "מספר תשלומים": "NumberOfPayments",
     "תשלומים שבוצעו": "PaymentsMade",
     "תשלומים שנותרו": "PaymentsRemaining",
-    מתרים: "Fundraiser",
-    "אופן תשלום": "PaymentMethod",
-    הערות: "Notes",
+    'מתרים': "Fundraiser",
+    "מותג": "PaymentMethod",
+    "תנועה": "PaymentMethod",
     "תשובה למתרים": "ResponseToFundraiser",
     "יום הנצחה": "MemorialDay",
-    הנצחה: "Commemoration",
+    'הנצחה': "Commemoration",
     "מספר התחייבות": "CommitmentId",
-    סכום: "Amount",
-    תאריך: "Date",
-    קמפיין: "CampainName",
+    'סכום': "Amount",
+    'תאריך עסקה': "Date",
+    'קמפיין': "CampainName",
   };
+    
 
   const fileRef = useRef(null);
   const [validPayments, setValidPayments] = useState([]);
   const [invalidPayments, setInvalidPayments] = useState([]);
   const [showPaymentsForm, setShowPaymentsForm] = useState(false);
   const { campainName } = useParams();
+  const [isLoading, setIsLoading] = useState(false);
 
   function parseExcelDate(value) {
     // Check if value is a number, which Excel often uses for dates
     const dateObject = XLSX.SSF.parse_date_code(value);
     return new Date(dateObject.y, dateObject.m - 1, dateObject.d);
+  }
+  function getPaymentMethod(hebrewHeader,cellValue) {
+    if(!cellValue)
+      return null
+    else if(hebrewHeader === 'מותג')
+    {
+      return 'הו"ק אשראי'
+    }
+    else if(hebrewHeader === 'תנועה' && cellValue ==='שידור')
+    {
+      return 'הו"ק בנקאית'
+    }
+    else
+    {
+      return null
+    }
+      
+    
+    
   }
    const handleFileUpload = async (e) => {
     const file = e.target.files[0];
@@ -73,7 +95,14 @@ function Payments() {
           if (englishKey) {
             if (englishKey === "Date" && typeof row[index] === "number") {
               mappedRow[englishKey] = parseExcelDate(row[index]);
-            } else {
+
+            }
+            else if (englishKey === "PaymentMethod") 
+              {
+
+                mappedRow[englishKey] = getPaymentMethod(header,row[index]);
+            }
+             else {
               mappedRow[englishKey] = row[index];
             }
           }
@@ -88,7 +117,8 @@ function Payments() {
     console.log('e');
     try {
       // Send the mapped data to reviewCommitments
-      const response = await reviewCommitmentsPayments(payments);
+      setIsLoading(true);
+      const response = await reviewCommitmentsPayments(payments,campainName);
       console.log(response.data);
       setValidPayments(response.data.validPayments);
       setInvalidPayments(response.data.invalidPayments);
@@ -97,6 +127,10 @@ function Payments() {
       // Optionally store the uploaded data
     } catch (error) {
       console.error("Error during reviewCommitments:", error);
+    }
+    finally
+    {
+      setIsLoading(false);
     }
   }
 
@@ -111,6 +145,7 @@ function Payments() {
     } else {
         try
         {
+          setIsLoading(true);
           const response = await uploadCommitmentsPayments(paymentsToUpload);
           console.log(response);
           toast.success("תשלום/ים נוספו בהצלחה");
@@ -120,7 +155,15 @@ function Payments() {
           console.log(error);
           toast.error(error.response.data.message);
         }
+        finally
+        {
+          setIsLoading(false);
+        }
     }
+  }
+  if(isLoading)
+  {
+    return <Spinner/>
   }
 
   return (

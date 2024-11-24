@@ -9,7 +9,6 @@ import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { max } from "date-fns";
 
 
-function AddToCampainTable({rowData,onAddPersonToCampain,searchText}) {
 
   function AddToCampainTable({rowData,onAddPersonToCampain,searchText}) {
 
@@ -73,6 +72,7 @@ function AddToCampainTable({rowData,onAddPersonToCampain,searchText}) {
         { headerName: 'מזהה אנש', field: 'AnashIdentifier', editable: false, sortable: true, filter: true,width: 120 },
         { headerName: 'שם', field: 'FirstName', editable: true, sortable: true, filter: true },
         { headerName: 'משפחה', field: 'LastName', editable: true, sortable: true, filter: true },
+        
         { headerName: 'כתובת', field: 'Address', editable: true, sortable: true, filter: true ,width: 120 },
         { headerName: 'מספר', field: 'adressNumber', editable: true, sortable: true, filter: true,width: 100 },
         { headerName: 'עיר', field: 'City', editable: true, sortable: true, filter: true,width: 100 },
@@ -120,27 +120,6 @@ function AddToCampainTable({rowData,onAddPersonToCampain,searchText}) {
             
       };
           const pageSizeOptions = [2,4];
-          const onGridReady = (params) => {
-            setGridApi(params.api);
-        
-            // Log the filter model to check the current state
-            // console.log(params.api);
-        
-                // Apply default filter for the 'isActive' column
-                params.api.setFilterModel({
-                    isActive: {
-                        filterType: 'set',
-                        values: [true],
-                    },
-                });
-                params.api.onFilterChanged();
-
-        
-                // Log the filter model after setting it
-        
-                // Force refresh of grid to ensure filter is applied
-            
-        };
       
       
   
@@ -157,7 +136,6 @@ function AddToCampainTable({rowData,onAddPersonToCampain,searchText}) {
           enableRtl={true}
           quickFilterText={searchText} // Applying the search text to filter the grid
           suppressClickEdit={true}
-          onGridReady={onGridReady}
           defaultColDef={{
             filterParams: {
               filterOptions: hebrewFilterOptions,
@@ -176,6 +154,6 @@ function AddToCampainTable({rowData,onAddPersonToCampain,searchText}) {
   );
 }
 
-}
+
 
 export default AddToCampainTable

@@ -1,11 +1,11 @@
 // Spinner.js
 import React from 'react';
-import { RingLoader } from 'react-spinners';
+import { RingLoader,BeatLoader  } from 'react-spinners';
 
-const Spinner = ({ color = "#07cae8", size = 150 }) => {
+const Spinner = ({ color = "#07cae8", size = 20 }) => {
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
-      <RingLoader color={color} size={size} />
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black opacity-50">
+      <BeatLoader  color={color} size={size} />
     </div>
   );
 };

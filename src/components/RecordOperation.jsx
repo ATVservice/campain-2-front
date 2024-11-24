@@ -1,4 +1,3 @@
-import { el } from 'date-fns/locale';
 import React from 'react'
 import Modal from 'react-modal';
 import { useState } from 'react';

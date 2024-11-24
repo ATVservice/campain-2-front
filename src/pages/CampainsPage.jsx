@@ -8,13 +8,15 @@ import { getCampains } from "../requests/ApiRequests";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import Spinner from "../components/Spinner";
 
 function CampainsPage() {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [campains, setCampains] = useState([]);
   const [campainData, setCampainData] = useState({
-    start: null,
-    end: null,
+    startDate: null,
+    endDate: null,
     CampainName: "",
     minimumAmountForMemorialDay: ""
   });
@@ -22,7 +24,7 @@ function CampainsPage() {
   let [message, setmessage] = useState('');
 
   const handleDateChange = (key, day) => {
-    console.log("Selected day:", day); // Check the structure of the day object
+    console.log(key, day); // Check the structure of the day object
     setCampainData(prevData => ({
       ...prevData,
       [key]: day
@@ -44,39 +46,54 @@ function CampainsPage() {
   };
 
   const handleAddCampain = async () => {
-    const { start, end, CampainName, minimumAmountForMemorialDay } = campainData;
-    if (!start || !end || !CampainName || !minimumAmountForMemorialDay) {
+    const { startDate, endDate, CampainName, minimumAmountForMemorialDay } = campainData;
+    console.log(startDate, CampainName, minimumAmountForMemorialDay);
+    console.log(campainData)
+    if (!startDate || !endDate || !CampainName || !minimumAmountForMemorialDay) {
       setmessage("נא למלא את כל השדות");
       return;
     }
-    if (start.date.getTime() > end.date.getTime()) {
+    if (startDate.date.getTime() > endDate.date.getTime()) {
       setmessage(" תאריך התחלה אינו יכול להיות גדול מתאריך הסיום");
       return;
     }
     
     try {
-      await addCampain({ start, end, CampainName, minimumAmountForMemorialDay });
+      setLoading(true);
+    // console.log(startDate.date, endDate.date, CampainName, minimumAmountForMemorialDay);
+      const res = await addCampain(campainData);
       toast.success("קמפיין נוסף בהצלחה!"); // הודעת Toast על הצלחה
+      setCampains(prevCampains => [...prevCampains, res.data.data.newCampain]);
       setShowAddCampainInputs(false); // סגירת הטופס לאחר הצלחה
-      setCampainData({ start: null, end: null, CampainName: "", minimumAmountForMemorialDay: "" }); // איפוס הטופס
+      setCampainData({ startDate: null, endDate: null, CampainName: "", minimumAmountForMemorialDay: "" }); // איפוס הטופס
       setmessage(""); // איפוס ההודעה
+      
     } catch (error) {
       toast.error("אירעה שגיאה בהוספת הקמפיין."); // הודעת Toast על שגיאה
+    }
+    finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true);
         const response = await getCampains();
         setCampains(response.data.data.campains);
       } catch (error) {
         console.log(error);
       }
+      finally {
+        console.log('e');
+        setLoading(false);
+      }
     };
 
     fetchData();
-  }, [campains]);
+  }, []);
+  // if(loading) return <Spinner />
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
@@ -117,32 +134,30 @@ function CampainsPage() {
           </div>
 
           <div className="mb-4">
-            <p className="mb-1 text-blue-700">תאריך התחלה:</p>
-            {campainData.start ? (
+            {campainData.startDate ? (
               <span className="text-blue-600">
-                {campainData.start.jewishDateStrHebrew}
+                {campainData.startDate.jewishDateStrHebrew}
               </span>
             ) : (
-              <span>לא נבחר תאריך</span>
+              <span className="text-red-600">לא נבחר תאריך</span>
             )}
             <ReactJewishDatePicker
-              onClick={(day) => handleDateChange("start", day)}
+              onClick={(day) => handleDateChange("startDate", day)}
               isHebrew
               className="mt-2"
             />
           </div>
 
           <div className="mb-4">
-            <p className="mb-1 text-blue-700">תאריך סיום:</p>
-            {campainData.end ? (
+            {campainData.endDate ? (
               <span className="text-blue-600">
-                {campainData.end.jewishDateStrHebrew}
+                {campainData.endDate.jewishDateStrHebrew}
               </span>
             ) : (
-              <span>לא נבחר תאריך</span>
+              <span className="text-red-600">לא נבחר תאריך</span>
             )}
             <ReactJewishDatePicker
-              onClick={(day) => handleDateChange("end", day)}
+              onClick={(day) => handleDateChange("endDate", day)}
               isHebrew
               className="mt-2"
             />
