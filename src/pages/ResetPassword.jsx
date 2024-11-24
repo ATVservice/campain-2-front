@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useParams ,useNavigate} from 'react-router-dom'; // Assuming you're using React Router for navigation
 import { resetPassword } from '../requests/ApiRequests';
 import { toast } from 'react-toastify';
+import Spinner from '../components/Spinner';
 const ResetPassword = () => {
     const { token } = useParams(); // Get the token from the URL
     const [newPassword, setNewPassword] = useState('');
@@ -28,6 +29,9 @@ const ResetPassword = () => {
             setLoading(false); // Re-enable interactions
         }
     };
+    if(loading) {
+        return <Spinner />;
+    }
     
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">

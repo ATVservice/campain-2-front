@@ -5,6 +5,7 @@ import { getCampains,getCommitment } from "../requests/ApiRequests";
 import { useNavigate,useSearchParams  } from 'react-router-dom';
 import MemorialDayDetails from './MemorialDayDetails';
 import AddMemorialDayToPerson from './AddMemorialDayToPerson';
+import Spinner from '../components/Spinner';
 
 
 function MemorialBoard() {
@@ -31,6 +32,7 @@ function MemorialBoard() {
   const [isCommitmentLoading, setCommitmentIsLoading] = useState(true);
   const [isCampainsLoading, setCampainsIsLoading] = useState(true);
   const [searchParams] = useSearchParams();
+  const [isLoading, setIsLoading] = useState(false);
 
   const CALENDAE_STATE = 'calendarState';
   
@@ -48,6 +50,7 @@ const [currentDate, setCurrentDate] = useState(getInitialState());
 
     const fetchData = async () => {
       try {
+        setIsLoading(true);
         setCampainsIsLoading(true);
         const response = await getCampains();
         setCampains(response.data.data.campains||[]);
@@ -56,6 +59,7 @@ const [currentDate, setCurrentDate] = useState(getInitialState());
       }
       finally {
         setCampainsIsLoading(false);
+        setIsLoading(false);
       }
 
     };
@@ -66,14 +70,17 @@ const [currentDate, setCurrentDate] = useState(getInitialState());
 
     const fetchData = async () => {
       try {
+        setIsLoading(true);
         setCommitmentIsLoading(true);
         const response = await getCommitment();
-        setCommitments(response.data.data.commitment||[]);
+        console.log(response);
+        setCommitments(response.data.data.commitments||[]);
       } catch (error) {
         console.error(error);
       }
       finally {
         setCommitmentIsLoading(false);
+        setIsLoading(false);
       }
 
     };
@@ -160,11 +167,13 @@ function getHebrewMonths(year) {
     }
     for (const commitment of commitments) {
       if(!commitment.MemorialDays || commitment.MemorialDays.length === 0|| commitment.CampainName != CampainName){
+        
         continue;
       }
-
+      
+      console.log('e');
       for (const memorialDay of commitment.MemorialDays) {
-
+        
         if(hdate.deltaDays(new HDate(new Date(memorialDay.date))) == 0){
           return {
             memorialDay: memorialDay,
@@ -204,15 +213,15 @@ function getHebrewMonths(year) {
       if(isMemorialDay){
         const gerdDate  = new HDate(i, hdate.mm, hdate.yy).greg()
         // console.log(isMemorialDay.memorialDay.Commeration);
-
-
+        
+        
         addOrShowMemorialMemorialDay = ()=>{navigate(`/memorial-day-details?CampainName=${isCampaignDay.CampainName}&date=${gerdDate}
           &anashidentifier=${isMemorialDay.anashidentifier}&commartion=${isMemorialDay.memorialDay?.Commeration||""}`)}
-        
-        backgroundColor = 'bg-green-400 text-black';
-        
-      }
-      else if(isCampaignDay){
+          
+          backgroundColor = 'bg-green-400 text-black';
+          
+        }
+        else if(isCampaignDay){
         const gerdDate  = new HDate(i, hdate.mm, hdate.yy).greg()
         
         addOrShowMemorialMemorialDay = ()=>{navigate(`/add-memorial-day-to-person?CampainName=${isCampaignDay.CampainName}&date=${gerdDate}`)}
@@ -277,6 +286,9 @@ function getHebrewMonths(year) {
     localStorage.setItem(CALENDAE_STATE, JSON.stringify({ mm: currentDate.mm, yy: currentDate.yy }));
 
     setCurrentDate(currentDate);
+  }
+  if(isLoading){
+    return <div><Spinner/></div>;
   }
 
   return (

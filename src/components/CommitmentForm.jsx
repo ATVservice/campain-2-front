@@ -5,9 +5,11 @@ import { getUserDetails, getPeople } from "../requests/ApiRequests";
 import SearchCommitmmentTable from "./SearchCommitmmentTable";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Spinner from "./Spinner";
 
 function CommitmentForm({ onSubmit, onClose }) {
   const [searchText, setSearchText] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   function onSelectRow(data) {
     setFormData({
       ...formData,
@@ -50,8 +52,46 @@ function CommitmentForm({ onSubmit, onClose }) {
 
   function handleChange(e) {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  }
+    if(name === "CommitmentAmount" || name === "AmountPaid" || name === "NumberOfPayments" || name === "PaymentsMade" || name === "AmountRemaining" || name === "PaymentsRemaining")
+      {
+        const parsedValue = parseFloat(value);
+        if ((isNaN(parsedValue) || parsedValue < 0) && value !== "")  {
+          toast.error("Please enter a valid number.");
+          return;
+        }
+      }
+
+      setFormData((prevCommitmentForm) =>
+        calculateUpdatedForm(prevCommitmentForm, name, value)
+      );
+    };
+
+  
+  
+  const calculateUpdatedForm = (prevCommitmentForm, name, value) => {
+    const updatedForm = {
+      ...prevCommitmentForm,
+      [name]: value,
+    };
+  
+    if (name === "CommitmentAmount") {
+      updatedForm.AmountRemaining = parseFloat(value) - parseFloat(prevCommitmentForm.AmountPaid);
+    }
+    else if (name === "AmountPaid") {
+      updatedForm.AmountRemaining = parseFloat(prevCommitmentForm.CommitmentAmount) - parseFloat(value);
+    }
+    else if (name === "NumberOfPayments") 
+    {
+      updatedForm.PaymentsRemaining = parseInt(value) - parseInt(prevCommitmentForm.PaymentsMade);
+
+    }
+    else if (name === "PaymentsMade") {
+      updatedForm.PaymentsRemaining = parseInt(prevCommitmentForm.NumberOfPayments) - parseInt(value);
+    }
+  
+    return updatedForm;
+  };
+
 
   const handleBlur = async (e) => {
     const AnashIdentifier = e.target.value;
@@ -87,24 +127,38 @@ function CommitmentForm({ onSubmit, onClose }) {
   useEffect(() => {
     const fetchCampaigns = async () => {
       try {
+        setIsLoading(true);
         const response = await getCampains();
         setCampaigns(response.data.data.campains); // הנחה שהמידע יושב במערך בשם data
       } catch (error) {
         toast.error("שגיאה בטעינת הקמפיינים");
       }
+      finally {
+        setIsLoading(false);
+      }
     };
     const fetchPeople = async () => {
       try {
+        setIsLoading(true);
         const response = await getPeople(true);
         setPeople(response.data.data.people);
       } catch (error) {
         toast.error("שגיאה בטעינת האנשים");
+      }
+      finally {
+        setIsLoading(false);
       }
     };
 
     fetchCampaigns();
     fetchPeople();
   }, []);
+  if(isLoading) {
+    return (
+        <Spinner />
+    );
+  }
+    
 
   return (
     <div className="w-full fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center rtl z-50">
@@ -198,26 +252,6 @@ function CommitmentForm({ onSubmit, onClose }) {
             />
           </div>
           <div className="flex justify-between">
-            <label>סכום שולם:</label>
-            <input
-              className="border border-gray-300 rounded-md outline-none"
-              type="Number"
-              name="AmountPaid"
-              value={formData.AmountPaid || ""}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="flex justify-between">
-            <label>סכום שנותר:</label>
-            <input
-              className="border border-gray-300 rounded-md outline-none"
-              type="Number"
-              name="AmountRemaining"
-              value={formData.AmountRemaining || ""}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="flex justify-between">
             <label>מספר תשלומים:</label>
             <input
               className="border border-gray-300 rounded-md outline-none"
@@ -227,24 +261,49 @@ function CommitmentForm({ onSubmit, onClose }) {
               onChange={handleChange}
             />
           </div>
+
+          <div className="flex justify-between">
+            <label>סכום שולם:</label>
+            <input
+              className="border border-gray-300 bg-gray-200 rounded-md outline-none"
+              type="Number"
+              name="AmountPaid"
+              value={formData.AmountPaid || 0}
+              onChange={handleChange}
+              readOnly
+            />
+          </div>
+          <div className="flex justify-between">
+            <label>סכום שנותר:</label>
+            <input
+              className="border border-gray-300 bg-gray-200 rounded-md outline-none"
+              type="Number"
+              name="AmountRemaining"
+              value={formData.AmountRemaining || 0}
+              onChange={handleChange}
+              readOnly
+            />
+          </div>
           <div className="flex justify-between">
             <label>תשלומים שבוצעו:</label>
             <input
-              className="border border-gray-300 rounded-md outline-none"
+              className="border border-gray-300 bg-gray-200 rounded-md outline-none"
               type="Number"
               name="PaymentsMade"
-              value={formData.PaymentsMade || ""}
+              value={formData.PaymentsMade || 0}
               onChange={handleChange}
+              readOnly
             />
           </div>
           <div className="flex justify-between">
             <label>תשלומים שנותרו:</label>
             <input
-              className="border border-gray-300 rounded-md outline-none"
+              className="border border-gray-300 bg-gray-200 rounded-md outline-none"
               type="Number"
               name="PaymentsRemaining"
-              value={formData.PaymentsRemaining || ""}
+              value={formData.PaymentsRemaining || 0}
               onChange={handleChange}
+              readOnly
             />
           </div>
           <div className="flex justify-between">

@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import { getCampainPeople, getCommitmentInCampain } from '../requests/ApiRequests';
+import Spinner from '../components/Spinner';
 function CampainPage() {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const campainName = queryParams.get('campainName');
   const minimumAmountForMemorialDay = queryParams.get('minimumAmountForMemorialDay');
+  const [isLoading, setIsLoading] = useState(false);
 
   const { campainId } = useParams();
   const navigate = useNavigate();
@@ -26,8 +28,13 @@ function CampainPage() {
 
   const fetchStats = async () => {
     try {
+      console.log("Fetching campaign stats...");
+
+      setIsLoading(true);
       const response = await getCampainPeople(campainName);
       const response2 = await getCommitmentInCampain(campainName);
+      console.log("Responses received", response, response2);
+
 
       const peopleData = response.data; // קבלת מערך האנשים
       const commitmentData = response2.data.data; // קבלת הנתונים מההתחייבויות
@@ -45,6 +52,11 @@ function CampainPage() {
       });
     } catch (error) {
       console.error('Error fetching campaign stats:', error);
+    }
+    finally {
+      console.log("Setting isLoading to false");
+
+      setIsLoading(false);
     }
   };
 
@@ -75,6 +87,11 @@ function CampainPage() {
     incrementNumbers('totalCommitted', stats.totalCommitted, 50);
     incrementNumbers('totalPaid', stats.totalPaid, 50);
   }, [stats, runningNumbers]);
+  // if(isLoading){
+  //   console.log("Loading state active...");
+
+  //   return <Spinner/>;
+  // }
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">

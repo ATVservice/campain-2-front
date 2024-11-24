@@ -36,21 +36,6 @@ function AddPersonPage() {
     e.preventDefault();
     console.log(userDetails);
 
-    // const newErrors = {};
-
-    // // Check required fields
-    // ['AnashIdentifier', 'FirstName', 'LastName', 'City'].forEach(field => {
-    //   if (!userDetails[field]) {
-    //     newErrors[field] = 'This field is required';
-    //   }
-    // });
-
-    // if (Object.keys(newErrors).length > 0) {
-    //   setErrors(newErrors);
-    //   toast.error('Please fill out all required fields');
-    //   return; // Stop further execution if validation fails
-    // }
-    // return
     try {
       setIsLoading(true);
       const response = await addPerson(userDetails); // Add await if addPerson is an async function
@@ -67,6 +52,13 @@ function AddPersonPage() {
       setIsLoading(false); // Ensure loading is stopped in case of an error
     }
   };
+  if(isLoading){
+    return (
+      <div>
+        <Spinner />
+      </div>
+    );
+  }
 
   return (
     <div>

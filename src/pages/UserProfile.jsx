@@ -15,6 +15,7 @@ import { IoMdRemove } from "react-icons/io";
 import { toast } from "react-toastify";
 import ReactModal from "react-modal";
 import ConfirmationModal from "../components/ConfirmationModal ";
+import Spinner from "../components/Spinner";
 
 function UserProfile() {
   const { user, loginUser } = useAuth();
@@ -30,17 +31,22 @@ function UserProfile() {
   const [showNewUserForm, setShowNewUserForm] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [userIdToDelete, setUserIdToDelete] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     // setUpdatedUser(user);
     const fetchData = async () => {
       if (user && user.Role === "Admin") {
         try {
+          setLoading(true);
           const res = await getUsers();
           setUsers(res.data.users);
           console.log(res);
         } catch (error) {
           console.error(error);
+        }
+        finally {
+          setLoading(false);
         }
       }
     };
@@ -49,6 +55,7 @@ function UserProfile() {
   }, []);
   const handleDelete = async (userId) => {
     try {
+      setLoading(true);
       const res = await deleteUserByAdmin(userId);
       console.log(res);
       if (res.status === 200) {
@@ -63,6 +70,9 @@ function UserProfile() {
       console.error("Failed to delete user:", error);
       toast.error("שגיאה במחיקת המשתמש");
     }
+    finally {
+      setLoading(false);
+    }
   };
 
   const registerUser = async (e) => {
@@ -70,6 +80,7 @@ function UserProfile() {
 
     if (!newUser.username || !newUser.password || !newUser.role) return;
     try {
+      setLoading(true);
       const res = await register(newUser);
       console.log(res);
       if (res.status === 201 || res.status === 200) {
@@ -89,6 +100,9 @@ function UserProfile() {
       console.error(error);
       toast.error("המשתמש לא נוצר בהצלחה");
     }
+    finally {
+      setLoading(false);
+    }
   };
 
   function handleNewUserInputChange(event) {
@@ -104,6 +118,7 @@ function UserProfile() {
   const handelUpdateSubmit = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true);
       const res = await updateManegerDetails(updatedUser);
       if (res.status === 200) {
         console.log(res);
@@ -123,6 +138,9 @@ function UserProfile() {
       console.error(error);
       toast.error("המשתמש לא עודכן בהצלחה");
     }
+    finally {
+      setLoading(false);
+    }
   };
 
   const handleEditClick = (user) => {
@@ -135,8 +153,9 @@ function UserProfile() {
     setUpdatedUser(null);
   };
   if (!user) {
-    return <div>Loading...</div>;
+    return <Spinner/>;
   }
+
 
   return (
     <div>

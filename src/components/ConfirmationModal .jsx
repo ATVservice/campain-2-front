@@ -1,12 +1,12 @@
 import React from 'react';
 
-const ConfirmationModal = ({ isVisible, onConfirm, onCancel }) => {
+const ConfirmationModal = ({ isVisible, onConfirm, onCancel, message }) => {
   if (!isVisible) return null;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white rounded-lg p-6 shadow-lg">
-        <h3 className="text-lg font-semibold">האם אתה בטוח שברצונך למחוק את המשתמש?</h3>
+        <h3 className="text-lg font-semibold">{message}</h3>
         <div className="flex justify-end gap-4 mt-4">
           <button
             onClick={onCancel}

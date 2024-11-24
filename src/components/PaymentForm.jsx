@@ -5,7 +5,6 @@ import "react-toastify/dist/ReactToastify.css";
 import SearchCommitmmentTable from "./SearchCommitmmentTable";
 import { getCampains, getPeople } from "../requests/ApiRequests";
 import Spinner from "./Spinner";
-import { ca } from "date-fns/locale";
 
 function PaymentForm({
   onSubmit,

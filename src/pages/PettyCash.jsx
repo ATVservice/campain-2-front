@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import TransactionsTable from '../components/TransactionsTable';
 import { getTransactions, addExpense } from '../requests/ApiRequests';
 import Modal from 'react-modal';
+import Spinner from '../components/Spinner';
 
 Modal.setAppElement('#root');
 
@@ -14,14 +15,19 @@ function PettyCashPage() {
         amount: '',
         date: '',
     });
+    const [isLoading, setIsLoading] = useState(false);
 
     const fetchTransactions = async () => {
         try {
+            setIsLoading(true);
             const response = await getTransactions();
             const transactions = response.data.data.transactions || [];
             calculateBalance(transactions); // מעדכן את היתרה לפי הטרנזקציות שהתקבלו
         } catch (error) {
             console.error('Error fetching transactions:', error);
+        }
+        finally {
+            setIsLoading(false);
         }
     };
     
@@ -73,6 +79,8 @@ function PettyCashPage() {
     const closeModal = () => {
         setIsModalOpen(false);
     };
+    if(isLoading)
+        return <Spinner/>
 
     return (
         <div className="text-center py-6">

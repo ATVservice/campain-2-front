@@ -16,7 +16,7 @@ function InvalidUploads({ invalidUploads, errorUploads,succesCount ,existingCoun
         overlayClassName="fixed inset-0 bg-black bg-opacity-50 z-50"
         onRequestClose={() => setIsModalOpen(false)}
       >
-        <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full text-right rtl relative">
+        <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full text-right rtl relative max-h-[98vh] overflow-y-auto">
           <h2 className='text-xl font-semibold mb-2'>העלאות עדכון תקינות:   {existingCount}</h2>
           <h2 className='text-xl font-semibold mb-2'> העלאות חדשות תקינות:  {newCount}   </h2>
           <h2 className='text-xl font-semibold mb-2'>סה"כ העלאות תקינות  {succesCount}</h2>

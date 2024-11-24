@@ -4,6 +4,7 @@ import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import dollarsBackground from "../images/Dollars.jpg";
 import { login } from "../requests/ApiRequests";
 import { useAuth } from '../components/AuthProvider';
+import Spinner from "../components/Spinner";
 
 const Login = () => {
   const { user, loginUser, logoutUser } = useAuth();
@@ -15,6 +16,7 @@ const Login = () => {
     role: "User",
   });
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const handelChange = (event) => {
     const { name, value } = event.target;
@@ -27,6 +29,8 @@ const Login = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
+      setLoading(true);
+      
       const res = await login(formData);
 
       if(res.status === 201||res.status === 200){
@@ -38,12 +42,18 @@ const Login = () => {
       setMessage('שם משתמש או סיסמא אינם תקינים');
       console.error(error);
     }
+    finally {
+      setLoading(false);
+    }
   };
 
   // פונקציה לטיפול בהצגה או הסתרת הסיסמה
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
+  if(loading) {
+    return <Spinner />;
+  }
 
   return (
     <div

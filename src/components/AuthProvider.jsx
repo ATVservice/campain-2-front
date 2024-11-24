@@ -1,28 +1,31 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import Spinner from './Spinner';
 
 // 1. Create a context to hold our auth data.
 const AuthContext = createContext(null);
 
 // 2. Define a provider component that holds and provides auth state to the app.
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(null);
-  const [loading, setLoading] = useState(true); // Add loading state
+  // Initialize state directly from session storage
+  const [user, setUser] = useState(() => {
+    const storedUser = sessionStorage.getItem('user');
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
 
-  // Load token and user from session storage on mount
+  const [token, setToken] = useState(() => sessionStorage.getItem('token') || null);
+  const [loading, setLoading] = useState(false);
+
+  // Sync state with session storage if it changes later
   useEffect(() => {
-    const storedToken = sessionStorage.getItem("token");
-    const storedUser = sessionStorage.getItem("user");
+    setLoading(true);
 
-    if (storedToken) {
-      setToken(storedToken);
-    }
+    const storedToken = sessionStorage.getItem('token');
+    const storedUser = sessionStorage.getItem('user');
 
-    if (storedUser) {
-      setUser(JSON.parse(storedUser)); // Parse stored JSON string for user data
-    }
+    if (storedToken) setToken(storedToken);
+    if (storedUser) setUser(JSON.parse(storedUser));
 
-    setLoading(false); // Set loading to false after data is loaded
+    setLoading(false);
   }, []);
 
   // Login function saves the token and user data.
@@ -43,9 +46,9 @@ export function AuthProvider({ children }) {
     sessionStorage.removeItem('user');
   };
 
-  // If loading, return null or a loading indicator
+  // If loading, return a loading indicator
   if (loading) {
-    return null;
+    return <Spinner />;
   }
 
   // 3. Return the provider component, sharing user, token, and login/logout functions.

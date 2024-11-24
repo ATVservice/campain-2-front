@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { uploadCommitment, getCampains, getUserDetails, getCommitment } from '../requests/ApiRequests';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Spinner from './Spinner';
 
 function CommitmentForm({ onClose, onSubmit, campainName}) {
     const [formData, setFormData] = useState({
@@ -23,14 +24,20 @@ function CommitmentForm({ onClose, onSubmit, campainName}) {
     });
     
     const [campaigns, setCampaigns] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         const fetchCampaigns = async () => {
             try {
+
+                setLoading(true);
                 const response = await getCampains();
                 setCampaigns(response.data.data.campains); // הנחה שהמידע יושב במערך בשם data
             } catch (error) {
                 toast.error('שגיאה בטעינת הקמפיינים');
+            }
+            finally {
+                setLoading(false);
             }
         };
 

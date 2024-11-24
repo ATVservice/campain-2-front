@@ -81,6 +81,7 @@ function MemorialDayDetails() {
   {
     try
     {
+      setIsLoading(true);
       const res = await DeleteMemorialDay(campainName,anashidentifier, memorialDay.date);
       if(res.status === 200)
       {
@@ -93,6 +94,10 @@ function MemorialDayDetails() {
     {
       console.log(error);
       toast.error("הנצחה לא נמחקה");
+    }
+    finally
+    {
+      setIsLoading(false);
     }
   }
   function handelCommartionChange(e)
@@ -108,6 +113,7 @@ function MemorialDayDetails() {
     let isDeletionSuccessful = false;
     try
     {
+      setIsLoading(true);
       const res =await DeleteMemorialDay(campainName,anashidentifier, memorialDay.date);
       console.log(res);
       if(res.status === 200)
@@ -128,12 +134,18 @@ function MemorialDayDetails() {
   {
     console.log(error);
     toast.error("הנצחה לא נמחקה");
+    return
     
     
+  }
+  finally
+  {
+    setIsLoading(false);
   }
   if(!isDeletionSuccessful)
     return;
   try{
+    setIsLoading(true);
     const data = {AnashIdentifier: newAnash, CampainName: campainName, MemorialDay: memorialDay}
     const res =await AddMemorialDay(data);
     if(res.status === 200)
@@ -153,6 +165,10 @@ function MemorialDayDetails() {
   {
     console.log(error);
     toast.error("הנצחה לא נוספה");
+  }
+  finally
+  {
+    setIsLoading(false);
   }
   
   

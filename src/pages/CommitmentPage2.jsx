@@ -10,7 +10,7 @@ import ReviewCommitmentsModal from "../components/ReviewCommitmentsModal";
 import CommitmentForm from "../components/CommitmentForm";
 import Payments from "../components/Payments";
 import CommitmentTable from "../components/CommitmentTable";
-import { set } from "date-fns";
+import Spinner from "../components/Spinner";
 
 
 function CommitmentPage2() {
@@ -43,6 +43,8 @@ function CommitmentPage2() {
   const [validCommitments, setValidCommitments] = useState([]);
   const [invalidCommitments, setInvalidCommitments] = useState([]);
   const [showCommitmentForm, setShowCommitmentForm] = useState(false);
+  const [showCommitmentsOfAcivePeople, setShowCommitmentsOfAcivePeople] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const fileRef = useRef(null);
 
@@ -102,6 +104,7 @@ function CommitmentPage2() {
   async function onReviewCommitments(commitments)
   {
     try {
+      setIsLoading(true);
       // Send the mapped data to reviewCommitments
      const response = await reviewCommitments(commitments);
      setValidCommitments(response.data.validCommitments);
@@ -113,6 +116,10 @@ function CommitmentPage2() {
 
     } catch (error) {
       console.error("Error during reviewCommitments:", error);
+    }
+    finally
+    {
+      setIsLoading(false);
     }
 }
 
@@ -131,6 +138,7 @@ function CommitmentPage2() {
     {
       try
       {
+        setIsLoading(true);
         const response = await uploadCommitments(commitmentsToUpload);
         console.log(response);
         // setCommitments([...commitments, ...response.data.uploadedCommitments]);
@@ -139,18 +147,25 @@ function CommitmentPage2() {
       }
       catch(error)
       {
+        setIsLoading(false);
         console.log(error);
         toast.error("שגיאה בשליחת התחייבויות");
+        return;
       }
       try
       {
-        const response = await getCommitmentsByCampaign(campainName);
+        setIsLoading(true);
+        const response = await getCommitmentsByCampaign(campainName, showCommitmentsOfAcivePeople);
         console.log(response);
         setCommitments(response.data.commitments);
       }
       catch(error)
       {
         console.log(error);
+      }
+      finally
+      {
+        setIsLoading(false);
       }
 
 
@@ -162,20 +177,24 @@ function CommitmentPage2() {
     console.log(campainName);
     const fetchData = async () => {
       try {
-        console.log(campainName);
-        const response = await getCommitmentsByCampaign(campainName);
+        setIsLoading(true);
+        const response = await getCommitmentsByCampaign(campainName, showCommitmentsOfAcivePeople);
+        console.log(response);
         setCommitments(response.data.commitments);
       } catch (error) {
         console.error('Error fetching commitments:', error);
       }
+      finally {
+        setIsLoading(false);
+      }
     };
     fetchData();
-  }, []);
+  }, [showCommitmentsOfAcivePeople]);
     
 
 
- 
-
+if(isLoading)
+  return <Spinner />
 
 
     return (
@@ -228,7 +247,7 @@ function CommitmentPage2() {
         onClose={() => setShowCommitmentForm(false)}
         />
       )}
-  {commitments?.length > 0 &&<CommitmentTable rowsData={[...commitments]}/>}
+  {commitments?.length > 0 &&<CommitmentTable rowsData={[...commitments]} setShowCommitmentsOfActivePeople={setShowCommitmentsOfAcivePeople} showCommitmentsOfActivePeople={showCommitmentsOfAcivePeople}/>}
 
     </div>
   );

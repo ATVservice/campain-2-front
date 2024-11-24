@@ -8,7 +8,7 @@ import 'ag-grid-community/styles/ag-theme-alpine.css';
 
 
 
-function CommitmentTable({rowsData}) {
+function CommitmentTable({rowsData,setShowCommitmentsOfActivePeople,showCommitmentsOfActivePeople=true}) {
     //   const [rowData, setRowData] = useState([]);
       const [gridApi, setGridApi] = useState(null);
       const navigate = useNavigate();
@@ -249,21 +249,25 @@ function CommitmentTable({rowsData}) {
       const searchStyle = {
         position: 'relative',
         zIndex: 2,
-        marginBottom: '8px',
       };
     
     
         
       return (
         <div style={{ position: 'relative' }}> {/* Wrapper with stacking context */}
-          <input
-            type="text"
-            placeholder="חפש..."
-            value={searchText}
-            onChange={onSearchChange}
-            className="mb-2 p-2 border rounded"
-            style={searchStyle}
-          />
+          <div className="flex items-end gap-2 mb-2">
+            <input
+              type="text"
+              placeholder="חפש..."
+              value={searchText}
+              onChange={onSearchChange}
+              className="border rounded"
+              style={searchStyle}
+            />
+            <input type="checkbox" checked={showCommitmentsOfActivePeople}
+            className="border border-gray-300 rounded-sm focus:outline-none w-4 h-4 focus:ring-2 focus:ring-sky-100"
+             onChange={()=>setShowCommitmentsOfActivePeople(!showCommitmentsOfActivePeople)}/>
+          </div>
           
           <div className="ag-theme-alpine" style={gridStyle}>
             <AgGridReact
