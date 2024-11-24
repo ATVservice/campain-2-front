@@ -140,6 +140,14 @@ function CommitmentTable({rowsData,setShowCommitmentsOfActivePeople,showCommitme
           ...commonColumnProps 
         },
         { 
+          headerName: 'סכום ששולם', 
+          field: 'AmountPaid', 
+          minWidth: 100, 
+          maxWidth: 110,
+          headerClass: 'multi-line-header', 
+          ...commonColumnProps 
+        },
+        { 
           headerName: 'מספר תשלומים', 
           field: 'NumberOfPayments', 
           minWidth: 120, 
