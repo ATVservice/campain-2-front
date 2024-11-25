@@ -31,6 +31,7 @@ function Payments() {
     "מספר התחייבות": "CommitmentId",
     'סכום': "Amount",
     'תאריך עסקה': "Date",
+    'תאריך': "Date",
     'קמפיין': "CampainName",
   };
     
@@ -93,6 +94,7 @@ function Payments() {
         headers.forEach((header, index) => {
           const englishKey = hebrewToEnglishMapping[header];
           if (englishKey) {
+            // console.log(englishKey);
             if (englishKey === "Date" && typeof row[index] === "number") {
               mappedRow[englishKey] = parseExcelDate(row[index]);
 
@@ -109,6 +111,7 @@ function Payments() {
         });
         return mappedRow;
       });
+      console.log(mappedDataToEnglish);
       onReviewPayments(mappedDataToEnglish);
     };
     reader.readAsArrayBuffer(file);
