@@ -13,6 +13,7 @@ import Spinner from "./Spinner";
 function Payments() {
   const hebrewToEnglishMapping = {
     "הערות": "AnashIdentifier",
+    'מזהה אנש': "AnashIdentifier",
     "מספר זהות": "PersonID",
     'שם': "FirstName",
     'משפחה': "LastName",

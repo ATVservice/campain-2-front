@@ -285,7 +285,6 @@ function CommitmentTable({rowsData,setShowCommitmentsOfActivePeople,showCommitme
               paginationPageSize={50}
               domLayout="normal"
               enableRtl={true}
-              onGridReady={onGridReady}
               quickFilterText={searchText}
               defaultColDef={{
                 minWidth: 50,

@@ -12,8 +12,6 @@ function AnashCommitmentDetails({
   allCampainMemorialDates = [],
   commitmentAmountBefourChange = 0
 }) {
-  // console.log(cam);
-  // console.log(commitmentForm);
   const [memorialDaysToDisplay, setMemorialDaysToDisplay] = useState([
     ...(commitmentForm?.MemorialDays ?? []),
   ]);
@@ -34,7 +32,7 @@ function AnashCommitmentDetails({
       updatedForm.PaymentsRemaining = parseInt(value) - parseInt(prevCommitmentForm.PaymentsMade);
 
     }
-    else if (name === "PaymentsMade") {
+    else if (name === "PaymentsMade" && commitmentForm.NumberOfPayments) {
       updatedForm.PaymentsRemaining = parseInt(prevCommitmentForm.NumberOfPayments) - parseInt(value);
     }
   
@@ -364,6 +362,8 @@ function AnashCommitmentDetails({
               <option value='הו"ק אשראי'>הו"ק אשראי</option>
               <option value="העברה בנקאית">העברה בנקאית</option>
               <option value='הו"ק בנקאית'>הו"ק בנקאית</option>
+              <option value="הבטחה"> הבטחה</option>
+              <option value="משולב"> משולב</option>
             </select>
           </label>
           <label>

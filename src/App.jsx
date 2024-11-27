@@ -9,7 +9,7 @@ import {
 } from "react-router-dom";
 import dollarsBackground from "./images/Dollars.jpg";
 import Navbar from "./features/Navbar";
-import AlfonPage from "./pages/AlfonPage";
+// import AlfonPage from "./pages/AlfonPage";
 import LoginPage from "./pages/LoginPage";
 import MenuPage from "./pages/MenuPage";
 // import CommitmentPage from "./pages/commitmentPage";
@@ -37,6 +37,7 @@ import ResetPassword from "./pages/ResetPassword";
 import CommitmentPage2 from "./pages/CommitmentPage2";
 import CommitmentDetailsPage2 from "./pages/CommitmentDetailsPage2";
 import PeopleInCampain2 from "./pages/PeopleInCampain2";
+import AlfonPage2 from "./pages/AlfonPage2";
 Modal.setAppElement("#root");
 
 // Custom component to handle showing Navbar conditionally
@@ -70,7 +71,8 @@ const App = () => {
 
 
                 <Route element={<ProtectedRoute />}>
-                  <Route path="/alfon" element={<AlfonPage />} />
+                  {/* <Route path="/alfon" element={<AlfonPage />} /> */}
+                  <Route path="/alfon" element={<AlfonPage2 />} />
                   <Route path="/menu" element={<MenuPage />} />
                   <Route path="/commitments/:campainName?" element={<CommitmentPage2 />} />
                   <Route

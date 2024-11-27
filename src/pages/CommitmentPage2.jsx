@@ -106,7 +106,7 @@ function CommitmentPage2() {
     try {
       setIsLoading(true);
       // Send the mapped data to reviewCommitments
-     const response = await reviewCommitments(commitments);
+     const response = await reviewCommitments(commitments,campainName);
      setValidCommitments(response.data.validCommitments);
      setInvalidCommitments(response.data.invalidCommitments);
         console.log(response);
