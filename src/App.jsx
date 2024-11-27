@@ -21,6 +21,7 @@ import CampainPage from "./pages/CampainPage";
 // import PeopleInCampain from "./pages/peopleInCampain";
 // import CampaignCommitments from "./pages/CampaignCommitments";
 import { ToastContainer } from "react-toastify";
+import DynamicTitle from "./components/DynamicTitle";
 import "react-toastify/dist/ReactToastify.css";
 import AddPersonPage from "./pages/AddPersonPage";
 import MemorialDay2 from "./pages/MemorialDay2";
@@ -58,6 +59,7 @@ const App = () => {
       <Router>
         <div>
           <ToastContainer />
+          <DynamicTitle />
           <Layout>
             <div className="flex-grow">
               <Routes>
