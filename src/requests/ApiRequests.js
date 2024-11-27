@@ -32,6 +32,7 @@ export const uploadPeople = async (data) => {
    
     return response;
   } catch (error) {
+    throw error
     console.log(error);
   }
 };
@@ -43,11 +44,12 @@ export const getPeople = async (isActive) => {
     return response;
   } catch (error) {
     console.log(error);
+    throw error
   }
 };
-export const getAlfonChanges = async (data) => {
+export const reviewUploadedPeople = async (data) => {
   try {
-    const response = await apiConfig.post('/api/alfon/get-alfon-changes', data);
+    const response = await apiConfig.post('/api/alfon/review-uploaded-people', data);
     return response;
   } catch (error) {
     console.log(error);
@@ -77,10 +79,10 @@ export const getCommitment = async (isActive=null) => {
   }
 }
 
-export const getCommitmentsByCampaign = async (campaignName, isActive=null) => { // Fixed "campainName" typo
+export const getCommitmentsByCampaign = async (campainName, isActive=null) => { // Fixed "campainName" typo
   try {
-    console.log(campaignName);
-    const response = await apiConfig.get(`/api/commitment/getCommitmentsByCampaign?campaignName=${encodeURIComponent(campaignName)}&isActive=${encodeURIComponent(isActive)}`);
+    console.log(campainName);
+    const response = await apiConfig.get(`/api/commitment/getCommitmentsByCampaign?campainName=${encodeURIComponent(campainName)}&isActive=${encodeURIComponent(isActive)}`);
     return response.data; // It's common to return `response.data`, not the full response object
   } catch (error) {
     console.error("Error fetching commitments:", error); // Improved error logging
@@ -440,9 +442,10 @@ export const updateManegerDetails = async (data) => {
     throw error
   }
 }
-export const reviewCommitments = async (data) => {
+export const reviewCommitments = async (data,campainName=null) => {
+  console.log('e');
   try {
-    const response = await apiConfig.post(`/api/commitment/review-commitments`, data); 
+    const response = await apiConfig.post(`/api/commitment/review-commitments?campainName=${encodeURIComponent(campainName)}`, data);
     return response;
   } catch (error) {
     throw error

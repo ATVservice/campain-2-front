@@ -146,6 +146,9 @@ function PaymentForm({
               <option value='הו"ק אשראי'>הו"ק אשראי</option>
               <option value="העברה בנקאית">העברה בנקאית</option>
               <option value='הו"ק בנקאית'>הו"ק בנקאית</option>
+              <option value="הבטחה"> הבטחה</option>
+              <option value="משולב"> משולב</option>
+
             </select>
           </div>
           <div className="flex justify-between">

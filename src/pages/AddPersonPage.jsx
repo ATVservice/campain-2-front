@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { addPerson } from '../requests/ApiRequests';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Spinner from '../components/Spinner';
 
 
 function AddPersonPage() {

@@ -12,7 +12,7 @@ import { GrUpdate } from "react-icons/gr";
 import { MdOutlineCancel } from "react-icons/md";
 
 
-function Table({rowData, setRowData ,setShowActivePeople ,showActivePeople}) {
+function Table({rowsData, setRowsData ,setShowActivePeople ,showActivePeople}) {
 
     const navigate = useNavigate();
     const [originalRowData, setOriginalRowData] = useState({});
@@ -314,7 +314,7 @@ function Table({rowData, setRowData ,setShowActivePeople ,showActivePeople}) {
           <AgGridReact
 
             columnDefs={columns}
-            rowData={rowData}
+            rowData={rowsData}
             pagination={true}
             paginationPageSize={50} // Increase the pagination page size as needed
             domLayout="normal" // Use normal layout to keep grid within the container height
