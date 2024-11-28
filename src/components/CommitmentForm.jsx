@@ -194,6 +194,7 @@ function CommitmentForm({ onSubmit, onClose }) {
               <option value='הו"ק אשראי'>הו"ק אשראי</option>
               <option value="העברה בנקאית">העברה בנקאית</option>
               <option value='הו"ק בנקאית'>הו"ק בנקאית</option>
+              <option value='לא סופק'>לא סופק </option>
             </select>
           </div>
           <div className="flex justify-between">
