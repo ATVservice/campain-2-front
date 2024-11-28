@@ -11,6 +11,7 @@ import CommitmentForm from "../components/CommitmentForm";
 import Payments from "../components/Payments";
 import CommitmentTable from "../components/CommitmentTable";
 import Spinner from "../components/Spinner";
+import { readFileContent } from "../components/Utils";
 
 
 function CommitmentPage2() {
@@ -50,34 +51,37 @@ function CommitmentPage2() {
 
   async function handleFileUpload(e) {
     const file = e.target.files[0];
-    const reader = new FileReader();
     
-    reader.onload = async (event) => {
-      const arrayBuffer = event.target.result;
-      const workbook = XLSX.read(arrayBuffer, { type: "array" });
-      const sheetName = workbook.SheetNames[0];
-      const sheet = workbook.Sheets[sheetName];
-      let json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+    // Check for file type before calling the utility function
+    const fileExtension = file.name.split('.').pop().toLowerCase();
+    
+    if (fileExtension !== 'csv' && fileExtension !== 'xlsx' && fileExtension !== 'xls') {
+      toast.error("Unsupported file type. Please upload an Excel or CSV file.");
+      return;
+    }
+    if (fileExtension == 'csv')
+      {
+        toast.error("סוג קובץ לא נתמך יש להעלות קובץ עם סיומת  xlsx",{rtl:true});
+        return;
+      }
   
-      // Filter out rows with empty values
-      json = json.filter((row) =>
-        row.some((cell) => cell !== null && cell !== undefined && cell !== "")
-      );
   
-      // Clear file input
-      fileRef.current.value = null;
+    try {
+      // Get the rows from the file using the utility function
+      const rows = await readFileContent(file, fileExtension); // Pass fileExtension to the utility function
   
       // Check for valid data
-      if (!json || json.length === 0 || json.length === 1) {
+      if (!rows || rows.length === 0 || rows.length === 1) {
         toast.error("אין נתונים בקובץ");
         return;
       }
   
-      const headers = json[0];
-      const rows = json.slice(1);
+      // Extract headers and data rows
+      const headers = rows[0];
+      const dataRows = rows.slice(1);
   
       // Map the data to English keys
-      const mappedDataToEnglish = rows.map((row) => {
+      const mappedDataToEnglish = dataRows.map((row) => {
         const mappedRow = {};
         headers.forEach((header, index) => {
           const englishKey = hebrewToEnglishMapping[header];
@@ -85,21 +89,24 @@ function CommitmentPage2() {
             mappedRow[englishKey] = row[index];
           }
         });
-        if(campainName && !mappedRow["CampainName"])
-        {
-          mappedRow["CampainName"] = campainName
+        if (campainName && !mappedRow["CampainName"]) {
+          mappedRow["CampainName"] = campainName;
         }
         return mappedRow;
       });
-          
-
+  
+      console.log(mappedDataToEnglish);
+      
+      // Call onReviewCommitments with the mapped data
       onReviewCommitments(mappedDataToEnglish);
   
-     
-    };
+      // Clear file input
+      fileRef.current.value = null;
   
-    reader.readAsArrayBuffer(file);
-
+    } catch (error) {
+      console.error("Error processing file:", error);
+      toast.error("There was an error processing the file.");
+    }
   }
   async function onReviewCommitments(commitments)
   {
@@ -247,7 +254,7 @@ if(isLoading)
         onClose={() => setShowCommitmentForm(false)}
         />
       )}
-  {commitments?.length > 0 &&<CommitmentTable rowsData={[...commitments]} setShowCommitmentsOfActivePeople={setShowCommitmentsOfAcivePeople} showCommitmentsOfActivePeople={showCommitmentsOfAcivePeople}/>}
+  {<CommitmentTable rowsData={[...commitments]} setShowCommitmentsOfActivePeople={setShowCommitmentsOfAcivePeople} showCommitmentsOfActivePeople={showCommitmentsOfAcivePeople}/>}
 
     </div>
   );
