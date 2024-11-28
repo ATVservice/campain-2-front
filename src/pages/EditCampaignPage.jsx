@@ -17,10 +17,10 @@ function EditCampaignPage() {
   const [campainData, setCampainData] = useState(null); // Original data
   const [editedCampainData, setEditedCampainData] = useState({}); // User-edited data
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
   const [showDeletedModal, setShowDeletedModal] = useState(false);
   const [deletedMemorialDays, setDeletedMemorialDays] = useState([]);
-
+  const navigate = useNavigate();
+  
   // Fetch campaign details on mount
   useEffect(() => {
     const fetchCampaignDetails = async () => {
@@ -103,24 +103,31 @@ function EditCampaignPage() {
         editedCampainData,
         campainData._id
       ); // Backend request
+      console.log(response);
       if (response.data.deletedMemorialDays?.length > 0) {
         setDeletedMemorialDays(response.data.deletedMemorialDays);
         setShowDeletedModal(true);
       } else {
         console.log("e");
         console.log(editedCampainData);
-        await editCampainDetails(
+      const res2 =  await editCampainDetails(
           editedCampainData,
           deletedMemorialDays,
           campainData._id
         ); // Backend request
-        setCampainData(editedCampainData);
-        navigate(`/edit-campaign/${editedCampainData.CampainName}`);
+        const updatedCampain = res2.data.data.updatedCampaign;
+        setCampainData(updatedCampain);
+        setEditedCampainData();
+        
+        navigate(`/campain/${updatedCampain._id}?campainName=${encodeURIComponent(updatedCampain.CampainName)}&minimumAmountForMemorialDay=${updatedCampain.minimumAmountForMemorialDay}`);
+
         toast.success("השינויים נשמרו בהצלחה");
+        console.log(res2);
+        
       }
     } catch (error) {
       console.error(error);
-      toast.error(error.response.data.message);
+      toast.error(error.response.data?.message||"שגיאה בשמירת השינויים");
     }
     finally {
       setIsLoading(false);
@@ -132,7 +139,7 @@ function EditCampaignPage() {
     setEditedCampainData(campainData);
     setDeletedMemorialDays([]);
   };
-  const handelEditCampainDetails = async () => {
+  const handelEditCampainDetailsWithMDays = async () => {
     setDeletedMemorialDays([]);
     setShowDeletedModal(false);
     try {
@@ -144,7 +151,9 @@ function EditCampaignPage() {
       ); // Backend request
       setCampainData(editedCampainData);
       console.log(response);
-      navigate(`/edit-campaign/${editedCampainData.CampainName}`);
+      // navigate(`/edit-campaign/${editedCampainData.CampainName}`);
+      // navigate(`/campain/${editedCampainData._id}?campainName=${encodeURIComponent(editedCampainData.CampainName)}&minimumAmountForMemorialDay=${campainData.minimumAmountForMemorialDay}`);
+
       toast.success("השינויים נשמרו בהצלחה");
     } catch (error) {
       console.error(error);
@@ -275,7 +284,7 @@ function EditCampaignPage() {
         <DeletedMemorialDaysModal
           isOpen={showDeletedModal}
           onClose={() => setShowDeletedModal(false)}
-          onSubmit={handelEditCampainDetails}
+          onSubmit={handelEditCampainDetailsWithMDays}
           deletedMemorialDays={deletedMemorialDays}
         />
       )}

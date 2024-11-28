@@ -43,7 +43,7 @@ function AnashCommitmentDetails({
     const { name, value } = e.target;
     if(name === "CommitmentAmount" || name === "AmountPaid" || name === "NumberOfPayments" || name === "PaymentsMade" || name === "AmountRemaining" || name === "PaymentsRemaining")
     {
-      const parsedValue = parseFloat(value);
+      const parsedValue = parseFloat(value).toFixed(2);
       if ((isNaN(parsedValue) || parsedValue < 0) && value !== "")  {
         toast.error("Please enter a valid number.");
         return;
@@ -58,6 +58,7 @@ function AnashCommitmentDetails({
   
   
   const handleDateChange = (displayIndex, selectedDay) => {
+
     const newMemorialDay = {
       ...memorialDaysToDisplay[displayIndex],
       date: selectedDay.date,
@@ -133,6 +134,7 @@ function AnashCommitmentDetails({
       ) {
         return false;
       }
+      }
       for (let i = 0; i < commitmentForm.MemorialDays.length; i++) {
         if (
           isTheSameDate(
@@ -143,7 +145,6 @@ function AnashCommitmentDetails({
           return false;
         }
       }
-    }
 
     return true;
   };
@@ -197,7 +198,8 @@ function AnashCommitmentDetails({
   }
 
   const AddMemorialDay = () => {
-    console.log(commitmentAmountBefourChange);
+    console.log(commitmentForm.MemorialDays);
+
     const remainingMemorialDays =
       Math.floor(
         commitmentAmountBefourChange / campain.minimumAmountForMemorialDay
@@ -330,7 +332,7 @@ function AnashCommitmentDetails({
             <input
               type="number"
               name="MonthlyPayment"
-              value={(commitmentForm.CommitmentAmount/commitmentForm.NumberOfPayments)||''}
+              value={(commitmentForm.CommitmentAmount/commitmentForm.NumberOfPayments).toFixed(2)||''}
               onChange={handleChange}
               className="mt-1 block w-full p-2 border border-gray-300  bg-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               readOnly

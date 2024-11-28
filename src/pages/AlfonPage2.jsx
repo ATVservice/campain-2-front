@@ -222,7 +222,7 @@ if(loading) return <Spinner/>
               הוסף תורם
             </motion.button>
           </div>
-          {rowsData?.length > 0 && <Table rowsData={rowsData} setRowsData={setRowsData} setShowActivePeople={setShowActivePeople} showActivePeople={showActivePeople} />}
+          {<Table rowsData={rowsData} setRowsData={setRowsData} setShowActivePeople={setShowActivePeople} showActivePeople={showActivePeople} />}
         </>
         {showModal&& (
             <ReviewAlfonChanges

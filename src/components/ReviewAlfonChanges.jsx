@@ -35,7 +35,7 @@ function ReviewAlfonChanges({ conflictsData,validPeople, invalidPeople, onSubmit
   };
   const [chosenDocsMap, setChosenDocsMap] = useState(() =>
     conflictsData.reduce((acc, conflict) => {
-      acc[conflict.anash] = conflict.existing;
+      acc[conflict.anash] = conflict.uploaded;
       return acc;
     }, {})
   );

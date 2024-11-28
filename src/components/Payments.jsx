@@ -7,6 +7,7 @@ import { reviewCommitmentsPayments,uploadCommitmentsPayments } from "../requests
 import ReviewPaymentsModal from "./ReviewPaymentsModal";
 import PaymentForm from "./PaymentForm";
 import Spinner from "./Spinner";
+import { readFileContent } from "./Utils";
 
 
 
@@ -70,34 +71,47 @@ function Payments() {
   }
    const handleFileUpload = async (e) => {
     const file = e.target.files[0];
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const arrayBuffer = event.target.result;
-      const workbook = XLSX.read(arrayBuffer, { type: "array" });
-      const sheetName = workbook.SheetNames[0];
-      const sheet = workbook.Sheets[sheetName];
-      let json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-      json = json.filter((row) =>
-        row.some((cell) => cell !== null && cell !== undefined && cell !== "")
-      );
-      if (!json || json.length === 0 || json.length === 1) {
-        toast.error("אין נתונים בקובץ");
+    const fileExtension = file.name.split('.').pop().toLowerCase();
+    if (fileExtension !== 'csv' && fileExtension !== 'xlsx' && fileExtension !== 'xls') {
+      toast.error("Unsupported file type");
+      return;
+    }
+    if (fileExtension == 'csv')
+      {
+        toast.error("סוג קובץ לא נתמך יש להעלות קובץ עם סיומת  xlsx",{rtl:true});
         return;
       }
+    let rows = []
+    try {
+            // Get the rows from the file using the utility function
+         rows = await readFileContent(file, fileExtension); // Pass fileExtension to the utility function
 
+        // Check for valid data
+        if (!rows || rows.length === 0 || rows.length === 1) {
+          toast.error("אין נתונים בקובץ");
+          return;
+        }
+      
+    }
+    catch (error) {
+      console.log(error);
+      toast.error(error.response.data?.message);
+      return;
+    }
+// console.log(rows);
       fileRef.current.value = null;
 
-      const headers = json[0];
-      const rows = json.slice(1);
+      const headers = rows[0];
+      rows = rows.slice(1);
 
       const mappedDataToEnglish = rows.map((row) => {
         const mappedRow = {};
         headers.forEach((header, index) => {
           const englishKey = hebrewToEnglishMapping[header];
           if (englishKey) {
-            // console.log(englishKey);
-            if (englishKey === "Date" && typeof row[index] === "number") {
+            if (englishKey == "Date") {
               mappedRow[englishKey] = parseExcelDate(row[index]);
+              // console.log(mappedRow[englishKey]);
 
             }
             else if (englishKey === "PaymentMethod") 
@@ -114,8 +128,7 @@ function Payments() {
       });
       console.log(mappedDataToEnglish);
       onReviewPayments(mappedDataToEnglish);
-    };
-    reader.readAsArrayBuffer(file);
+    
   };
   async function onReviewPayments(payments) {
     console.log('e');

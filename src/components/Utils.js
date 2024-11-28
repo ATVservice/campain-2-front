@@ -1,31 +1,52 @@
+
+
+
+
+
+// fileUtils.js
 import * as XLSX from 'xlsx';
 
-
-
-
-
-export const handleFileUpload = (e, callback) => {
-  const file = e.target.files[0];
+// Function to read a file and return its rows (for both CSV and Excel files)
+export const readFileContent = async (file, fileExtension) => {
   const reader = new FileReader();
 
-  reader.onload = (event) => {
-    const arrayBuffer = event.target.result;
-    const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-    const sheetName = workbook.SheetNames[0];
-    const sheet = workbook.Sheets[sheetName];
-    const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+  return new Promise((resolve, reject) => {
+    reader.onload = (event) => {
+      let rows = [];
 
-    // Invoke the callback function, passing the JSON data to it
-    callback(json);
-  };
+      try {
+        if (fileExtension === 'csv') {
+          const text = event.target.result;
+          
+          // Check if the file uses tab-separated values or comma-separated
+          const delimiter = text.indexOf('\t') > text.indexOf(',') ? '\t' : ',';
 
-  reader.readAsArrayBuffer(file);
+          // Split by the detected delimiter
+          rows = text.split('\n').map(row => row.split(delimiter));
+        } else {
+          const arrayBuffer = event.target.result;
+          const workbook = XLSX.read(arrayBuffer, { type: "array" });
+          const sheetName = workbook.SheetNames[0];
+          const sheet = workbook.Sheets[sheetName];
+          rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+        }
+
+        // Filter out empty rows
+        rows = rows.filter(row => row.some(cell => cell !== null && cell !== undefined && cell !== ''));
+
+        resolve(rows);
+      } catch (error) {
+        reject(error);
+      }
+    };
+
+    reader.onerror = (error) => reject(error);
+
+    // Determine file read type
+    if (fileExtension === 'csv') {
+      reader.readAsText(file);  // For CSV, read as text
+    } else {
+      reader.readAsArrayBuffer(file);  // For Excel files, read as ArrayBuffer
+    }
+  });
 };
-
-
-export function recordOperation(date,operationType) 
-{
-
-}
-
-
