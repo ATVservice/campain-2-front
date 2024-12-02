@@ -59,7 +59,13 @@ const App = () => {
     <AuthProvider>
       <Router>
         <div>
-          <ToastContainer />
+        <ToastContainer 
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        closeOnClick
+        rtl={true}  // Important for Hebrew
+      />
           <DynamicTitle />
           <Layout>
             <div className="flex-grow">

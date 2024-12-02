@@ -5,6 +5,7 @@ import {getCommitmentDetails,getCampainByName,getAllMemorialDates,updateCommitme
 import AnashPaymentsDetails from '../components/AnashPaymentsDetails'
 import PaymentForm from '../components/PaymentForm'
 import { toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 import PasswordConfirmationModal from '../components/PasswordConfirmationModal'
 import Spinner from '../components/Spinner'
 
@@ -76,7 +77,7 @@ function CommitmentDetailsPage2() {
       
     } catch (error) {
       console.error("Error updating commitment:", error.response.data.message);
-      toast.error(error.response.data.message);
+      toast.error(error.response.data.message||'שגיאה בעדכון התחייבות');
     }
     finally {
       setIsLoading(false);
@@ -91,7 +92,7 @@ function CommitmentDetailsPage2() {
       setIsLoading(true);
       const response = await uploadCommitmentPayment(paymentData);
       if (response && response.status === 200) {
-        console.log(console.log(response.data.newPayment));
+        console.log(console.log(response));
         console.log(console.log(response.data.updatedCommitment));
         setCommitmentForm(response.data.updatedCommitment);
         
@@ -102,8 +103,11 @@ function CommitmentDetailsPage2() {
         console.error("Commitment update failed.");
       }
     } catch (error) {
-      console.error("Error updating commitment:", error.response.data.message);
-      toast.error(error.response.data.message);
+      toast.error(error.response.data.message||'שגיאה בהעלאת התשלום');
+      console.log('ee');
+      // console.log(error);
+      // console.error("Error updating commitment:", error.response.data.message);
+      // console.log(message);
     }
     finally {
       setIsLoading(false);

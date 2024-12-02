@@ -2,7 +2,7 @@ import { CgDetailsMore } from "react-icons/cg";
 import { useNavigate,useParams } from "react-router-dom";
 import React, { useState, useEffect } from 'react';
 import * as XLSX from 'xlsx';
-import { uploadPeople, getPeople,upadateUserDetails ,deleteUser} from '../requests/ApiRequests';
+import { uploadPeople, getPeople,upadateUserDetails ,deleteUser,recoverUserActivity} from '../requests/ApiRequests';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
@@ -10,6 +10,9 @@ import { FaRegEdit } from "react-icons/fa";
 import { AiOutlineDelete } from "react-icons/ai";
 import { GrUpdate } from "react-icons/gr";
 import { MdOutlineCancel } from "react-icons/md";
+import { GiConfirmed } from "react-icons/gi";
+import { ToastContainer, toast } from 'react-toastify';
+
 
 
 function Table({rowsData, setRowsData ,setShowActivePeople ,showActivePeople}) {
@@ -21,7 +24,6 @@ function Table({rowsData, setRowsData ,setShowActivePeople ,showActivePeople}) {
     const [isFilterApplied, setIsFilterApplied] = useState(false);
 
 
-    
     
     
     const onSearch = (event) => {
@@ -46,7 +48,7 @@ function Table({rowsData, setRowsData ,setShowActivePeople ,showActivePeople}) {
         if (isCurrentRowEditing) {
             return (
                 <div style={{ display: 'flex', gap: '15px' }} className="h-full ">
-                    <button className="action-button update p-1 px-2 text-xl bg-green-100	rounded-sm" onClick={() => onActionClick('update', props.api, props.node)}><GrUpdate/></button>
+                    <button className="action-button update p-1 px-2 text-xl bg-green-100	rounded-sm" onClick={() => onActionClick('update', props.api, props.node)}><GiConfirmed/></button>
                     <button className="action-button cancel p-1 px-2  text-xl bg-gray-200	rounded-sm" onClick={() => onActionClick('cancel', props.api, props.node)}><MdOutlineCancel/> </button>
                 </div>
             );
@@ -54,13 +56,19 @@ function Table({rowsData, setRowsData ,setShowActivePeople ,showActivePeople}) {
             return (
                 <div style={{ display: 'flex', gap: '15px' }} className="h-full "> 
                     <button className="action-button edit   p-1 px-2 text-xl bg-blue-100	rounded-sm	 	" onClick={() => onActionClick('edit', props.api, props.node)}><FaRegEdit /> </button>
-                    <button className="action-button delete p-1 px-2  text-xl bg-red-100	rounded-sm			" onClick={() => onActionClick('delete', props.api, props.node)}> <AiOutlineDelete/></button>
+                    {
+                      props.data.isActive ?
+                      <button className="action-button delete p-1 px-2  text-xl bg-red-100	rounded-sm" onClick={() => onActionClick('delete', props.api, props.node)}> <AiOutlineDelete/></button>:
+                      <button className="action-button delete p-1 px-2  text-xl bg-gray-200	rounded-sm" onClick={() => onActionClick('recover', props.api, props.node)}> <GrUpdate/></button>
+                      }
                 </div>
             );
         }
     };
     
     const onActionClick = async (action, api, node) => {
+
+
         switch (action) {
           case 'edit':
             api.startEditingCell({
@@ -73,10 +81,13 @@ function Table({rowsData, setRowsData ,setShowActivePeople ,showActivePeople}) {
             if (isConfirmed) {
               const originalRowData = node.data;
               try {
+                console.log('Before deleteUser');
                 const res = await deleteUser(originalRowData.AnashIdentifier);
-               
-                console.log('res');
-                api.applyTransaction({
+                console.log('After deleteUser', res);
+                     
+                const toastResult = toast.success('משתמש נמחק בהצלחה');
+                console.log('Toast called', toastResult);
+                      api.applyTransaction({
                   remove: [node.data]
                 });
               } catch (error) {
@@ -112,6 +123,21 @@ function Table({rowsData, setRowsData ,setShowActivePeople ,showActivePeople}) {
       
             console.log('Edited cells:', editedCells); // Log or process the edited cells
       
+            break;
+          case 'recover':
+            try{
+              const res = await recoverUserActivity(node.data.AnashIdentifier);
+              console.log(res);
+              toast.success("משתמש שוחזר בהצלחה",{closeOnClick: false});
+              api.applyTransaction({
+                remove: [node.data]
+              });
+             
+            }catch(error){
+              console.error(error);
+
+              
+            }
             break;
           case 'cancel':
             api.stopEditing(true);
@@ -175,7 +201,8 @@ function Table({rowsData, setRowsData ,setShowActivePeople ,showActivePeople}) {
           },
         },        
         
-        { headerName: 'מזהה אנש', field: 'AnashIdentifier', editable: false, sortable: true, filter: true,width: 120 },
+        { headerName: 'מזהה אנש', field: 'AnashIdentifier', editable: false, sortable: true, filter: true,width: 120 ,  sort: 'asc'  // This will sort the column from lowest to highest by default
+        },
         { headerName: 'שם', field: 'FirstName', editable: true, sortable: true, filter: true },
         { headerName: 'משפחה', field: 'LastName', editable: true, sortable: true, filter: true },
         { headerName: 'כתובת', field: 'Address', editable: true, sortable: true, filter: true },
@@ -194,7 +221,7 @@ function Table({rowsData, setRowsData ,setShowActivePeople ,showActivePeople}) {
           headerName: 'פעיל',
           field: 'isActive',
           // filter: true,
-          editable: true,
+          editable: false,
          
           width: 100,
           filterParams: {
@@ -225,7 +252,7 @@ function Table({rowsData, setRowsData ,setShowActivePeople ,showActivePeople}) {
               },
         },
         {
-          headerName: 'עריכה/מחיקה',
+          headerName: 'עריכה/שחזור/מחיקה',
           cellRenderer: ActionCellRenderer,
           editable: false,
           colId: 'action',

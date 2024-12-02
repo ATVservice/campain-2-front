@@ -47,8 +47,8 @@ function CampainsPage() {
 
   const handleAddCampain = async () => {
     const { startDate, endDate, CampainName, minimumAmountForMemorialDay } = campainData;
-    console.log(startDate, CampainName, minimumAmountForMemorialDay);
-    console.log(campainData)
+    // console.log(startDate, CampainName, minimumAmountForMemorialDay);
+    // console.log(campainData)
     if (!startDate || !endDate || !CampainName || !minimumAmountForMemorialDay) {
       setmessage("נא למלא את כל השדות");
       return;
@@ -69,7 +69,8 @@ function CampainsPage() {
       setmessage(""); // איפוס ההודעה
       
     } catch (error) {
-      toast.error("אירעה שגיאה בהוספת הקמפיין."); // הודעת Toast על שגיאה
+      console.log(error);
+      toast.error( error.response.data.message || "אירעה שגיאה בהוספת הקמפיין."); // הודעת Toast על שגיאה
     }
     finally {
       setLoading(false);

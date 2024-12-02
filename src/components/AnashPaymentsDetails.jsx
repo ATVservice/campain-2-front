@@ -13,9 +13,11 @@ function AnashPaymentsDetails({
 }) {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [paymentIdToDelete, setPaymentIdToDelete] = useState(null);
+  const [paymentToDelete, setPaymentToDelete] = useState(null);
   const [password, setPassword] = useState('');
 
   const [isLoading, setIsLoading] = useState(false);
+  
 
 
   const handleDeletePayment = async (paymentId) => {
@@ -42,6 +44,8 @@ function AnashPaymentsDetails({
 
     try {
       setIsLoading(true);
+      
+
       const res = await validateUserPassword(password);
       console.log(res);
       
@@ -100,6 +104,10 @@ function AnashPaymentsDetails({
                   onClick={() => {
                     setShowConfirmationModal(true);
                     setPaymentIdToDelete(payment._id);
+                    if(payment&&payment.PaymentMethod == 'מזומן')
+                      toast.warning('יתכן ומחיקת תשלום מזומן זה תשפיע על יתרת קופה קטנה')
+              
+
                   }}
                   className="text-red-500 hover:text-red-700"
                 >

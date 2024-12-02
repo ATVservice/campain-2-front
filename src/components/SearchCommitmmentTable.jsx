@@ -62,7 +62,8 @@ function SearchCommitmmentTable({rowData,searchText ,onSelectRow,onUnselectRow})
 
   const columns = [
     
-    { headerName: 'מזהה אנש', field: 'AnashIdentifier', editable: false, sortable: true, filter: true,width: 110 },
+    { headerName: 'מזהה אנש', field: 'AnashIdentifier', editable: false, sortable: true, filter: true,width: 110,  sort: 'asc'  // This will sort the column from lowest to highest by default
+    },
     { headerName: 'שם', field: 'FirstName', editable: true, sortable: true, filter: true ,width: 110},
     { headerName: 'משפחה', field: 'LastName', editable: true, sortable: true, filter: true ,width: 110},
     {

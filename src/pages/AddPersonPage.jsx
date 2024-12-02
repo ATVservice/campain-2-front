@@ -2,7 +2,8 @@ import React from 'react'
 import {useNavigate } from 'react-router-dom';
 import { useState } from 'react'
 import { addPerson } from '../requests/ApiRequests';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast , ToastContainer} from 'react-toastify';
+
 import 'react-toastify/dist/ReactToastify.css';
 import Spinner from '../components/Spinner';
 
@@ -63,7 +64,7 @@ function AddPersonPage() {
 
   return (
     <div>
-      <ToastContainer autoClose={500} />
+      {/* <ToastContainer autoClose={500} /> */}
 
       <form className="max-w-7xl mx-auto p-3" onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-5 gap-[20px]">

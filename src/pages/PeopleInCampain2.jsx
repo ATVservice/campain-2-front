@@ -151,6 +151,7 @@ function PeopleInCampain2() {
       toast.success("תורם נוסף לקמפיין בהצלחה");
     } catch (error) {
       console.error("Error adding person to campaign:", error);
+      toast.error("שגיאה בהוספה לקמפיין"); 
     } finally {
       setLoading(false);
     }

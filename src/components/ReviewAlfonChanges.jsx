@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import SearchFilter from "./SearchFilter";
+import { set } from "lodash";
 
 function ReviewAlfonChanges({ conflictsData,validPeople, invalidPeople, onSubmit, onClose,showConflicts,setShowConflicts }) {
   const englishToHebrewMapping = {
@@ -74,7 +76,14 @@ function ReviewAlfonChanges({ conflictsData,validPeople, invalidPeople, onSubmit
     // Pass the arrays to onSubmit
     onSubmit(chosenPeople, validPeople);
   }
+  const [filteredconflictsData, setFilteredconflictsData] = useState(conflictsData);
+  const getFilteredConflictedData = (filteredData) => {
+    setFilteredconflictsData(filteredData);
+  };
+
   
+
+
 
 
 
@@ -86,9 +95,19 @@ function ReviewAlfonChanges({ conflictsData,validPeople, invalidPeople, onSubmit
     showValidPeople ? validPeople : invalidPeople
   );
   const togglePeopleDisplay = () => {
-    setShowValidPeople((prev) => !prev);
-    setPeopleToDisplay((prev) => (showValidPeople ? invalidPeople : validPeople));
+    const newPeople = showValidPeople ? invalidPeople : validPeople;
+    setPeopleToDisplay(newPeople);
+    setFilteredPeople(newPeople);
+    setShowValidPeople(prev => !prev);
   };
+    
+
+  const [filteredPeople, setFilteredPeople] = useState(peopleToDisplay||[]);
+  const getFilteredData = (filteredData) => {
+    setFilteredPeople(filteredData);
+  };
+
+
 
 
 
@@ -103,15 +122,26 @@ function ReviewAlfonChanges({ conflictsData,validPeople, invalidPeople, onSubmit
 
   return (
     <div className="w-[100vw] h-[100vh] max-h-[100vh] bg-gray-500 bg-opacity-75 z-50 flex flex-col justify-center items-center rtl fixed inset-0 bg-black bg-opacity-50">
-      <div className="bg-white rounded-lg w-fit flex flex-col justify-center items-center rtl min-w-[50vw] max-h-[90vh] relative overflow-hidden">
-        <div className="w-[90%] flex justify-start items-center gap-4 p-4">
+      <div className="bg-white rounded-lg w-fit flex flex-col justify-center items-center rtl min-w-[50vw] max-h-[90vh] relative overflow-hidden min-h-[90vh]">
+        <div className="w-[90%] flex justify-start gap-4 p-4 items-start">
           <p className="font-bold  px-2 py-1 rounded border-b-2 border-green-300">תקינים:{validPeople?.length}</p>
           <p className="font-bold  px-2 py-1 rounded border-b-2 border-red-300">לא תקינים:{invalidPeople?.length}</p>
           <p className="font-bold   px-2 py-1 rounded border-b-2 border-yellow-300">קונפליקטים:{conflictsData?.length}</p>
         </div>
+        <div className="w-[90%] flex items-center gap-4 p-4">
+          <SearchFilter
+            data={conflictsData}
+            columns = {['FirstName', 'LastName', 'anash']}
+            onFilter={getFilteredConflictedData}
+            placeholder={'חיפוש לפי שם/משפחה/אנש'}
+
+          />
+        </div>
+
+
         {/* Scrollable content area with bottom padding */}
-        <div className="w-full overflow-y-auto px-8 pb-24 pt-6 space-y-4">
-          {conflictsData?.map((conflict, conflictIndex) => (
+        <div className="w-full overflow-y-auto px-8 pb-24 pt-6 space-y-4 flex-1">
+          {filteredconflictsData?.map((conflict, conflictIndex) => (
             <div
               key={`conflict-${conflictIndex}`}
               className="w-[80%] mb-4 rounded-md border border-gray-300 p-4 shadow-md"
@@ -119,6 +149,10 @@ function ReviewAlfonChanges({ conflictsData,validPeople, invalidPeople, onSubmit
               {/* Header with "anash" */}
               <p className="text-right font-bold mb-4">
                 מזהה אנש: {conflict.anash}
+                <br />
+                 שם פרטי: {conflict.FirstName}
+                <br />
+                 שם משפחה: {conflict.LastName}
               </p>
 
               {/* Rows for conflicting fields */}
@@ -273,6 +307,14 @@ function ReviewAlfonChanges({ conflictsData,validPeople, invalidPeople, onSubmit
               </button>
             </div>
           </div>
+          <SearchFilter
+          data={peopleToDisplay}
+          columns = {['FirstName', 'LastName', 'AnashIdentifier']}
+          onFilter={getFilteredData}
+          placeholder={'חיפוש לפי שם/משפחה/אנש'}
+
+        />
+
   
           {/* Table container with its own scrollable area */}
           <div className="flex-1 overflow-hidden">
@@ -301,7 +343,7 @@ function ReviewAlfonChanges({ conflictsData,validPeople, invalidPeople, onSubmit
                   </tr>
                 </thead>
                 <tbody>
-                  {peopleToDisplay.map((person, index) => (
+                  {filteredPeople.map((person, index) => (
                     <tr key={index} className="border-t">
                       {!showValidPeople && (
                         <td className="py-2 px-4 text-center">

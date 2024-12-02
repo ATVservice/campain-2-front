@@ -59,12 +59,13 @@ function TransactionsTable({ rowsData, fetchTransactions}) {
     },
     {
       headerName: 'מחיקה',
+      flex: 1,
       cellRenderer: (params) => {
         if (params.data.TransactionType === 'הוצאה') {
           return (
             <button
               onClick={() => deleteTransactionProcess(params.node)}
-              className="text-red-500 hover:text-red-700"
+              className="text-red-500 hover:text-red-700 flex-grow"
             >
               <FaTrash size={18} /> {/* שימוש באייקון */}
             </button>
@@ -78,13 +79,14 @@ function TransactionsTable({ rowsData, fetchTransactions}) {
   const gridStyle = {
     width: '100%',
     height: '400px',
+    
   };
 
   const getRowStyle = (params) => {
     if (params.data.TransactionType === 'הוצאה') {
       return { backgroundColor: '#ffe6e6' }; // רקע אדום בהיר להוצאה
     } else if (params.data.TransactionType === 'הכנסה') {
-      return { backgroundColor: '#e6ffe6' }; // רקע ירוק בהיר להכנסה
+      return { backgroundColor: '#e6ffe6'}; // רקע ירוק בהיר להכנסה
     }
     return null;
   };
@@ -106,7 +108,11 @@ function TransactionsTable({ rowsData, fetchTransactions}) {
 };
 
   return (
-    <div className="ag-theme-alpine" style={gridStyle}>
+    <div className="ag-theme-alpine"       style={{ 
+      width: '100%', // Ensure the container is full width
+      height: '400px' 
+    }}
+>
       <AgGridReact
         columnDefs={columns}
         rowData={rowsData}
@@ -118,6 +124,10 @@ function TransactionsTable({ rowsData, fetchTransactions}) {
         gridOptions={{
           enableCellTextSelection: true,
         }}
+
+
+        
+
 
       />
     </div>

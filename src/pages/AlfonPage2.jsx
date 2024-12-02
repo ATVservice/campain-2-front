@@ -12,6 +12,7 @@ import Table from "../components/Table";
 import Spinner from "../components/Spinner";
 import InvalidUploads from "../components/InvalidUploads";
 import ReviewAlfonChanges from "../components/ReviewAlfonChanges";
+import { toast } from "react-toastify";
 
 
 function AlfonPage2() {
@@ -162,10 +163,12 @@ function AlfonPage2() {
       {
        const response =  await getPeople(showActivePeople);
        setRowsData(response.data.data.people || []);
+       toast.success("נתונים הועלו בהצלחה");
       }
       
       } catch (error) {
         console.log(error);
+        toast.error("שגיאה בהעלאת נתונים");
         
       }
       finally

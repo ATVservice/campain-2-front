@@ -52,6 +52,7 @@ export const reviewUploadedPeople = async (data) => {
     const response = await apiConfig.post('/api/alfon/review-uploaded-people', data);
     return response;
   } catch (error) {
+    throw error
     console.log(error);
   }
 };
@@ -63,6 +64,7 @@ export const uploadCommitment = async (data) => {
     const response = await apiConfig.post('/api/commitment/upload', data);
     return response;
   } catch (error) {
+    throw error
     console.log('Error uploading commitment:', error);
   }
 };
@@ -135,6 +137,7 @@ export const getUserDetails = async (AnashIdentifier) => {
 
     return response;
   } catch (error) {
+    throw error
     console.log(error);
   }
 };
@@ -189,6 +192,7 @@ export const upadateUserDetails = async (data) => {
     return response;
   } 
   catch (error) {
+    throw error
     console.log(error);
   }
 }
@@ -215,6 +219,7 @@ export const getCampains= async () => {
     const response = await apiConfig.get(`/api/campain/get-campains`);
     return response;
   } catch (error) {
+      throw error
     console.log(error);
   }
 }
@@ -262,6 +267,7 @@ export const getCommitmentInCampain= async (campainName,isActive=null) => {
     const response = await apiConfig.get(`/api/campain/get-commitment-in-campain/${campainName}?isActive=${isActive}`);
     return response;
   } catch (error) {
+    throw error
     console.log(error);
   }
   
@@ -273,6 +279,7 @@ export const addPerson= async (data) => {
     const response = await apiConfig.post(`/api/alfon/add-user`,data);
     return response;
   } catch (error) {
+    throw error
     console.log(error);
   }
 }
@@ -345,7 +352,8 @@ export const getTransactions = async () => {
   try {
     const response = await apiConfig.get('/api/transaction'); 
     return response;
-  } catch (error) {
+  } catch (error) { 
+    throw error
     console.log(error);
   }
 }
@@ -355,6 +363,7 @@ export const deleteTransaction = async (transactionId) => {
     const response = await apiConfig.delete(`/api/transaction/delete-transaction?transactionId=${transactionId}`); 
     return response;
   } catch (error) {
+    throw error
     console.log(error);
   }
 }
@@ -365,6 +374,7 @@ export const addExpense = async (newExpense) => {
     const response = await apiConfig.post('/api/transaction/create-expense', newExpense); 
     return response;
   } catch (error) {
+    throw error
     console.log(error);
   }
 }
@@ -498,6 +508,14 @@ export const reviewBefourAddPeopleToCampain = async (campainName,people) => {
 export const addPeopleToCampain= async (campainName,people) => {
   try {
     const response = await apiConfig.post(`/api/campain/add-people-to-campain`,{campainName,people});
+    return response;
+  } catch (error) {
+    throw error
+  }
+}
+export const recoverUserActivity= async (AnashIdentifier) => {
+  try {
+    const response = await apiConfig.put(`/api/alfon/recover-user-activity/${AnashIdentifier}`);
     return response;
   } catch (error) {
     throw error

@@ -13,7 +13,7 @@ function PettyCashPage() {
     const [formData, setFormData] = useState({
         reason: '',
         amount: '',
-        date: '',
+        date: new Date(),
     });
     const [isLoading, setIsLoading] = useState(false);
 
@@ -66,7 +66,7 @@ function PettyCashPage() {
         } catch (error) {
             console.error('Error adding expense:', error);
         }
-        setFormData({ reason: '', amount: '', date: '' });
+        setFormData({ reason: '', amount: '', date: new Date() });
         closeModal();     
     };
 
@@ -137,13 +137,13 @@ function PettyCashPage() {
                         <label className="block text-sm font-medium mb-2">תאריך:</label>
                         <input
                             type="date"
-                            value={formData.date}
-                            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                            value={formData.date.toISOString().split('T')[0]|| ''}
+                            onChange={(e) => setFormData({ ...formData, date: new Date(e.target.value) })}
                             className="w-full p-2 border border-gray-300 rounded"
                             required
                         />
                     </div>
-                    <div className="flex justify-end space-x-2">
+                    <div className="flex justify-end space-x-2 gap-4">
                         <button
                             type="submit"
                             className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-300"
