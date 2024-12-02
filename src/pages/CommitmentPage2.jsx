@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import * as XLSX from "xlsx";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {reviewCommitments,uploadCommitments,getCommitmentsByCampaign} from  '../requests/ApiRequests'
 // import CommitmentTable from "../components/CommitmentTable";
@@ -36,6 +36,9 @@ function CommitmentPage2() {
     'סכום': "Amount",
     'תאריך': "Date",
     'קמפיין': "CampainName",
+    'קטגוריה': "CampainName",
+    'קטגורייה': "CampainName",
+
   };
   let { campainName } = useParams(); // Extracts the 'campainName' from the URL
   campainName = campainName && campainName != "undefined" ? campainName : null
@@ -132,6 +135,7 @@ function CommitmentPage2() {
 
   async function onUploadCommitments()
   {
+    toast.success("aaa");
     const commitmentsToUpload = [...validCommitments];
     setInvalidCommitments([]);
     setValidCommitments([]);

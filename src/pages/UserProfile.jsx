@@ -32,6 +32,7 @@ function UserProfile() {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [userIdToDelete, setUserIdToDelete] = useState(null);
   const [loading, setLoading] = useState(false);
+  const rolesToHebrewMap = { User: "משתמש עריכה", Admin: "מנהל",Guest:"משתמש קריאה" };
 
   useEffect(() => {
     // setUpdatedUser(user);
@@ -184,7 +185,7 @@ function UserProfile() {
             bgColor="bg-blue-100"
           />
         ) : (
-          <div className="inline-flex gap-4 p-2 rounded-lg shadow-md  max-w-fit bg-blue-100 ">
+          <div className="inline-flex gap-4 p-2 rounded-lg shadow-md  max-w-fit bg-blue-100 w-full">
             <div className="flex flex-col gap-2">
               <p className="text-gray-600 font-medium self-start">שם משתמש:</p>
               <span className="text-gray-800 border border-gray-300 rounded-lg p-2 min-w-[250px] bg-gray-200">
@@ -210,6 +211,12 @@ function UserProfile() {
               </p>
               <span className="text-gray-800 border border-gray-300 rounded-lg p-2 w-[250px] bg-gray-200">
                 <p className="text-gray-500 italic">סיסמה מוסתרת</p>
+              </span>
+            </div>
+            <div className="flex flex-col gap-2">
+              <p className="text-gray-600 font-medium self-start"> הרשאת משתמש:</p>
+              <span className="text-gray-800 border border-gray-300 rounded-lg p-2 w-[250px] bg-gray-200">
+                {rolesToHebrewMap[user.Role]}
               </span>
             </div>
             <div className="flex items-end gap-2">

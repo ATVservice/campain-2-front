@@ -49,6 +49,12 @@ function CommitmentForm({ onSubmit, onClose }) {
 
   const [campaigns, setCampaigns] = useState([]);
   const [people, setPeople] = useState([]);
+  const validPaymentMethods = [
+    'מזומן', 'העברה בנקאית', 'הבטחה', 
+    'משולב', 'כרטיס אשראי', 'שיקים', 'לא סופק', 
+    'הוראת קבע', 'אשראי הו"ק'
+  ];
+
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -187,17 +193,12 @@ function CommitmentForm({ onSubmit, onClose }) {
               onChange={handleChange}
               required
             >
-              <option value="">בחר אופן תשלום</option>
-              <option value="מזומן">מזומן</option>
-              <option value="שיק">שיק</option>
-              <option value="אשראי">אשראי</option>
-              <option value='הו"ק אשראי'>הו"ק אשראי</option>
-              <option value="העברה בנקאית">העברה בנקאית</option>
-              <option value='הו"ק בנקאית'>הו"ק בנקאית</option>
-              <option value="הבטחה"> הבטחה</option>
-              <option value="משולב"> משולב</option>
-              <option value='לא סופק'>לא סופק </option>
-
+              <option  value="">בחר אופן תשלום</option>
+              {validPaymentMethods.map((method) => (
+                <option key={method} value={method}>
+                  {method}
+                </option>
+              ))}
             </select>
           </div>
           <div className="flex justify-between">
@@ -207,6 +208,7 @@ function CommitmentForm({ onSubmit, onClose }) {
               name="CampainName"
               value={formData.CampainName}
               onChange={handleChange}
+              required
             >
               <option value="">בחר קמפיין</option>
               {campaigns.map((campaign) => (

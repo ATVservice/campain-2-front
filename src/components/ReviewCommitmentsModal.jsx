@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import SearchFilter from './SearchFilter';
 
 function ReviewCommitmentsModal({ onUploadCommitment, validCommitments, invalidCommitments, onClose }) {
   const hebrewToEnglishMapping = {
@@ -25,10 +26,21 @@ function ReviewCommitmentsModal({ onUploadCommitment, validCommitments, invalidC
   };
   const [showValidCommitments, setShowValidCommitments] = useState(()=> validCommitments.length > 0);
   const [commitmentsToDisplay, setCommitmentsToDisplay] = useState(showValidCommitments ? validCommitments : invalidCommitments);
-  function handleChange() {
-    setCommitmentsToDisplay(showValidCommitments ? invalidCommitments : validCommitments);
+  const [filteredCommitments, setFilteredCommitments] = useState(commitmentsToDisplay||[]);
+  // console.log(filteredCommitments);
+  // console.log(commitmentsToDisplay);
+
+
+  const handleChange = () => {
+    const newCommitments = showValidCommitments ? invalidCommitments : validCommitments;
+    setCommitmentsToDisplay(newCommitments);
+    setFilteredCommitments(newCommitments);
     setShowValidCommitments(!showValidCommitments);
-  }
+  };
+  const getFilteredData = (filteredData) => {
+    setFilteredCommitments(filteredData);
+  };
+
   function handelUpload() {
     onUploadCommitment();
   }
@@ -66,6 +78,13 @@ function ReviewCommitmentsModal({ onUploadCommitment, validCommitments, invalidC
             </button>
           </div>
         </div>
+        <SearchFilter
+          data={commitmentsToDisplay}
+          columns = {['FirstName', 'LastName', 'AnashIdentifier']}
+          onFilter={getFilteredData}
+          placeholder={'חיפוש לפי שם/משפחה/אנש'}
+        />
+
 
         {/* Table container with its own scrollable area */}
         <div className="overflow-hidden z-51">
@@ -94,7 +113,7 @@ function ReviewCommitmentsModal({ onUploadCommitment, validCommitments, invalidC
               </thead>
               <tbody className='z-50'>
                 {
-                  commitmentsToDisplay.map((commitment, index) => (
+                  filteredCommitments?.map((commitment, index) => (
                     <tr key={index} className="border-t">
                       {!showValidCommitments && (
                         <td className="py-2 px-4 text-center">{commitment.reason || "-"}</td>

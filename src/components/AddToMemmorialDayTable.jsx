@@ -79,6 +79,8 @@ function AddToMemmorialDayTable({ rowData, onAddMemorialDayToPerson }) {
       sortable: true,
       filter: true,
       width: 120,
+      sort: 'asc'  // This will sort the column from lowest to highest by default
+
     },
     {
       headerName: "שם",

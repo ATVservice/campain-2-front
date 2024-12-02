@@ -17,8 +17,11 @@ function PaymentForm({
   const [campaigns, setCampaigns] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  // const {campainName} = useParams();
-  // console.log(campainName);
+  const validPaymentMethods = [
+    'מזומן', , 'העברה בנקאית', 'הבטחה', 
+    'משולב', 'כרטיס אשראי', 'שיקים', 'לא סופק', 
+    'הוראת קבע', 'אשראי הו"ק'
+  ];
 
   const [formData, setFormData] = useState({
     AnashIdentifier: anashIdentifier ? anashIdentifier : "",
@@ -97,6 +100,7 @@ function PaymentForm({
     });
   }
   function handleSubmit(e) {
+    // console.log('3333');
     e.preventDefault();
     console.log(formData);
     onSubmit(formData);
@@ -140,15 +144,11 @@ function PaymentForm({
               required
             >
               <option value="">בחר אופן תשלום</option>
-              <option value="מזומן">מזומן</option>
-              <option value="שיק">שיק</option>
-              <option value="אשראי">אשראי</option>
-              <option value='הו"ק אשראי'>הו"ק אשראי</option>
-              <option value="העברה בנקאית">העברה בנקאית</option>
-              <option value='הו"ק בנקאית'>הו"ק בנקאית</option>
-              <option value="הבטחה"> הבטחה</option>
-              <option value="משולב"> משולב</option>
-
+              {validPaymentMethods.map((method) => (
+                <option key={method} value={method}>
+                  {method}
+                </option>
+              ))}
             </select>
           </div>
           <div className="flex justify-between">

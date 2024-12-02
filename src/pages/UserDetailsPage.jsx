@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getUserDetails, upadateUserDetails,deleteUser } from '../requests/ApiRequests';
+import { getUserDetails, upadateUserDetails,deleteUser,recoverUserActivity } from '../requests/ApiRequests';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Modal from 'react-modal';
@@ -34,6 +34,7 @@ function UserDetailsPage() {
 
     const handleChange = (e) => {
         const { name, type, value, checked } = e.target;
+        console.log(name, type, value, checked);
         const newValue = type === 'checkbox' ? checked : value;
 
         console.log(newValue);
@@ -97,6 +98,27 @@ function UserDetailsPage() {
         
           }
         }
+
+        const handelRecoverUser = async (e) => {
+            e.preventDefault();
+            try {
+              setIsLoading(true);
+              await recoverUserActivity(userDetails.AnashIdentifier);
+              toast.success('המשתמש שוחזר בהצלחה')
+              }
+            
+            catch (error) {
+              console.error('Failed to recover user:', error.message);
+              toast.error('שגיאה בשחזור המשתמש');
+
+            
+              }
+            finally{
+              setIsLoading(false);
+
+            }
+            }
+
             
     useEffect(() => {
         const fetchData = async () => {
@@ -198,8 +220,8 @@ function UserDetailsPage() {
           מספר:
           <input
             type="text"
-            name="adressNumber"
-            value={userDetails.adressNumber || ''}
+            name="AddressNumber"
+            value={userDetails.AddressNumber || ''}
             onChange={handleChange}
             className="mt-1 block w-full p-2 border border-gray-300 rounded"
           />
@@ -405,7 +427,7 @@ function UserDetailsPage() {
             className="mt-1 block w-full p-2 border border-gray-300 rounded"
           />
         </label>
-        <label>
+        {/* <label>
           פעיל /לא פעיל:
           <input
             type="checkbox"
@@ -414,7 +436,7 @@ function UserDetailsPage() {
             onChange={handleChange}
             className="mt-1 block w-full p-2 border border-gray-300 rounded"
           />
-        </label>
+        </label> */}
       </div>
       <button
         type="submit"
@@ -425,14 +447,22 @@ function UserDetailsPage() {
         אשר עדכון פרטים
       </button>
 
-    <button 
+{   userDetails.isActive ?
+ <button 
     className="m-4 p-2 bg-red-500 text-white rounded hover:bg-red-600"
 
     onClick={(e)=>openModal(e)}
     disabled={isLoading}
     >מחק משתמש
-    </button> 
-
+    </button> :
+    <button
+      className="m-4 p-2 bg-green-500 text-white rounded hover:bg-green-600"
+      onClick={handelRecoverUser}
+      disabled={isLoading}
+    >
+      שחזר משתמש
+    </button>
+}
     <button
       className="m-4 p-2 bg-orange-500 text-white rounded hover:bg-orange-600"
       onClick={handelShowOperations}
@@ -444,7 +474,7 @@ function UserDetailsPage() {
     
     </form>
     {isRecordModalOpen &&(
-      <RecordOperation operations={userDetails.Operations} isRecordModalOpen={isRecordModalOpen} setIsRecordModalOpen={setIsRecordModalOpen} />
+      <RecordOperation userDetails={userDetails} isRecordModalOpen={isRecordModalOpen} setIsRecordModalOpen={setIsRecordModalOpen} />
       
     )
     

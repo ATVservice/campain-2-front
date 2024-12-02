@@ -27,6 +27,7 @@ function Payments() {
     'מתרים': "Fundraiser",
     "מותג": "PaymentMethod",
     "תנועה": "PaymentMethod",
+    "אופן תשלום": "PaymentMethod",
     "תשובה למתרים": "ResponseToFundraiser",
     "יום הנצחה": "MemorialDay",
     'הנצחה': "Commemoration",
@@ -35,6 +36,8 @@ function Payments() {
     'תאריך עסקה': "Date",
     'תאריך': "Date",
     'קמפיין': "CampainName",
+    'קטגוריה': "CampainName",
+    'קטגורייה': "CampainName",
   };
     
 
@@ -60,6 +63,10 @@ function Payments() {
     else if(hebrewHeader === 'תנועה' && cellValue ==='שידור')
     {
       return 'הו"ק בנקאית'
+    }
+    else if(hebrewHeader === 'אופן תשלום')
+    {
+      return  cellValue
     }
     else
     {
@@ -152,6 +159,7 @@ function Payments() {
   }
 
   async function onUploadPayments() {
+    // console.log('222');
     const paymentsToUpload = [...validPayments];
     setInvalidPayments([]);
     setValidPayments([]);

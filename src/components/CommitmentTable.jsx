@@ -97,6 +97,9 @@ function CommitmentTable({rowsData,setShowCommitmentsOfActivePeople,showCommitme
           field: 'AnashIdentifier', 
           minWidth: 80, 
           maxWidth: 90, 
+          sort: 'asc' , // This will sort the column from lowest to highest by default
+          sortable:true,
+
           headerClass: 'multi-line-header', 
           ...commonColumnProps 
         },

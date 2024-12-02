@@ -69,7 +69,8 @@ import { max } from "date-fns";
     
       const columns = [
         
-        { headerName: 'מזהה אנש', field: 'AnashIdentifier', editable: false, sortable: true, filter: true,width: 120 },
+        { headerName: 'מזהה אנש', field: 'AnashIdentifier', editable: false, sortable: true, filter: true,width: 120,  sort: 'asc'  // This will sort the column from lowest to highest by default
+        },
         { headerName: 'שם', field: 'FirstName', editable: true, sortable: true, filter: true },
         { headerName: 'משפחה', field: 'LastName', editable: true, sortable: true, filter: true },
         

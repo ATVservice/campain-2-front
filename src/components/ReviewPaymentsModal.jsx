@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import SearchFilter from './SearchFilter';
 
 function ReviewPaymentsModal({ onUploadPayments, validPayments, invalidPayments, onClose }) {
     const hebrewToEnglishMapping = {
@@ -25,10 +26,21 @@ function ReviewPaymentsModal({ onUploadPayments, validPayments, invalidPayments,
       };
       const [showValidPayments, setShowValidPayments] = useState(()=> validPayments.length > 0);
       const [paymentsToDisplay, setPaymentsToDisplay] = useState(showValidPayments ? validPayments : invalidPayments);
+      const [filteredPayments, setFilteredPayments] = useState(paymentsToDisplay||[]);
+
       function handleChange() {
-        setPaymentsToDisplay(showValidPayments ? invalidPayments : validPayments);
+        const newPayments = showValidPayments ? invalidPayments : validPayments;
         setShowValidPayments(!showValidPayments);
+        setPaymentsToDisplay(newPayments);
+        setFilteredPayments(newPayments);
+
+
       }
+
+      const getFilteredData = (filteredData) => {
+        setFilteredPayments(filteredData);
+      };
+    
       function handelUpload() {
         onUploadPayments();
       }
@@ -67,6 +79,14 @@ function ReviewPaymentsModal({ onUploadPayments, validPayments, invalidPayments,
                   </button>
                 </div>
               </div>
+              <SearchFilter
+          data={paymentsToDisplay}
+          columns = {['FirstName', 'LastName', 'AnashIdentifier']}
+          onFilter={getFilteredData}
+          placeholder={'חיפוש לפי שם/משפחה/אנש'}
+
+        />
+
       
               {/* Table container with its own scrollable area */}
               <div className="flex-1 overflow-hidden">
@@ -86,7 +106,7 @@ function ReviewPaymentsModal({ onUploadPayments, validPayments, invalidPayments,
                       </tr>
                     </thead>
                     <tbody>
-                      {paymentsToDisplay.map((payment, index) => (
+                      {filteredPayments.map((payment, index) => (
                         <tr key={index} className="border-t">
                           {!showValidPayments && (
                             <td className="py-2 px-4 text-center">{payment.reason || "-"}</td>
