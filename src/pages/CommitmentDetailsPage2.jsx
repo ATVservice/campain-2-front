@@ -4,8 +4,8 @@ import AnashCommitmentDetails from '../components/AnashCommitmentDetails'
 import {getCommitmentDetails,getCampainByName,getAllMemorialDates,updateCommitmentDetails,uploadCommitmentPayment,deletePayment,deleteCommitment,validateUserPassword} from '../requests/ApiRequests'
 import AnashPaymentsDetails from '../components/AnashPaymentsDetails'
 import PaymentForm from '../components/PaymentForm'
-import { toast } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import PasswordConfirmationModal from '../components/PasswordConfirmationModal'
 import Spinner from '../components/Spinner'
 
@@ -70,7 +70,8 @@ function CommitmentDetailsPage2() {
       if (response && response.status === 200) {
         setCommitmentForm(response.data.updatedCommitment);
         setCommitmentAmountBefourChange(response.data.updatedCommitment.CommitmentAmount);
-        toast.success( 'התחייבות עודכנה בהצלחה');
+        const t = toast.success( 'התחייבות עודכנה בהצלחה')
+        console.log(t);
         
       }
     

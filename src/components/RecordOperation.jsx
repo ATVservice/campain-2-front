@@ -40,7 +40,7 @@ const englishToHebrewMapping = {
   "PaymentsMade": "תשלומים שבוצעו",
   "PaymentsRemaining": "תשלומים שנותרו",
   "Fundraiser": "מתרים",
-  "PaymentMethod": ["מותג", "תנועה", "אופן תשלום"],
+  "PaymentMethod": 'אופן התשלום',
   "ResponseToFundraiser": "תשובה למתרים",
   "MemorialDay": "יום הנצחה",
   "Commemoration": "הנצחה",
@@ -94,9 +94,6 @@ function RecordOperation({ userDetails, isRecordModalOpen, setIsRecordModalOpen 
         const oldItem = oldValues[key];
         const newItem = newValues[key];
 
-        // Handle arrays specifically for MemorialDays
-        if ((Array.isArray(oldItem) && key === 'MemorialDays' && oldItem.length == 0) && (Array.isArray(newItem) && key === 'MemorialDays' && newItem.length == 0)) 
-          return null
         
         if ((Array.isArray(oldItem) && key === 'MemorialDays' && oldItem.length > 0) || (Array.isArray(newItem) && key === 'MemorialDays' && newItem.length > 0)) {
           return (
