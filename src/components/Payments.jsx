@@ -56,13 +56,17 @@ function Payments() {
   function getPaymentMethod(hebrewHeader,cellValue) {
     if(!cellValue)
       return null
+    if(cellValue === 'החזרת הוראת קבע')
+    {
+      return 'החזר תשלום'
+    }
     else if(hebrewHeader === 'מותג')
     {
-      return 'הו"ק אשראי'
+      return 'אשראי הו"ק'
     }
-    else if(hebrewHeader === 'תנועה' && cellValue ==='שידור')
+    else if(hebrewHeader === 'תנועה' && cellValue === 'שידור')
     {
-      return 'הו"ק בנקאית'
+      return 'הוראת קבע'
     }
     else if(hebrewHeader === 'אופן תשלום')
     {

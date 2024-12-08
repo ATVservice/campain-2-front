@@ -94,7 +94,7 @@ export const getCommitmentsByCampaign = async (campainName, isActive=null) => { 
 
 export const uploadPayment = async (paymentData) => {
   try {
-    console.log(paymentData);
+    console.log('eeee');
     
     const response = await apiConfig.post('/api/payment/uploadPayment', paymentData);
     console.log(response);

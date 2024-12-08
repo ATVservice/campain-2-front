@@ -12,6 +12,8 @@ import Payments from "../components/Payments";
 import CommitmentTable from "../components/CommitmentTable";
 import Spinner from "../components/Spinner";
 import { readFileContent } from "../components/Utils";
+import { exportToExcel, exportToPDF } from "../../Reports/exportFilesHandler";
+
 
 
 function CommitmentPage2() {
@@ -49,6 +51,11 @@ function CommitmentPage2() {
   const [showCommitmentForm, setShowCommitmentForm] = useState(false);
   const [showCommitmentsOfAcivePeople, setShowCommitmentsOfAcivePeople] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [dataToExportToExcel, setDataToExportToExcel] = useState([]);
+  const [triggerExportToExcel, setTriggerExportToExcel] = useState(false);
+  const gridRef = useRef(null);
+
+
 
   const fileRef = useRef(null);
 
@@ -135,7 +142,6 @@ function CommitmentPage2() {
 
   async function onUploadCommitments()
   {
-    toast.success("aaa");
     const commitmentsToUpload = [...validCommitments];
     setInvalidCommitments([]);
     setValidCommitments([]);
@@ -201,6 +207,51 @@ function CommitmentPage2() {
     };
     fetchData();
   }, [showCommitmentsOfAcivePeople]);
+
+
+
+  const onGetDataToExportToExcel = (data) => {
+
+    setDataToExportToExcel(data);
+  }
+
+  const getCurrentGridData = () => {
+    if(!gridRef.current || !gridRef.current.api) return 
+
+    const columnOrder = gridRef.current.api
+      .getColumnDefs()
+      .map((colDef) => colDef.field);
+    const rowData = [];
+
+    gridRef.current.api.forEachNodeAfterFilterAndSort((node) => {
+      const reorderedData = new Map();
+      columnOrder.forEach((field) => {
+        if (field in node.data) {
+          reorderedData.set(field, node.data[field]);
+        }
+      });
+
+      // Convert Map back to an object with ordered keys
+      rowData.push(Object.fromEntries(reorderedData));
+    });
+
+    return rowData;
+  };
+
+
+
+  const handelExportToExcel = () => {
+
+    const data = getCurrentGridData();
+    exportToExcel(data, 'התחייבויות');
+  }
+    
+  const handelExportToPdf = () => {
+    const data = getCurrentGridData();
+    exportToPDF(data, 'התחייבויות');
+  }
+
+
     
 
 
@@ -209,8 +260,8 @@ if(isLoading)
 
 
     return (
-    <div className="p-2">
-  <div className="flex items-center mb-4">
+    <div className="w-screen max-w-full	">
+  <div className="flex items-center mb-4 p-2">
   <input
     type="file"
     id="commitmentFile"
@@ -232,6 +283,20 @@ if(isLoading)
      מלא טופס התחייבות
     </button>
     <Payments />
+    <div className="flex gap-4 mr-auto">
+            <button type='button' className='bg-sky-500 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded'
+              onClick={() => handelExportToExcel()}
+              >
+              יצוא דו"ח EXCEL
+            </button>
+            <button type='button' className='bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded  '
+              onClick={() => handelExportToPdf()}
+              >
+              יצוא דו"ח PDF
+            </button>
+          </div>
+    
+
   </div>
 
 
@@ -258,7 +323,8 @@ if(isLoading)
         onClose={() => setShowCommitmentForm(false)}
         />
       )}
-  {<CommitmentTable rowsData={[...commitments]} setShowCommitmentsOfActivePeople={setShowCommitmentsOfAcivePeople} showCommitmentsOfActivePeople={showCommitmentsOfAcivePeople}/>}
+  {<CommitmentTable rowsData={[...commitments]} setShowCommitmentsOfActivePeople={setShowCommitmentsOfAcivePeople} 
+  showCommitmentsOfActivePeople={showCommitmentsOfAcivePeople} gridRef={gridRef}/>}
 
     </div>
   );

@@ -1,6 +1,6 @@
 import { CgDetailsMore } from "react-icons/cg";
 import { useNavigate } from "react-router-dom";
-import React, { useState} from 'react';
+import React, { useState, useEffect,useRef} from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
@@ -8,32 +8,15 @@ import 'ag-grid-community/styles/ag-theme-alpine.css';
 
 
 
-function CommitmentTable({rowsData,setShowCommitmentsOfActivePeople,showCommitmentsOfActivePeople=true}) {
+function CommitmentTable({rowsData,setShowCommitmentsOfActivePeople,showCommitmentsOfActivePeople=true,gridRef}) {
     //   const [rowData, setRowData] = useState([]);
       const [gridApi, setGridApi] = useState(null);
       const navigate = useNavigate();
       const [originalRowData, setOriginalRowData] = useState({});
       const [searchText, setSearchText] = useState('');
   
-      function convertExcelDate(excelDate) {
-        // אקסל מתחיל את הספירה מ-1 בינואר 1900, לכן נוסיף את מספר הימים מאז
-        const startDate = new Date(1900, 0, 1);
-        // הפחתת יומיים עקב ההטיה של אקסל (תיקון יום 29 בפברואר 1900 שאינו קיים)
-        const adjustedDate = new Date(startDate.setDate(startDate.getDate() + excelDate - 2));
-        return adjustedDate.toISOString(); // המרת התאריך לפורמט ISO
-      }
+  
     
-    //   useEffect(() => {
-    //     const fetchData = async () => {
-    //       try {
-    //         const response = await getCommitment();
-    //         setRowData(response.data.data.commitment || []);
-    //       } catch (error) {
-    //         console.error('Error fetching commitments:', error);
-    //       }
-    //     };
-    //     fetchData();
-    //   }, []);
     
       const commonColumnProps = {
         resizable: true,
@@ -153,7 +136,7 @@ function CommitmentTable({rowsData,setShowCommitmentsOfActivePeople,showCommitme
         { 
           headerName: 'מספר תשלומים', 
           field: 'NumberOfPayments', 
-          minWidth: 120, 
+          minWidth: 100, 
           maxWidth: 130, 
           headerClass: 'multi-line-header', 
           ...commonColumnProps 
@@ -161,7 +144,13 @@ function CommitmentTable({rowsData,setShowCommitmentsOfActivePeople,showCommitme
         { 
           headerName: 'תשלומים שנותרו', 
           field: 'PaymentsRemaining', 
-          minWidth: 120, 
+          maxWidth: 130, 
+          headerClass: 'multi-line-header', 
+          ...commonColumnProps 
+        },
+        { 
+          headerName: 'תשלומים שבוצעו', 
+          field: 'PaymentsMade', 
           maxWidth: 130, 
           headerClass: 'multi-line-header', 
           ...commonColumnProps 
@@ -169,7 +158,6 @@ function CommitmentTable({rowsData,setShowCommitmentsOfActivePeople,showCommitme
         { 
           headerName: 'אופן תשלום', 
           field: 'PaymentMethod', 
-          minWidth: 150, 
           maxWidth: 150, 
           headerClass: 'multi-line-header', 
           ...commonColumnProps 
@@ -179,8 +167,9 @@ function CommitmentTable({rowsData,setShowCommitmentsOfActivePeople,showCommitme
         { 
           headerName: 'הערות', 
           field: 'Notes', 
-          minWidth: 200, 
+          minWidth: 150, 
           maxWidth: 250, 
+          width: 150,
           flex: 1,
           ...commonColumnProps 
         }
@@ -267,8 +256,8 @@ function CommitmentTable({rowsData,setShowCommitmentsOfActivePeople,showCommitme
     
         
       return (
-        <div style={{ position: 'relative' }}> {/* Wrapper with stacking context */}
-          <div className="flex items-end gap-2 mb-2">
+        <div> {/* Wrapper with stacking context */}
+          <div className="flex items-center gap-2 py-2 bg-gray-100 px-4">
             <input
               type="text"
               placeholder="חפש..."
@@ -306,6 +295,7 @@ function CommitmentTable({rowsData,setShowCommitmentsOfActivePeople,showCommitme
                 enableCellTextSelection: true,
               }}
               suppressRowTransform={true}
+              ref={gridRef}
             />
           </div>
         </div>
