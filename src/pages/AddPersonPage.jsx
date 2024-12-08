@@ -13,7 +13,7 @@ function AddPersonPage() {
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-
+// toast.error('שגיאה בהוספה');
   const handleChange = (e) => {
     const { name, value, validity, title } = e.target;
 
@@ -34,7 +34,6 @@ function AddPersonPage() {
   };
 
   const handleSubmit = async (e) => {
-    console.log('e');
     e.preventDefault();
     console.log(userDetails);
 
@@ -50,7 +49,7 @@ function AddPersonPage() {
       }, 2000);
     } catch (error) {
       console.error(error);
-      toast.error('An error occurred while submitting the form');
+      toast.error(error.response.data.message||'שגיאה בהוספה');
       setIsLoading(false); // Ensure loading is stopped in case of an error
     }
   };

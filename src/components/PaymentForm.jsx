@@ -5,6 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 import SearchCommitmmentTable from "./SearchCommitmmentTable";
 import { getCampains, getPeople } from "../requests/ApiRequests";
 import Spinner from "./Spinner";
+import { isNumber } from "lodash";
 
 function PaymentForm({
   onSubmit,
@@ -20,9 +21,10 @@ function PaymentForm({
   const validPaymentMethods = [
     'מזומן', , 'העברה בנקאית', 'הבטחה', 
     'משולב', 'כרטיס אשראי', 'שיקים', 'לא סופק', 
-    'הוראת קבע', 'אשראי הו"ק'
+    'הוראת קבע', 'אשראי הו"ק','קיזוז',
   ];
-
+  
+  
   const [formData, setFormData] = useState({
     AnashIdentifier: anashIdentifier ? anashIdentifier : "",
     Amount: "",
@@ -102,7 +104,11 @@ function PaymentForm({
   function handleSubmit(e) {
     // console.log('3333');
     e.preventDefault();
-    console.log(formData);
+    if(formData.Amount && isNumber(formData.Amount) && formData.Amount <= 0){
+      toast.error('הסכום לתשלום חייב להיות גדול מ-0');
+      return;
+      
+    }
     onSubmit(formData);
     onClose();
   }
