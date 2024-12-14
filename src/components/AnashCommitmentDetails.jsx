@@ -15,6 +15,7 @@ function AnashCommitmentDetails({
   const [memorialDaysToDisplay, setMemorialDaysToDisplay] = useState([
     ...(commitmentForm?.MemorialDays ?? []),
   ]);
+  console.log(commitmentForm);
   const calculateUpdatedForm = (prevCommitmentForm, name, value) => {
     const updatedForm = {
       ...prevCommitmentForm,

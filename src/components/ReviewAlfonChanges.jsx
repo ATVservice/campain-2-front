@@ -1,40 +1,47 @@
 import React, { useEffect, useState } from "react";
 import SearchFilter from "./SearchFilter";
-import { set } from "lodash";
+import {exportToExcel, exportToPDF} from "../../Reports/exportFilesHandler.jsx";
+import { format } from 'date-fns';
+import { RiFileExcel2Line } from "react-icons/ri";
+import { FaDownload } from "react-icons/fa6";
 
 function ReviewAlfonChanges({ conflictsData,validPeople, invalidPeople, onSubmit, onClose,showConflicts,setShowConflicts }) {
+  // console.log(validPeople);
   const englishToHebrewMapping = {
-    AnashIdentifier: "מזהה אנש",
-    FullNameForLists: "שם מלא",
-    FirstName: "שם",
-    LastName: "משפחה",
-    FatherName: "שם האב",
-    PersonID: "מספר זהות",
-    Address: "כתובת",
-    AddressNumber: "מספר",
-    floor: "קומה",
-    zipCode: "מיקוד",
-    City: "עיר",
-    MobilePhone: "נייד 1 ",
-    MobileHomePhone: "נייד בבית 1",
-    HomePhone: "בית 1",
+    AnashIdentifier: 'מזהה אנש',
+    FullNameForLists: 'שם מלא',
+    FirstName: 'שם',
+    LastName: 'משפחה',
+    FatherName: 'שם אב',
+    FatherId: 'תז האב',
+    PersonID: 'מספר זהות',
+    Address: 'כתובת',
+    AddressNumber: 'מספר',
+    PartyInviterName: 'שם מזמין למסיבה',
+    floor: 'קומה',
+    zipCode: 'מיקוד',
+    Entry: 'כניסה',
+    City: 'עיר',
+    MobilePhone: 'נייד 1',
+    MobileHomePhone: 'נייד בבית 1',
+    HomePhone: 'בית 1',
     Email: 'דוא"ל',
-    BeitMidrash: "בית מדרש",
-    Classification: "סיווג",
-    DonationMethod: "אופן התרמה",
-    fundRaiser: "מתרים",
-    StudiedInYeshivaYears: "למד בישיבה בשנים",
-    yashagYear: "שנה ישיג",
-    CommitteeResponsibility: "אחראי ועד",
-    PartyGroup: "קבוצה למסיבה",
-    GroupNumber: "מספר קבוצה",
-    PartyInviterName: "שם מזמין למסיבה",
-    isActive: "פעיל",
-    FreeFieldsToFillAlone: "שדה חופשי",
-    AnotherFreeFieldToFillAlone: "שדה חופשי 2",
-    PhoneNotes: "הערות אלפון",
-    Rank: "דרגה",
-  };
+    BeitMidrash: 'בית מדרש',
+    Classification: 'סיווג',
+    DonationMethod: 'אופן התרמה',
+    fundRaiser: 'מתרים',
+    StudiedInYeshivaYears: 'למד בישיבה בשנים',
+    yashagYear: 'שנה ישיג',
+    CommitteeResponsibility: 'אחראי ועד',
+    PartyGroup: 'קבוצה למסיבה',
+    GroupNumber: 'מספר קבוצה',
+    isActive: 'פעיל לא פעיל',
+    FreeFieldsToFillAlone: 'שדה חופשי',
+    AnotherFreeFieldToFillAlone: 'שדה חופשי 2',
+    PhoneNotes: 'הערות אלפון',
+    Rank: 'דרגה'
+  }
+  
   const [chosenDocsMap, setChosenDocsMap] = useState(() =>
     conflictsData.reduce((acc, conflict) => {
       acc[conflict.anash] = conflict.uploaded;
@@ -62,7 +69,6 @@ function ReviewAlfonChanges({ conflictsData,validPeople, invalidPeople, onSubmit
   function handelSubmit() {
     let chosenPeople = [];
   
-    console.log(chosenDocsMap);
   
     // Check if chosenDocsMap is a valid object and not empty
     if (chosenDocsMap && Object.keys(chosenDocsMap).length > 0) {
@@ -299,6 +305,14 @@ function ReviewAlfonChanges({ conflictsData,validPeople, invalidPeople, onSubmit
                   הצג תקינים
                 </button>
               )}
+            <button
+                className='flex flex-col gap-1 text-center items-center justify-center'
+                onClick={() => exportToExcel(filteredPeople,'data')}
+              >
+                <RiFileExcel2Line size={24} className='text-blue-800' />
+                <FaDownload size={16} className='text-blue-800 ' />
+              </button>
+
               <button
                 onClick={onClose}
                 className="text-red-500 hover:text-red-700 font-bold text-lg"

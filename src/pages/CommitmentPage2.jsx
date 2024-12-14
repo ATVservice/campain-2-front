@@ -13,6 +13,7 @@ import CommitmentTable from "../components/CommitmentTable";
 import Spinner from "../components/Spinner";
 import { readFileContent } from "../components/Utils";
 import { exportToExcel, exportToPDF } from "../../Reports/exportFilesHandler";
+import {englishToHebrewCommitmentMapping,hebrewToEnglishCommitmentMapping} from '../components/Utils'
 
 
 
@@ -52,8 +53,8 @@ function CommitmentPage2() {
   const [showCommitmentsOfAcivePeople, setShowCommitmentsOfAcivePeople] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [dataToExportToExcel, setDataToExportToExcel] = useState([]);
-  const [triggerExportToExcel, setTriggerExportToExcel] = useState(false);
   const gridRef = useRef(null);
+  const navigate = useNavigate();
 
 
 
@@ -243,12 +244,12 @@ function CommitmentPage2() {
   const handelExportToExcel = () => {
 
     const data = getCurrentGridData();
-    exportToExcel(data, 'התחייבויות');
+    exportToExcel(data,englishToHebrewCommitmentMapping, 'התחייבויות');
   }
     
   const handelExportToPdf = () => {
     const data = getCurrentGridData();
-    exportToPDF(data, 'התחייבויות');
+    exportToPDF(data,englishToHebrewCommitmentMapping, 'התחייבויות');
   }
 
 
@@ -261,7 +262,7 @@ if(isLoading)
 
     return (
     <div className="w-screen max-w-full	">
-  <div className="flex items-center mb-4 p-2">
+  <div className="flex items-center mb-4 p-2 gap-10">
   <input
     type="file"
     id="commitmentFile"
@@ -270,31 +271,41 @@ if(isLoading)
     ref={fileRef}
     className="hidden"
     />
-  <button
-    className="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded ml-4"
-    onClick={() => fileRef.current && fileRef.current.click()}
-    >
-    בחר קובץ התחייבויות
-  </button>
-    <button 
-      className="bg-sky-500 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded ml-10"
-      onClick={() => setShowCommitmentForm(true)}
-    >
-     מלא טופס התחייבות
+  <div className="flex gap-4">
+    <button
+      className="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
+      onClick={() => fileRef.current && fileRef.current.click()}
+      >
+      בחר קובץ התחייבויות
     </button>
+      <button
+        className="bg-sky-500 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded "
+        onClick={() => setShowCommitmentForm(true)}
+      >
+       מלא טופס התחייבות
+      </button>
+  </div>
     <Payments />
-    <div className="flex gap-4 mr-auto">
-            <button type='button' className='bg-sky-500 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded'
-              onClick={() => handelExportToExcel()}
-              >
-              יצוא דו"ח EXCEL
-            </button>
-            <button type='button' className='bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded  '
-              onClick={() => handelExportToPdf()}
-              >
-              יצוא דו"ח PDF
-            </button>
-          </div>
+    <div className="flex gap-4">
+      <button type='button' className='bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded  '
+        onClick={() => handelExportToPdf()}
+        >
+        יצוא דו"ח PDF
+      </button>
+      <button type='button' className='bg-sky-500 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded '
+        onClick={() => handelExportToExcel()}
+        >
+        יצוא דו"ח EXCEL
+      </button>
+     
+    </div>
+      <button type='button' className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-auto'
+        onClick={() => navigate('/payments-without-commitment')}
+        >
+          
+        תשלומים ללא התחייבות
+      </button>
+          
     
 
   </div>

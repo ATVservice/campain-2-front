@@ -12,43 +12,12 @@ import Spinner from "../components/Spinner";
 import ReviewAlfonChanges from "../components/ReviewAlfonChanges";
 import { toast } from "react-toastify";
 import { exportToExcel, exportToPDF } from "../../Reports/exportFilesHandler.jsx";
+import {hebrewToEnglisAlfonhMapping,englishToHebrewAlfonhMapping} from '../components/Utils'
 
 
 
 
 function AlfonPage2() {
-  const hebrewToEnglishMapping = {
-    'מזהה אנש': 'AnashIdentifier',
-    'שם מלא': 'FullNameForLists',
-    'שם': 'FirstName',
-    'משפחה': 'LastName',
-    'שם האב': 'FatherName',
-    'מספר זהות': 'PersonID',
-    'כתובת': 'Address',
-    'מספר': 'AddressNumber',
-    'שם מזמין למסיבה': 'PartyInviterName',
-    'קומה': 'floor',
-    'מיקוד': 'zipCode',
-    'עיר': 'City',
-    'נייד 1': 'MobilePhone',
-    'נייד בבית 1': 'MobileHomePhone',
-    'בית 1': 'HomePhone',
-    'דוא"ל': 'Email',
-    'בית מדרש': 'BeitMidrash',
-    'סיווג': 'Classification',
-    'אופן התרמה': 'DonationMethod',
-    'מתרים': 'fundRaiser',
-    'למד בישיבה בשנים': 'StudiedInYeshivaYears',
-    'שנה ישיג': 'yashagYear',
-    'אחראי ועד': 'CommitteeResponsibility',
-    'קבוצה למסיבה': 'PartyGroup',
-    'מספר קבוצה': 'GroupNumber',
-    'פעיל לא פעיל': 'isActive',
-    'שדה חופשי': 'FreeFieldsToFillAlone',
-    'שדה חופשי 2': 'AnotherFreeFieldToFillAlone',
-    'הערות אלפון': 'PhoneNotes',
-    'דרגה': 'Rank',
-  };
   const [showActivePeople, setShowActivePeople] = useState(true);
   const [rowsData, setRowsData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -109,13 +78,14 @@ function AlfonPage2() {
       const mappedData = rows.slice(1, rows.length).map(row => {
         const mappedRow = {};
         headers.forEach((header, index) => {
-          const englishKey = hebrewToEnglishMapping[header];
+          const englishKey = hebrewToEnglisAlfonhMapping[header];
           if (englishKey) {
             mappedRow[englishKey] = row[index];
           }
         });
         return mappedRow;
       });
+      // console.log(mappedData);
 
       await handelReview(mappedData);
       setLoading(false);
@@ -222,12 +192,12 @@ function AlfonPage2() {
   const handelExportToExcel = () => {
 
     const data = getCurrentGridData();
-    exportToExcel(data, 'אלפון');
+    exportToExcel(data,englishToHebrewAlfonhMapping, 'אלפון');
   }
     
   const handelExportToPdf = () => {
     const data = getCurrentGridData();
-    exportToPDF(data, 'אלפון');
+    exportToPDF(data,englishToHebrewAlfonhMapping, 'אלפון');
   }
 
 

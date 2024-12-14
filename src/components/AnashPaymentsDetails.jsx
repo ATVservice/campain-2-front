@@ -1,92 +1,148 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { deletePayment, validateUserPassword,  } from "../requests/ApiRequests";
+import { deletePayment, validateUserPassword, transferPayment,uploadCommitmentPayment } from "../requests/ApiRequests";
 import { FaTrash, FaUndo } from "react-icons/fa";
 import { useAuth } from "../components/AuthProvider";
 import PasswordConfirmationModal from "./PasswordConfirmationModal";
 import Spinner from "./Spinner";
+import { set } from "lodash";
 function AnashPaymentsDetails({
   commitmentPayments,
   setCommitmentPayments,
   setCommitmentForm,
-  UploadCommitmentPayment
 }) {
-  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
-  const [paymentIdToDelete, setPaymentIdToDelete] = useState(null);
-  const [paymentToDelete, setPaymentToDelete] = useState(null);
-  const [password, setPassword] = useState('');
-
   const [isLoading, setIsLoading] = useState(false);
 
+  const [showDeleteConfirmationModal, setShowDeleteConfirmationModal] = useState(false);
+  const [paymentIdToDelete, setPaymentIdToDelete] = useState(null);
+  
+  const [showTransferConfirmationModal, setShowTransferConfirmationModal] = useState(false);
+  const [transferData, setTransferData] = useState({paymentId: '', campainName: ''});
 
+  const [showRefundConfirmationModal, setShowRefundConfirmationModal] = useState(false);
+  const [refundData, setRefundData] = useState(null);
+  
+  const [password, setPassword] = useState('');
+  const [massage, setMassage] = useState('');
 
-  const handleDeletePayment = async (paymentId) => {
+  const handleDeletePayment = async (password) => {
     try {
       setIsLoading(true);
-      const res = await deletePayment(paymentId);
-      if (res.status === 200) {
-        setCommitmentPayments(
-          commitmentPayments.filter((payment) => payment._id !== paymentId)
-        );
-        setCommitmentForm(res.data.updatedCommitment);
-        toast.success("התשלום נמחק בהצלחה");
+      const validateRes = await validateUserPassword(password);
+      if(validateRes.status==200)
+      {
+        
+        const deleteRes = await deletePayment(paymentIdToDelete);
+        if (deleteRes.status === 200) {
+          setCommitmentPayments(
+            commitmentPayments.filter((payment) => payment._id !== paymentIdToDelete)
+          );
+          setCommitmentForm(deleteRes.data.updatedCommitment);
+          toast.success("התשלום נמחק בהצלחה");
+          setShowDeleteConfirmationModal(false);
+        }
+
       }
-    } catch (error) {
-      console.log(error);
-      toast.error(error.response.data.message);
-    }
-    finally {
-      setIsLoading(false);
-    }
-  };
-  const handleValidatePassword = async (e) => {
-    e.preventDefault();
 
-    try {
-      setIsLoading(true);
-
-
-      const res = await validateUserPassword(password);
-      console.log(res);
-
-      if (res.status === 200) {
-        setShowConfirmationModal(false);
-        await handleDeletePayment(paymentIdToDelete);
-      }
     } catch (error) {
       console.log(error);
       toast.error(error.response.data.message || 'שגיאה במחיקת התשלום');
     }
     finally {
-      setPassword('');
       setIsLoading(false);
+      setPassword('');
     }
   };
 
-  const handelRefuendPayment = async (payment) => {
+  const onSelectPaymentToTransfer = (payment,campainName) => {
+    if(!payment||!campainName) return
+    setTransferData({paymentId: payment._id, campainName: campainName});
+    setMassage(`לאישור העברת תשלום זה בסך ${payment.Amount} ש"ח  לקמפיין ${payment.CampainName} אנא הזן סיסמה`);
+    setShowTransferConfirmationModal(true);
+  };
+
+
+  const handleTransferPayment = async (password) => {
+    setIsLoading(true);
+    console.log(transferData);
+
+    try {
+      const validateRes = await validateUserPassword(password);
+      if(validateRes.status===200){
+       const res = await transferPayment(transferData.paymentId,transferData.campainName);
+       console.log(res);
+       if(res.status===200)
+       {
+
+         toast.success('התשלום הועבר בהצלחה');
+         setCommitmentPayments(commitmentPayments.filter(payment => payment._id !== transferData.paymentId));
+         setCommitmentForm(res.data.prevCommitment);
+         setShowTransferConfirmationModal(false);
+         setTransferData({paymentId: '', campainName: ''});
+         
+       }
+      }
+    } catch (error) {
+      console.error('Error transfering payment:', error);
+        toast.error(error.response.data?.message||'שגיאה בהעברת התשלום');
+    }
+    finally{
+      setIsLoading(false);
+      setPassword('');
+    }
+  };
+
+  const handelSelectRefuendPayment = async (payment) => {
+    if(!payment) return
     const { _id, ...refundPayment } = payment;  // Destructure 'id' out and keep the rest in refundPayment
-    console.log(refundPayment);
     // Modify the refundPayment as required
     const updatedRefundPayment = {
       ...refundPayment,               // Spread the remaining properties of the original payment
       Amount: -payment.Amount,        // Change the amount
-      PaymentMethod: 'החזר תשלום', // Update payment method
+      PaymentMethod: 'החזר תשלום מזומן', // Update payment method
       Date: new Date(),               // Set the current date
     };
-    UploadCommitmentPayment(updatedRefundPayment);
+    setRefundData(updatedRefundPayment);
+    setShowRefundConfirmationModal(true); 
+    // UploadCommitmentPayment(updatedRefundPayment);
 
-    //  if (res.status === 200) {
-    //   setCommitmentPayments(
-    //     ...commitmentPayments,
-    //     res.data.newPayment
-    //   );
-    //   setCommitmentForm(res.data.updatedCommitment);
-    //   toast.success("התשלום נוסף בהצלחה");
-    // }
+   
+  };
+
+  const handelUploadRefundPayment = async (password) => {
+    try {
+      setIsLoading(true);
+      const validateRes = await validateUserPassword(password);
+      if(validateRes.status===200){
+        const res = await uploadCommitmentPayment(refundData);
+        console.log(res);
+        if(res.status===200){
+          toast.success('  החזר תשלום בוצע בהצלחה');
+          setCommitmentPayments((prevPayments) => [...prevPayments, res.data.newPayment]);
+          setCommitmentForm(res.data.updatedCommitment);
+
+          setShowRefundConfirmationModal(false);
+          setRefundData(null);
+        }
+      }
+    } catch (error) {
+      console.error('Error transfering payment:', error);
+        toast.error(error.response.data?.message||'שגיאה בהעברת התשלום');
+  }
+    finally{
+      setIsLoading(false);
+      setPassword('');
+    }
 
 
   };
+
+
+  
+
+
+    
 
 
 
@@ -96,11 +152,28 @@ function AnashPaymentsDetails({
   return (
     <div>
       <PasswordConfirmationModal
-        isOpen={showConfirmationModal}
-        onClose={() => setShowConfirmationModal(false)}
-        onSubmit={handleValidatePassword}
+        isOpen={showDeleteConfirmationModal}
+        onClose={() => setShowDeleteConfirmationModal(false)}
+        onSubmit={handleDeletePayment}
         password={password}
         setPassword={setPassword}
+        massage={'למחיקת תשלום זה אנא הזן סיסמה'}
+      />
+      <PasswordConfirmationModal
+        isOpen={showTransferConfirmationModal}
+        onClose={() => setShowTransferConfirmationModal(false)}
+        onSubmit={handleTransferPayment}
+        password={password}
+        setPassword={setPassword}
+        massage={'להעברת תשלום זה אנא הזן סיסמה'}
+      />
+      <PasswordConfirmationModal
+        isOpen={showRefundConfirmationModal}
+        onClose={() => setShowRefundConfirmationModal(false)}
+        onSubmit={handelUploadRefundPayment}
+        password={password}
+        setPassword={setPassword}
+        massage={'לביצוע החזר תשלום זה אנא הזן סיסמה'}
       />
 
       <div className="mb-2 mt-4 mx-auto flex justify-center">
@@ -115,6 +188,7 @@ function AnashPaymentsDetails({
             <th className="px-4 py-2 border-b">תאריך</th>
             <th className="px-4 py-2 border-b">אמצעי תשלום</th>
             <th className="px-4 py-2 border-b">מחיקה</th>
+            <th className="px-4 py-2 border-b">העברה</th>
             <th className="px-4 py-2 border-b">החזר</th>
           </tr>
 
@@ -128,7 +202,7 @@ function AnashPaymentsDetails({
               <td className="px-4 py-2 border-b">
                 <button
                   onClick={() => {
-                    setShowConfirmationModal(true);
+                    setShowDeleteConfirmationModal(true);
                     setPaymentIdToDelete(payment._id);
                     if (payment && payment.PaymentMethod == 'מזומן')
                       toast.warning('מחיקת תשלום מזומן זה תשפיע על יתרת קופה קטנה')
@@ -140,10 +214,39 @@ function AnashPaymentsDetails({
                   <FaTrash />
                 </button>
               </td>
+              <td>
+                <select className="w-full border rounded outline-none p-1"  name="transfer" onChange={(e) =>
+                {
+                  console.log(e.target.value);
+                  onSelectPaymentToTransfer(payment, e.target.value)}
+
+                }
+                
+                
+                   
+                   >
+
+                <option value="">בחר קמפיין  </option>
+
+                  {
+                    payment.AnashDetails?.Campaigns
+                    ?.map((campainName) => (
+                      <option key={campainName} value={campainName}>
+                        {campainName}
+                      </option>
+                      
+                    ))
+
+
+                  }
+
+
+                </select>
+              </td>
               <td className="px-4 py-2 border-b">
                 {payment && payment.Amount > 0 && <button
                   className="text-blue-500 hover:text-blue-700"
-                  onClick={() => handelRefuendPayment(payment)}
+                  onClick={() => handelSelectRefuendPayment(payment)}
                 >
                   <FaUndo />
                 </button>}

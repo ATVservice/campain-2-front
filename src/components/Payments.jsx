@@ -3,11 +3,12 @@ import React, { useState, useEffect, useRef } from "react";
 import * as XLSX from "xlsx";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { reviewCommitmentsPayments,uploadCommitmentsPayments } from "../requests/ApiRequests";
+import { reviewCommitmentsPayments,uploadCommitmentsPayments,uploadCommitmentPayment } from "../requests/ApiRequests";
 import ReviewPaymentsModal from "./ReviewPaymentsModal";
 import PaymentForm from "./PaymentForm";
 import Spinner from "./Spinner";
 import { readFileContent } from "./Utils";
+import {englishToHebrewPaymentsMapping,hebrewToEnglishPaymentsMapping} from './Utils'
 
 
 
@@ -42,11 +43,12 @@ function Payments() {
     
 
   const fileRef = useRef(null);
-  const [validPayments, setValidPayments] = useState([]);
+  const [validPaymentsWithCommitment, setValidPaymentsWithCommitment] = useState([]);
+  const [validPaymentsWithoutCommitment, setValidPaymentsWithoutCommitment] = useState([]);
   const [invalidPayments, setInvalidPayments] = useState([]);
   const [showPaymentsForm, setShowPaymentsForm] = useState(false);
-  const { campainName } = useParams();
   const [isLoading, setIsLoading] = useState(false);
+  const { campainName } = useParams();
 
   function parseExcelDate(value) {
     // Check if value is a number, which Excel often uses for dates
@@ -147,11 +149,11 @@ function Payments() {
       // Send the mapped data to reviewCommitments
       setIsLoading(true);
       const response = await reviewCommitmentsPayments(payments,campainName);
-      console.log(response.data);
-      setValidPayments(response.data.validPayments);
+      setValidPaymentsWithCommitment(response.data.validPaymentsWithCommitment);
+      setValidPaymentsWithoutCommitment(response.data.validPaymentsWithoutCommitment);
       setInvalidPayments(response.data.invalidPayments);
-      //     console.log(response);
-
+      console.log(response);
+     
       // Optionally store the uploaded data
     } catch (error) {
       console.error("Error during reviewCommitments:", error);
@@ -164,9 +166,10 @@ function Payments() {
 
   async function onUploadPayments() {
     // console.log('222');
-    const paymentsToUpload = [...validPayments];
+    const paymentsToUpload = [...validPaymentsWithCommitment, ...validPaymentsWithoutCommitment];
     setInvalidPayments([]);
-    setValidPayments([]);
+    setValidPaymentsWithCommitment([]);
+    setValidPaymentsWithoutCommitment([]);
 
     if (paymentsToUpload?.length == 0) {
       toast.error("אין נתונים לשליחה");
@@ -176,8 +179,10 @@ function Payments() {
         {
           setIsLoading(true);
           const response = await uploadCommitmentsPayments(paymentsToUpload);
+          
           console.log(response);
           toast.success("תשלום/ים נוספו בהצלחה");
+          return response;
         }
         catch(error)
         {
@@ -189,6 +194,28 @@ function Payments() {
           setIsLoading(false);
         }
     }
+  }
+  async function onUploadPaymentManually(payment) {
+
+  
+        try
+        {
+          setIsLoading(true);
+          const response = await uploadCommitmentPayment(payment);
+          console.log(response);
+          toast.success("תשלום נוסף בהצלחה");
+          return response;
+        }
+        catch(error)
+        {
+          console.log(error);
+          toast.error(error.response.data.message);
+        }
+        finally
+        {
+          setIsLoading(false);
+        }
+    
   }
   if(isLoading)
   {
@@ -206,27 +233,31 @@ function Payments() {
           ref={fileRef}
           className="hidden"
         />
-        <button
-          className="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded ml-4"
-          onClick={() => fileRef.current && fileRef.current.click()}
-        >
-          בחר קובץ תשלומים
-        </button>
-        <button
-          className="bg-sky-500 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded ml-4"
-          onClick={() => setShowPaymentsForm(true)}
-        >
-           מלא טופס תשלום
-        </button>
+        <div className="flex gap-4">
+          <button
+            className="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded "
+            onClick={() => fileRef.current && fileRef.current.click()}
+          >
+            בחר קובץ תשלומים
+          </button>
+          <button
+            className="bg-sky-500 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded "
+            onClick={() => setShowPaymentsForm(true)}
+          >
+             מלא טופס תשלום
+          </button>
+        </div>
         
       </div>
-      {(validPayments?.length > 0 || invalidPayments?.length > 0) && (
+      {(validPaymentsWithCommitment?.length > 0|| validPaymentsWithoutCommitment?.length > 0 || invalidPayments?.length > 0) && (
         <ReviewPaymentsModal
           onUploadPayments={onUploadPayments}
-          validPayments={validPayments}
+          validPaymentsWithCommitment={validPaymentsWithCommitment}
+          validPaymentsWithoutCommitment={validPaymentsWithoutCommitment}
           invalidPayments={invalidPayments}
           onClose={() => {
-            setValidPayments([]);
+            setValidPaymentsWithCommitment([]);
+            setValidPaymentsWithoutCommitment([]);
             setInvalidPayments([]);
           }}
         />
@@ -234,7 +265,7 @@ function Payments() {
 
       {showPaymentsForm && (
         <PaymentForm
-          onSubmit={ onReviewPayments}
+          onSubmit={ onUploadPaymentManually}
           onClose={() => setShowPaymentsForm(false)}
           campainName={campainName}
         />

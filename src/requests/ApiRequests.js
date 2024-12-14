@@ -96,7 +96,7 @@ export const uploadPayment = async (paymentData) => {
   try {
     console.log('eeee');
     
-    const response = await apiConfig.post('/api/payment/uploadPayment', paymentData);
+    const response = await apiConfig.post('/api/payments/uploadPayment', paymentData);
     console.log(response);
     
     return response;
@@ -109,26 +109,14 @@ export const uploadPayment = async (paymentData) => {
 export const deletePayment = async (paymentId) => {
   try {
     console.log(paymentId);
-    const response = await apiConfig.delete(`/api/payment/delete-payment/${paymentId}`);
+    const response = await apiConfig.delete(`/api/payments/delete-payment/${paymentId}`);
     return response;
   } catch (error) {
     console.error('Error deleting payment:', error);
     throw error;
   }
 };
-// export const uploadCommitmentPayment = async (paymentData) => {
-//   try {
-//     console.log(paymentData);
-    
-//     const response = await apiConfig.post('/api/payment/uploadCommitmentPayment', paymentData);
-//     console.log(response);
-    
-//     return response;
-//   } catch (error) {
-//     console.error('Error uploading payment:', error);
-//     throw error; // Optional: re-throw the error if you want to handle it outside the function
-//   }
-// };
+
 
 export const getUserDetails = async (AnashIdentifier) => {
   try {
@@ -175,7 +163,7 @@ export const updateCommitmentDetails = async (commitment) => {
 };
 export const uploadCommitmentPayment = async (payment) => {
   try {
-    const response = await apiConfig.post(`/api/commitment/upload-commitment-payment`, payment);
+    const response = await apiConfig.post(`/api/payments/upload-commitment-payment`, payment);
     return response;
   } catch (error) {
     console.error(error);
@@ -293,7 +281,7 @@ export const getCommitmentByAnashAndCampain= async (AnashIdentifier, CampainName
 }
 export const reviewCommitmentsPayments = async (data,campainName) => {
   try {
-    const response = await apiConfig.post(`/api/commitment/review-commitment-payments`,{data,campainName});
+    const response = await apiConfig.post(`/api/payments/review-commitment-payments`,{data,campainName});
     return response;
   } catch (error) {
     throw error
@@ -301,7 +289,7 @@ export const reviewCommitmentsPayments = async (data,campainName) => {
 }
 export const uploadCommitmentsPayments = async (data) => {
   try {
-    const response = await apiConfig.post(`/api/commitment/upload-commitment-payments`,data);
+    const response = await apiConfig.post(`/api/payments/upload-commitment-payments`,data);
     return response;
   } catch (error) {
     throw error
@@ -516,6 +504,22 @@ export const addPeopleToCampain= async (campainName,people) => {
 export const recoverUserActivity= async (AnashIdentifier) => {
   try {
     const response = await apiConfig.put(`/api/alfon/recover-user-activity/${AnashIdentifier}`);
+    return response;
+  } catch (error) {
+    throw error
+  }
+}
+export const getPaymentsWithoutCommitment= async () => {
+  try {
+    const response = await apiConfig.get(`/api/payments/get-payments-without-commitment`);
+    return response;
+  } catch (error) {
+    throw error
+  }
+}
+export const transferPayment= async (paymentId,campainName) => {
+  try {
+    const response = await apiConfig.put(`/api/payments/transfer-payment`,{paymentId,campainName});
     return response;
   } catch (error) {
     throw error

@@ -39,7 +39,8 @@ import CommitmentPage2 from "./pages/CommitmentPage2";
 import CommitmentDetailsPage2 from "./pages/CommitmentDetailsPage2";
 import PeopleInCampain2 from "./pages/PeopleInCampain2";
 import AlfonPage2 from "./pages/AlfonPage2";
-Modal.setAppElement("#root");
+import PaymentsWithoutCommitment from "./pages/PaymentsWithoutCommitment";
+// Modal.setAppElement("#root");
 
 // Custom component to handle showing Navbar conditionally
 const Layout = ({ children }) => {
@@ -58,7 +59,7 @@ const App = () => {
   return (
     <AuthProvider>
       <Router>
-        <div>
+        <>
         <ToastContainer 
         position="top-right"
         autoClose={5000}
@@ -68,7 +69,6 @@ const App = () => {
       />
           <DynamicTitle />
           <Layout>
-            <div className="flex-grow">
               <Routes>
                 <Route path="/" element={<Navigate to="/login" replace />} />
                 <Route path="/login" element={<LoginPage />} />
@@ -116,11 +116,11 @@ const App = () => {
 
                   <Route path="/user-profile" element={<UserProfile />} />
                   <Route path="edit-campain/:campainName" element={<EditCampaignPage />} />
+                  <Route path="/payments-without-commitment" element={<PaymentsWithoutCommitment />} />
                 </Route>
               </Routes>
-            </div>
           </Layout>
-        </div>
+        </>
       </Router>
     </AuthProvider>
   );

@@ -1,5 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import SearchFilter from './SearchFilter';
+import {exportToExcel, exportToPDF} from "../../Reports/exportFilesHandler.jsx";
+import { format } from 'date-fns';
+import { RiFileExcel2Line } from "react-icons/ri";
+import { FaDownload } from "react-icons/fa6";
+import {englishToHebrewCommitmentMapping,hebrewToEnglishCommitmentMapping} from '../components/Utils'
+
 
 function ReviewCommitmentsModal({ onUploadCommitment, validCommitments, invalidCommitments, onClose }) {
   const hebrewToEnglishMapping = {
@@ -50,32 +56,45 @@ function ReviewCommitmentsModal({ onUploadCommitment, validCommitments, invalidC
       <div className="bg-white p-6 rounded-lg shadow-lg w-auto max-w-full h-[80vh] flex flex-col z-50">
 
         {/* Header section */}
-        <div className=" mb-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-semibold">התחייבויות תקינות: <span className="text-emerald-500">{validCommitments.length}</span></h2>
-            <h2 className="text-2xl font-semibold">התחייבויות לא תקינות: <span className="text-red-500">{invalidCommitments.length}</span ></h2>
-            <h2 className="text-2xl font-semibold">סה"כ התחייבויות: <span className="text-gray-500">{validCommitments.length + invalidCommitments.length}</span></h2>
-            {showValidCommitments ? (
+        <div className=" mb-4 mx-4">
+          <div className="flex justify-between">
+            <div className="flex gap-4">
+              <h2 className="text-xl font-semibold">התחייבויות תקינות: <span className="text-emerald-500">{validCommitments.length}</span></h2>
+              <h2 className="text-xl font-semibold">התחייבויות לא תקינות: <span className="text-red-500">{invalidCommitments.length}</span ></h2>
+              <h2 className="text-xl font-semibold">סה"כ התחייבויות: <span className="text-gray-500">{validCommitments.length + invalidCommitments.length}</span></h2>
+              </div>
+              <div className="flex gap-10">
+              {showValidCommitments ? (
+                <button
+                  onClick={() => handleChange()}
+                  className="font-bold text-lg bg-red-500 text-white rounded hover:bg-red-700 px-4 py-2"
+                >
+                  הצג לא תקינות
+                </button>
+              ) : (
+                <button
+                  onClick={() => handleChange()}
+                  className="font-bold text-lg bg-green-500 text-white rounded hover:bg-green-700 px-4 py-2"
+                >
+                  הצג תקינות
+                </button>
+              
+              
+              )}
               <button
-                onClick={() => handleChange()}
-                className="font-bold text-lg bg-red-500 text-white rounded hover:bg-red-700 px-4 py-2"
-              >
-                הצג לא תקינות
-              </button>
-            ) : (
+                  className='flex flex-col gap-1 text-center items-center justify-center'
+                  onClick={() => exportToExcel(filteredCommitments,englishToHebrewCommitmentMapping,'data')}
+                >
+                  <RiFileExcel2Line size={24} className='text-blue-800' />
+                  <FaDownload size={16} className='text-blue-800 ' />
+                </button>
               <button
-                onClick={() => handleChange()}
-                className="font-bold text-lg bg-green-500 text-white rounded hover:bg-green-700 px-4 py-2"
+                onClick={onClose}
+                className="text-red-500 hover:text-red-700 font-bold text-lg"
               >
-                הצג תקינות
+                <span className="text-2xl">x</span>
               </button>
-            )}
-            <button
-              onClick={onClose}
-              className="text-red-500 hover:text-red-700 font-bold text-lg"
-            >
-              <span className="text-2xl">x</span>
-            </button>
+            </div>
           </div>
         </div>
         <SearchFilter

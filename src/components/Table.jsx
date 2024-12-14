@@ -29,8 +29,7 @@ function Table({
   const navigate = useNavigate();
   const [originalRowData, setOriginalRowData] = useState({});
   const [searchText, setSearchText] = useState("");
-  const [gridApi, setGridApi] = useState(null);
-  const [isFilterApplied, setIsFilterApplied] = useState(false);
+
 
   const onSearch = (event) => {
     setSearchText(event.target.value);
@@ -372,33 +371,6 @@ function Table({
       filterOptions: hebrewFilterOptions,
     },
   };
-  const onGridReady = (params) => {
-    setGridApi(params.api);
-
-    // Log the filter model to check the current state
-    // console.log(params.api);
-
-    // Apply default filter for the 'isActive' column
-    params.api.setFilterModel({
-      isActive: {
-        filterType: "set",
-        values: [true],
-      },
-    });
-
-    // Log the filter model after setting it
-
-    // Force refresh of grid to ensure filter is applied
-    params.api.onFilterChanged();
-    params.api.refreshCells();
-    params.api.redrawRows();
-
-    // Set the state to true so the filter is not applied again
-    setIsFilterApplied(true);
-
-    // Log the final filter model to confirm
-  };
-
   return (
     <div className="bg-gray-100 flex flex-col">
       <div className="flex items-center ">

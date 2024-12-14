@@ -21,7 +21,7 @@ const Navbar = () => {
   const isMenuPage = location.pathname === '/menu'; // בדיקה אם הנתיב הנוכחי הוא /menu
 
   return (
-    <nav className="bg-gradient-to-r from-blue-700 via-blue-800 to-blue-900 w-full py-4 px-8 flex items-center justify-between shadow-lg relative">
+    <nav className="bg-indigo-800  w-full py-4 px-8 flex items-center justify-between shadow-lg relative z-50">
       {/* הקישורים יופיעו רק אם לא מדובר בדף menu */}
       <div className="flex gap-8">
         {!isMenuPage && (
@@ -51,7 +51,7 @@ const Navbar = () => {
       {/* הכיתוב ברוך הבא לאתר יופיע רק בדף menu */}
       {isMenuPage && (
         <div className="absolute left-1/2 transform -translate-x-1/2 text-white text-3xl font-bold">
-          ברוך הבא לאתר
+          {/* ברוך הבא לאתר */}
         </div>
       )}
 

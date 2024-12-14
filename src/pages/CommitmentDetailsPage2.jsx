@@ -205,7 +205,7 @@ if(isLoading) {
         <AnashCommitmentDetails commitmentForm={commitmentForm} setCommitmentForm={setCommitmentForm}
          campain={campain} allCampainMemorialDates={allCampainMemorialDates} commitmentAmountBefourChange={commitmentAmountBefourChange}/>
         <AnashPaymentsDetails commitmentPayments={commitmentPayments} 
-        setCommitmentPayments={setCommitmentPayments} setCommitmentForm={setCommitmentForm} UploadCommitmentPayment={UploadCommitmentPayment}/>
+        setCommitmentPayments={setCommitmentPayments} setCommitmentForm={setCommitmentForm}/>
 
     </div>
   )
