@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import dollarsBackground from "../images/Dollars.jpg";
+import menuImage from '../images/menuImage.jpg'
+
 import { login } from "../requests/ApiRequests";
 import { useAuth } from '../components/AuthProvider';
 import Spinner from "../components/Spinner";
@@ -59,11 +61,12 @@ const Login = () => {
     <div
       className="flex h-screen items-start justify-center bg-gray-100"
       style={{
-        backgroundImage: `url(${dollarsBackground})`,
+        backgroundImage: `url(${menuImage}) `,
         backgroundSize: "cover",
         backgroundRepeat: "no-repeat",
-        backgroundPosition: "center",
-      }}
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Black overlay with 50% opacity
+        backgroundBlendMode: 'overlay'
+            }}
     >
       <div className="w-full max-w-md p-8 space-y-8 bg-white shadow-md rounded-lg mt-16">
         <h2 className="text-2xl font-bold text-center">התחברות</h2>

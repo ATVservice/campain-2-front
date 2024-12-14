@@ -1,7 +1,13 @@
 import React from "react";
 import ReactModal from "react-modal";
 
-function PasswordConfirmationModal({ isOpen, onClose, onSubmit, password, setPassword }) {
+function PasswordConfirmationModal({ isOpen, onClose, onSubmit, password, setPassword,massage="" }) {
+
+  const handleSubmit = (e) => {
+    e.preventDefault(); // Prevents the default form submission behavior
+    onSubmit(password); // Passes the password to the onSubmit function
+  };
+
   return (
     <ReactModal
       isOpen={isOpen}
@@ -10,8 +16,8 @@ function PasswordConfirmationModal({ isOpen, onClose, onSubmit, password, setPas
       className="modal p-6 bg-white rounded-lg shadow-lg"
       overlayClassName="modal-overlay fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center"
     >
-      <h2 className="text-xl font-semibold text-center mb-4">אנא הזן את סיסמתך</h2>
-      <form onSubmit={onSubmit}>
+      <h2 className="text-xl font-semibold text-center mb-4">{massage}</h2>
+      <form onSubmit={handleSubmit}>
         <input
           type="password"
           placeholder="סיסמה"

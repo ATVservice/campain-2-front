@@ -1,47 +1,84 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import menuImage from '../images/menuImage.jpg'
 
 const MenuPage = () => {
+  // Define the animation variant
+  const scaleVariant = {
+    animate: {
+      scale: [0.99, 0.97, 0.99], // Animate scale from 1 -> 0.95 -> 1
+      transition: {
+        duration: 1, // Duration for each cycle
+        ease: 'easeInOut',
+        repeat: Infinity, // Repeat infinitely
+      },
+    },
+  };
+
   return (
-    <div className="min-h-screen flex flex-wrap items-start justify-center p-4 gap-y-2">
-      <Link
-        to="/alfon"
-        className="bg-blue-200 text-blue-900 text-center p-16 mx-2 rounded-lg shadow-md hover:bg-blue-300 transition-all w-full md:w-1/3 lg:w-1/4 text-2xl"
-      >
-        אלפון
-      </Link>
-      <Link
-        to="/campains"
-        className="bg-blue-200 text-blue-900 text-center p-16 mx-2 rounded-lg shadow-md hover:bg-blue-300 transition-all w-full md:w-1/3 lg:w-1/4 text-2xl"
-      >
-        קמפיינים
-      </Link>
-      <Link
-        to="/commitments"
-        className="bg-blue-200 text-blue-900 text-center p-14 mx-2 rounded-lg shadow-md hover:bg-blue-300 transition-all h-40 w-full md:w-1/3 lg:w-1/4 text-2xl"
-      >
-        התחייבויות ותשלומים
-      </Link>
-      <Link
-        to="/reports"
-        className="bg-blue-200 text-blue-900 text-center p-16 mx-2 rounded-lg shadow-md hover:bg-blue-300 transition-all w-full md:w-1/3 lg:w-1/4 text-2xl"
-      >
-        דוחות
-      </Link>
-      <Link
-        to="/memorial-board"
-        className="bg-blue-200 text-blue-900 text-center p-16 mx-2 rounded-lg shadow-md hover:bg-blue-300 transition-all w-full md:w-1/3 lg:w-1/4 text-2xl"
-      >
-        לוח הנצחה
-      </Link>
-      <Link
-        to="/petty-cash"
-        className="bg-blue-200 text-blue-900 text-center p-16 mx-2 rounded-lg shadow-md hover:bg-blue-300 transition-all w-full md:w-1/3 lg:w-1/4 text-2xl"
-      >
-        קופה קטנה
-      </Link>
-    </div>
+    <motion.div
+      className="flex flex-1 flex-col justify-center items-center max-h-[100vh] w-full text-white font-bold text-2xl relative"
+    >
+      <img src={menuImage} alt="" className="absolute top-0 left-0 w-full h-full object-cover opacity-50" />
+      
+      {/* First Group of Links */}
+      <motion.div className="flex justify-center items-center" animate="animate">
+        <motion.div
+          className="w-[300px] h-[150px] flex justify-center items-center bg-indigo-500/90 hover:bg-indigo-600/100 cursor-pointer rounded-sm"
+          variants={scaleVariant} // Apply the variant to this container
+        >
+          <Link to="/alfon" className="w-full h-full flex justify-center items-center text-white">
+            אלפון
+          </Link>
+        </motion.div>
+        <motion.div
+          className="w-[300px] h-[150px] flex justify-center items-center bg-indigo-500/90 hover:bg-indigo-600/100 cursor-pointer rounded-sm"
+          variants={scaleVariant}
+        >
+          <Link to="/campains" className="w-full h-full flex justify-center items-center text-white">
+            קמפיינים
+          </Link>
+        </motion.div>
+        <motion.div
+          className="w-[300px] h-[150px] flex justify-center items-center bg-indigo-500/90 hover:bg-indigo-600/100 cursor-pointer rounded-sm"
+          variants={scaleVariant}
+        >
+          <Link to="/commitments" className="w-full h-full flex justify-center items-center text-white">
+            התחייבויות ותשלומים
+          </Link>
+        </motion.div>
+      </motion.div>
+      
+      {/* Second Group of Links */}
+      <motion.div className="flex justify-center items-center" animate="animate">
+        <motion.div
+          className="w-[300px] h-[150px] flex justify-center items-center bg-indigo-500/90 hover:bg-indigo-600/100 cursor-pointer rounded-sm"
+          variants={scaleVariant}
+        >
+          <Link to="/reports" className="w-full h-full flex justify-center items-center text-white">
+            דוחות
+          </Link>
+        </motion.div>
+        <motion.div
+          className="w-[300px] h-[150px] flex justify-center items-center bg-indigo-500/90 hover:bg-indigo-600/100 cursor-pointer rounded-sm"
+          variants={scaleVariant}
+        >
+          <Link to="/memorial-board" className="w-full h-full flex justify-center items-center text-white">
+            לוח הנצחה
+          </Link>
+        </motion.div>
+        <motion.div
+          className="w-[300px] h-[150px] flex justify-center items-center bg-indigo-500/90 hover:bg-indigo-600/100 cursor-pointer rounded-sm"
+          variants={scaleVariant}
+        >
+          <Link to="/petty-cash" className="w-full h-full flex justify-center items-center text-white">
+            קופה קטנה
+          </Link>
+        </motion.div>
+      </motion.div>
+    </motion.div>
   );
-};
+      };
 
 export default MenuPage;

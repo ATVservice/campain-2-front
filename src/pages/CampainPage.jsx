@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
-import { getCampainPeople, getCommitmentInCampain } from '../requests/ApiRequests';
+import { getCampainPeople, getCommitmentInCampain ,getCampainByName} from '../requests/ApiRequests';
 import Spinner from '../components/Spinner';
 function CampainPage() {
   const location = useLocation();
@@ -25,6 +25,10 @@ function CampainPage() {
     totalCommitted: 0,
     totalPaid: 0,
   });
+  const [campainHebrewDatesRange, setCampainHebrewDatesRange] = useState({
+    startDate: '',
+    endDate: '',
+  });
 
   const fetchStats = async () => {
     try {
@@ -33,23 +37,30 @@ function CampainPage() {
       setIsLoading(true);
       const response = await getCampainPeople(campainName);
       const response2 = await getCommitmentInCampain(campainName);
+      const campainRes = await getCampainByName(campainName);
+      console.log(campainRes);
       console.log("Responses received", response, response2);
-
 
       const peopleData = response.data; // קבלת מערך האנשים
       const commitmentData = response2.data.data; // קבלת הנתונים מההתחייבויות
 
-      // סכימה של מספר האנשים בקמפיין
       const peopleInCampain = peopleData.length;
-      // console.log(peopleInCampain);
-
-      // עדכון הסטטיסטיקות ב-state
       setStats({
         peopleInCampain,
         peopleWithCommitments: commitmentData.numberOfCommitments, // שימוש במספר ההתחייבויות
         totalCommitted: commitmentData.totalCommitted,
         totalPaid: commitmentData.totalPaid,
       });
+      const campain = campainRes.data.data.campain;
+      setCampainHebrewDatesRange({
+        startDate: campain.
+        hebrewStartDate,
+        endDate: campain.hebrewEndDate
+      })
+        
+      
+
+
     } catch (error) {
       console.error('Error fetching campaign stats:', error);
     }
@@ -92,10 +103,13 @@ function CampainPage() {
 
   //   return <Spinner/>;
   // }
+  if(isLoading){
+    return <Spinner/>;
+  }
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      <h1 className="text-2xl font-semibold text-center mb-6">ניהול {campainName}</h1>
+      <h1 className="text-2xl font-semibold text-center mb-6 border-button ">ניהול {campainName} <span className='text-gray-600'>טווח תאריכים</span>: {campainHebrewDatesRange.startDate} - {campainHebrewDatesRange.endDate}</h1>
 
       {/* הצגת מספרים רצים */}
       <div className="grid grid-cols-2 gap-8 text-center mb-6">
