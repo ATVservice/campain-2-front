@@ -276,6 +276,13 @@ export const hebrewToEnglishCommitmentMapping = {
     CampainName: 'שם קמפיין',
     reason: 'סיבה'
   };
+  export const englishToHebrewPPettyCashMapping = {
+    FullNameOrReasonForIssue: 'סיבת הוצאה/שם',
+    Amount: 'סכום',
+    TransactionDate: 'תאריך',
+    TransactionType: 'סוג תנועה',
+    currentBalance: 'יתרה נוכחית',
+  };
   
 
 

@@ -1,8 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import TransactionsTable from '../components/TransactionsTable';
 import { getTransactions, addExpense } from '../requests/ApiRequests';
 import Modal from 'react-modal';
 import Spinner from '../components/Spinner';
+import { exportToExcel, exportToPDF } from "../../Reports/exportFilesHandler.jsx";
+import {englishToHebrewPPettyCashMapping} from '../components//Utils.js'
+
+
 
 Modal.setAppElement('#root');
 
@@ -16,6 +20,8 @@ function PettyCashPage() {
         date: new Date(),
     });
     const [isLoading, setIsLoading] = useState(false);
+    const gridRef = useRef(null);
+    
 
     const fetchTransactions = async () => {
         try {
@@ -79,6 +85,43 @@ function PettyCashPage() {
     const closeModal = () => {
         setIsModalOpen(false);
     };
+
+
+    const getCurrentGridData = () => {
+        console.log(gridRef.current);
+        if(!gridRef.current || !gridRef.current.api) return 
+    
+        const columnOrder = gridRef.current.api
+          .getColumnDefs()
+          .map((colDef) => colDef.field);
+        const rowData = [];
+    
+        gridRef.current.api?.forEachNodeAfterFilterAndSort((node) => {
+          const reorderedData = new Map();
+          columnOrder.forEach((field) => {
+            if (field in node.data) {
+              reorderedData.set(field, node.data[field]);
+            }
+          });
+    
+          // Convert Map back to an object with ordered keys
+          rowData.push(Object.fromEntries(reorderedData));
+        });
+    
+        return rowData;
+      };
+        const handelExportToExcel = () => {
+      
+          const data = getCurrentGridData();
+          exportToExcel(data,englishToHebrewPPettyCashMapping, 'קופה קטנה');
+        }
+          
+        const handelExportToPdf = () => {
+          const data = getCurrentGridData();
+          exportToPDF(data,englishToHebrewPPettyCashMapping, 'קופה קטנה');
+        }
+      
+    
     if(isLoading)
         return <Spinner/>
 
@@ -102,7 +145,22 @@ function PettyCashPage() {
                         {balance < 0 && '-'}
                         {Math.abs(balance)} ₪
                     </div>
+                    
                 </div>
+                <div className="flex gap-4 mr-auto ml-2">
+            <button type='button' className='bg-sky-500 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded'
+              onClick={handelExportToExcel}
+              >
+              יצוא דו"ח EXCEL
+            </button>
+            <button type='button' className='bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded  '
+              onClick={handelExportToPdf}
+              >
+              יצוא דו"ח PDF
+            </button>
+          </div>
+
+                
             </div>
             <Modal
                 isOpen={isModalOpen}
@@ -162,7 +220,7 @@ function PettyCashPage() {
             </Modal>
 
             {rowsData.length > 0 && (
-                <TransactionsTable rowsData={rowsData} fetchTransactions={fetchTransactions}/>
+                <TransactionsTable rowsData={rowsData} fetchTransactions={fetchTransactions} gridRef={gridRef}/>
             )}
         </div>
     );
