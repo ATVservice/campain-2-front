@@ -1,11 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { FaTrash } from 'react-icons/fa'; // ייבוא האייקון
 import {deleteTransaction} from '../requests/ApiRequests';
 import { set } from 'date-fns';
-function TransactionsTable({ rowsData, fetchTransactions}) {
+import {AG_GRID_LOCALE_IL} from '../components/ag-grid-localization';
+import { format } from 'date-fns';
+function TransactionsTable({ rowsData, fetchTransactions,gridRef}) {
+    const [searchText, setSearchText] = useState("");
+  
 
   const columns = [
     {
@@ -40,9 +44,52 @@ function TransactionsTable({ rowsData, fetchTransactions}) {
       field: 'TransactionDate',
       editable: false,
       sortable: true,
-      filter: true,
-      valueFormatter: (params) => new Date(params.value).toLocaleDateString('he-IL'),
-    },
+      filter: 'agDateColumnFilter',
+      valueFormatter: (params) => {
+        // Format the date as you prefer
+        if (params.value) {
+          return new Date(params.value).toLocaleDateString("he-IL", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          })
+          // Or use a specific format like:
+          // return moment(params.value).format('DD/MM/YYYY');
+        }
+        return "";
+      },
+    
+          
+      filterParams: {
+        comparator: (filterLocalDateAtMidnight, cellValue) => {
+          const date = new Date(cellValue);
+          
+          if (date < filterLocalDateAtMidnight) return -1;
+          if (date > filterLocalDateAtMidnight) return 1;
+          return 0;
+        },
+        // Enable all filter types including range
+        browserDatePicker: true,
+        inRangeInclusive: true,
+        defaultOption: 'inRange',
+
+      }
+      ,
+      getQuickFilterText: (params) => {
+        if (params.value) {
+          return new Date(params.value).toLocaleDateString("he-IL", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          });
+        }
+        return "";
+      },
+
+    }
+    
+    
+    ,
     {
       headerName: 'יתרה נוכחית',
       field: 'currentBalance',
@@ -108,28 +155,42 @@ function TransactionsTable({ rowsData, fetchTransactions}) {
 };
 
   return (
-    <div className="ag-theme-alpine"       style={{ 
-      width: '100%', // Ensure the container is full width
-      height: '400px' 
-    }}
->
-      <AgGridReact
-        columnDefs={columns}
-        rowData={rowsData}
-        pagination={true}
-        paginationPageSize={20}
-        domLayout="autoHeight"
-        enableRtl={true}
-        getRowStyle={getRowStyle}
-        gridOptions={{
-          enableCellTextSelection: true,
-        }}
+    <div>
+            <div className="w-[80vw] flex justify-start">
+        <input
+          id="search"
+          type="text"
+          placeholder="חיפוש..."
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          className="m-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-sky-100 w-[200px]"
+        />
+      </div>
+
+      <div className="ag-theme-alpine"       style={{
+        width: '100%', // Ensure the container is full width
+        height: '400px'
+      }}
+      >
+        <AgGridReact
+          columnDefs={columns}
+          rowData={rowsData}
+          pagination={true}
+          paginationPageSize={20}
+          domLayout="autoHeight"
+          enableRtl={true}
+          ref={gridRef}
+          getRowStyle={getRowStyle}
+          quickFilterText={searchText}
 
 
-        
-
-
-      />
+          gridOptions={{
+            enableCellTextSelection: true,
+            // localeText: AG_GRID_LOCALE_IL
+          }}
+      
+        />
+      </div>
     </div>
   );
 }

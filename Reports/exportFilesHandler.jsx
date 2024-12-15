@@ -63,7 +63,7 @@ export const exportToExcel = async (data,columsMapping, fileName) => {
       const row = {};
       headers.forEach(header => {
           
-          if (isDate(item[header]) && header === 'Date') {
+          if (isDate(item[header]) && (header === 'Date'|| header === 'TransactionDate')) {
               row[header] = format(new Date(item[header]), 'dd/MM/yyyy');
           } else {
               row[header] = item[header];
@@ -90,9 +90,13 @@ export const exportToExcel = async (data,columsMapping, fileName) => {
 };
  
  
- function fixEn(str) {
+ function fixEn(str,key) {
   if (/[א-ת]/.test(String(str))) return str;
-  const reversedStr =  String(str).split("").reverse().join("");
+  let reversedStr =  String(str).split("").reverse().join("");
+  if (isDate(reversedStr)&& (key === 'Date'|| key === 'TransactionDate')) {
+    reversedStr = format(new Date( reversedStr), 'dd/MM/yyyy');
+  }
+
   return reversedStr;
 }
 
@@ -153,7 +157,7 @@ const reverseHebrewText = (text) => {
     let rows = dataToExport.map(item =>
       columns.map(column => {
         const value = item[column];
-        return value ? fixEn(value) : '';
+        return value ? fixEn(value,column) : '';
       
       }).reverse() // Reverse the row for proper RTL alignment
     );
