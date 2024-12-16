@@ -186,7 +186,7 @@ function TransactionsTable({ rowsData, fetchTransactions,gridRef}) {
 
           gridOptions={{
             enableCellTextSelection: true,
-            // localeText: AG_GRID_LOCALE_IL
+            localeText: AG_GRID_LOCALE_IL
           }}
       
         />
