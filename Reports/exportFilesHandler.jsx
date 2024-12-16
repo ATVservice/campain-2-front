@@ -91,12 +91,15 @@ export const exportToExcel = async (data,columsMapping, fileName) => {
  
  
  function fixEn(str,key) {
-  if (/[א-ת]/.test(String(str))) return str;
-  let reversedStr =  String(str).split("").reverse().join("");
-  if (isDate(reversedStr)&& (key === 'Date'|| key === 'TransactionDate')) {
-    reversedStr = format(new Date( reversedStr), 'dd/MM/yyyy');
-  }
+   if (/[א-ת]/.test(String(str))) return str;
+   
+   if(isDate(str) && (key === 'Date'|| key === 'TransactionDate')) 
+   {
+    // console.log(format(new Date(str), 'dd/MM/yyyy'));
 
+     str = format(new Date(str), 'dd/MM/yyyy');
+   }
+  let reversedStr =  String(str).split("").reverse().join("");
   return reversedStr;
 }
 
@@ -161,6 +164,7 @@ const reverseHebrewText = (text) => {
       
       }).reverse() // Reverse the row for proper RTL alignment
     );
+    console.log(rows);
 columns= columns.map(column => columsMapping[column]);
     
     // Generate the table with RTL support
