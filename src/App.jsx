@@ -40,6 +40,9 @@ import CommitmentDetailsPage2 from "./pages/CommitmentDetailsPage2";
 import PeopleInCampain2 from "./pages/PeopleInCampain2";
 import AlfonPage2 from "./pages/AlfonPage2";
 import PaymentsWithoutCommitment from "./pages/PaymentsWithoutCommitment";
+import ReportNavigation from "./pages/ReportNavigation";
+import ReportCommitments from "./pages/ReportCommitments";
+import ReportPayments from "./pages/ReportPayments";
 // Modal.setAppElement("#root");
 
 // Custom component to handle showing Navbar conditionally
@@ -117,6 +120,9 @@ const App = () => {
                   <Route path="/user-profile" element={<UserProfile />} />
                   <Route path="edit-campain/:campainName" element={<EditCampaignPage />} />
                   <Route path="/payments-without-commitment" element={<PaymentsWithoutCommitment />} />
+                  <Route path="/report-navigation" element={<ReportNavigation />} />
+                  <Route path="/report-commitments/:campainName?" element={<ReportCommitments />} />
+                  <Route path="/report-payments" element={<ReportPayments />} />
                 </Route>
               </Routes>
           </Layout>

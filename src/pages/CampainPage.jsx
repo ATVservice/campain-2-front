@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
-import { getCampainPeople, getCommitmentInCampain ,getCampainByName} from '../requests/ApiRequests';
+import { getCampainPeople, getCommitmentInCampain ,getCampainByName,getCampainIncomSummeryByPaymentMethod} from '../requests/ApiRequests';
 import Spinner from '../components/Spinner';
 function CampainPage() {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const campainName = queryParams.get('campainName');
   const minimumAmountForMemorialDay = queryParams.get('minimumAmountForMemorialDay');
+  const [incomsByPaymentsMethods, setIncomsByPaymentsMethods] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
   const { campainId } = useParams();
@@ -38,6 +39,9 @@ function CampainPage() {
       const response = await getCampainPeople(campainName);
       const response2 = await getCommitmentInCampain(campainName);
       const campainRes = await getCampainByName(campainName);
+      const incomsByPaymentsMethodsRes = await getCampainIncomSummeryByPaymentMethod(campainName);
+      setIncomsByPaymentsMethods(incomsByPaymentsMethodsRes.data.incomsByPaymentsMethods)
+      
       console.log(campainRes);
       console.log("Responses received", response, response2);
 
@@ -128,6 +132,14 @@ function CampainPage() {
         <div className="bg-white shadow-lg p-4 rounded-lg">
           <h2 className="text-xl font-semibold text-gray-700">סך הכל שולם</h2>
           <p className="text-3xl font-bold text-blue-600">{runningNumbers.totalPaid} ₪</p>
+          <div>
+            {Object.keys(incomsByPaymentsMethods).map(key => (
+              <div key={key}>
+                <p className="text-gray-600">{key}: {incomsByPaymentsMethods[key]} ₪</p>
+              </div>
+              
+            ))}
+          </div>
         </div>
         <div className="bg-white shadow-lg p-4 rounded-lg col-span-2 flex justify-center items-center gap-4">
           <h2 className="text-xl font-semibold text-gray-700">סכום מינימום עבור יום הנצחה בקמפיין</h2>
@@ -137,24 +149,30 @@ function CampainPage() {
       </div>
 
       {/* כפתורים לתחתית הדף */}
-      <div className="mt-8 flex justify-center gap-4">
+      <div className="mt-8 flex justify-center gap-4  max-w-[70vw] mx-auto">
         <button
           onClick={() => navigate(`/edit-campain/${campainName}`)}
-          className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-all"
+          className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-all w-1/4"
         >
           עריכת קמפיין
         </button>
         <button
           onClick={() => navigate(`/peopleincampain/${campainName}`)}
-          className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all"
+          className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all w-1/4"
         >
           רשימת אנשים בקמפיין
         </button>
         <button
           onClick={() => navigate(`/commitments/${campainName}`)}
-          className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-all"
+          className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-all w-1/4"
         >
           רשימת התחייבויות בקמפיין
+        </button>
+        <button
+            onClick={() => navigate(`/report-commitments/${campainName}`)}
+            className="bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-all w-1/4"
+        >
+          הוצאת דו"ח קמפיין
         </button>
       </div>
     </div>

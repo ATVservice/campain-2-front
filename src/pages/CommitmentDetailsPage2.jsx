@@ -143,8 +143,9 @@ const handelDeleteCommitment = async () => {
     
 
 };
-const handleValidatePassword = async (e) => {
-    e.preventDefault();
+const handleValidatePassword = async (password) => {
+  // console.log(e);
+  //   e.preventDefault();
     try {
       setIsLoading(true);
       const res = await validateUserPassword(password);

@@ -218,6 +218,7 @@ export const hebrewToEnglishCommitmentMapping = {
     FatherId: 'תז אב',
     FatherName: 'שם האב',
     MobilePhone: 'טל נייד',
+    MobileHomePhone: 'נייד בבית 1',
     HomePhone: 'טל בית',
     BeitMidrash: 'בית מדרש',
     Classification: 'סיווג',
@@ -231,7 +232,6 @@ export const hebrewToEnglishCommitmentMapping = {
     floor: 'קומה',
     zipCode: 'מיקוד',
     Entry: 'כניסה',
-    MobileHomePhone: 'נייד בבית 1',
     Email: 'דוא"ל',
     GroupNumber: 'מספר קבוצה',
     FreeFieldsToFillAlone: 'שדה חופשי',
@@ -250,6 +250,7 @@ export const hebrewToEnglishCommitmentMapping = {
     PersonID: 'מספר זהות',
     DonationMethod: 'אופן התרמה',
     Fundraiser: 'מתרים',
+    fundRaiser: 'מתרים',
     StudiedInYeshivaYears: 'למד בישיבה בשנים',
     yashagYear: 'שנה ישיג',
     CommitteeResponsibility: 'אחראי ועד',
@@ -283,6 +284,86 @@ export const hebrewToEnglishCommitmentMapping = {
     TransactionType: 'סוג תנועה',
     currentBalance: 'יתרה נוכחית',
   };
+
+  export const englishToHebrewCommitmentReportMapping = {
+    AnashIdentifier: 'מזהה אנש',
+    FirstName: 'שם',
+    LastName: 'משפחה',
+    PersonID: 'מספר זהות',
+    Fundraiser: 'מתרים',
+    CommitmentAmount: 'סכום התחייבות',
+    AmountPaid: 'סכום שולם',
+    AmountRemaining: 'סכום שנותר',
+    NumberOfPayments: 'מספר תשלומים',
+    PaymentsMade: 'תשלומים שבוצעו',
+    PaymentsRemaining: 'תשלומים שנותרו',
+    PaymentMethod: 'אופן תשלום',
+    Notes: 'הערות',
+    ResponseToFundraiser: 'תשובה למתרים',
+    CampainName: 'שם הקמפיין',
+    City: 'עיר',
+    MobilePhone: 'טל נייד',
+    MobileHomePhone: 'נייד בבית 1',
+    HomePhone: 'טל בית',
+    PreviousCommitments: 'התחייבותים הקודמות',
+    BeitMidrash: 'בית מדרש',
+    Classification: 'סיווג',
+    DonationMethod: 'אופן התרמה',
+    Fundraiser: 'מתרים',
+    City: 'עיר',
+    CampainName: 'שם הקמפיין',
+    StudiedInYeshivaYears: 'למד בישיבה בשנים',
+    yashagYear: 'שנה יש"ג',
+    CommitteeResponsibility: 'אחראי ועד',
+    PartyGroup: 'קבוצה למסיבה',
+    GroupNumber: 'מספר קבוצה',
+    PartyInviterName: 'שם מזמין למסיבה',
+    FreeFieldsToFillAlone: 'שדה חופשי',
+    AnotherFreeFieldToFillAlone: 'שדה חופשי 2',
+    Notes: 'הערות',
+    ungrouped: 'ללא ערך בשדה הממיין דפים',
+  
+
+  
+    };
+
+    export const englishToHebrewPaymentsReportMapping = {
+      AnashIdentifier: 'מזהה אנש',
+      FirstName: 'שם',
+      Amount: 'סכום',
+      Date: 'תאריך',
+      PaymentMethod: 'אופן תשלום',
+      CampainName: 'שם קמפיין',
+  
+      LastName: 'משפחה',
+      PersonID: 'מספר זהות',
+      Fundraiser: 'מתרים',
+      PaymentMethod: 'אופן תשלום',
+      CampainName: 'שם הקמפיין',
+      City: 'עיר',
+      MobilePhone: 'טל נייד',
+      MobileHomePhone: 'נייד בבית 1',
+      HomePhone: 'טל בית',
+      BeitMidrash: 'בית מדרש',
+      Classification: 'סיווג',
+      City: 'עיר',
+      CampainName: 'שם הקמפיין',
+      StudiedInYeshivaYears: 'למד בישיבה בשנים',
+      yashagYear: 'שנה יש"ג',
+      CommitteeResponsibility: 'אחראי ועד',
+      PartyGroup: 'קבוצה למסיבה',
+      GroupNumber: 'מספר קבוצה',
+      PartyInviterName: 'שם מזמין למסיבה',
+      FreeFieldsToFillAlone: 'שדה חופשי',
+      AnotherFreeFieldToFillAlone: 'שדה חופשי 2',
+      Notes: 'הערות',
+      ungrouped: 'ללא ערך בשדה הממיין דפים',
+    
+  
+    
+      };
+  
+
   
 
 

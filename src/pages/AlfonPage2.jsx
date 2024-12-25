@@ -168,23 +168,21 @@ function AlfonPage2() {
     if(!gridRef.current || !gridRef.current.api) return 
 
     const columnOrder = gridRef.current.api
-      .getColumnDefs()
+      .getColumnDefs().filter((colDef) => colDef.cellDataType
+      !== false)
       .map((colDef) => colDef.field);
+      console.log(columnOrder);
+      
     const rowData = [];
+    console.log(gridRef.current.api);
 
     gridRef.current.api.forEachNodeAfterFilterAndSort((node) => {
-      const reorderedData = new Map();
-      columnOrder.forEach((field) => {
-        if (field in node.data) {
-          reorderedData.set(field, node.data[field]);
-        }
-      });
-
+      rowData.push(node.data);
+      
       // Convert Map back to an object with ordered keys
-      rowData.push(Object.fromEntries(reorderedData));
     });
 
-    return rowData;
+    return { rowData, columnOrder };
   };
 
 
@@ -192,12 +190,13 @@ function AlfonPage2() {
   const handelExportToExcel = () => {
 
     const data = getCurrentGridData();
-    exportToExcel(data,englishToHebrewAlfonhMapping, 'אלפון');
+    exportToExcel(data.rowData,data.columnOrder,englishToHebrewAlfonhMapping, 'אלפון');
   }
     
   const handelExportToPdf = () => {
     const data = getCurrentGridData();
-    exportToPDF(data,englishToHebrewAlfonhMapping, 'אלפון');
+    console.log(data);
+    exportToPDF(data.rowData,data.columnOrder,englishToHebrewAlfonhMapping, 'אלפון');
   }
 
 

@@ -162,7 +162,7 @@ function CommitmentTable({rowsData,setShowCommitmentsOfActivePeople,showCommitme
           headerClass: 'multi-line-header', 
           ...commonColumnProps 
         },
-        { headerName: 'מתרים', field: 'fundRaiser', editable: true, sortable: true, filter: true,width: 100 },
+        { headerName: 'מתרים', field: 'Fundraiser', editable: true, sortable: true, filter: true,width: 100 },
 
         { 
           headerName: 'הערות', 
