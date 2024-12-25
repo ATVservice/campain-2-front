@@ -56,7 +56,7 @@ const MenuPage = () => {
           className="w-[300px] h-[150px] flex justify-center items-center bg-indigo-500/90 hover:bg-indigo-600/100 cursor-pointer rounded-sm"
           variants={scaleVariant}
         >
-          <Link to="/reports" className="w-full h-full flex justify-center items-center text-white">
+          <Link to="/report-navigation" className="w-full h-full flex justify-center items-center text-white">
             דוחות
           </Link>
         </motion.div>

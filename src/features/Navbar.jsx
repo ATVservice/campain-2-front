@@ -35,7 +35,7 @@ const Navbar = () => {
             <Link to="/commitments" className="text-white text-lg font-semibold transition duration-300 ease-in-out transform hover:scale-110 hover:text-gray-300">
               התחייבויות ותשלומים
             </Link>
-            <Link to="/reports" className="text-white text-lg font-semibold transition duration-300 ease-in-out transform hover:scale-110 hover:text-gray-300">
+            <Link to="/report-navigation" className="text-white text-lg font-semibold transition duration-300 ease-in-out transform hover:scale-110 hover:text-gray-300">
               דוחות
             </Link>
             <Link to="/memorial-board" className="text-white text-lg font-semibold transition duration-300 ease-in-out transform hover:scale-110 hover:text-gray-300">

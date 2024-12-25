@@ -4,6 +4,7 @@ import {exportToExcel, exportToPDF} from "../../Reports/exportFilesHandler.jsx";
 import { format } from 'date-fns';
 import { RiFileExcel2Line } from "react-icons/ri";
 import { FaDownload } from "react-icons/fa6";
+import {englishToHebrewAlfonhMapping,hebrewToEnglisAlfonhMapping} from '../components/Utils'
 
 function ReviewAlfonChanges({ conflictsData,validPeople, invalidPeople, onSubmit, onClose,showConflicts,setShowConflicts }) {
   // console.log(validPeople);
@@ -111,6 +112,11 @@ function ReviewAlfonChanges({ conflictsData,validPeople, invalidPeople, onSubmit
   const [filteredPeople, setFilteredPeople] = useState(peopleToDisplay||[]);
   const getFilteredData = (filteredData) => {
     setFilteredPeople(filteredData);
+  };
+
+  const handleExportToExcel = () => {
+    const columns = Array.from(new Set(filteredPeople.flatMap(item => Object.keys(item))));
+    exportToExcel(filteredPeople,columns,englishToHebrewAlfonhMapping, "data");
   };
 
 
@@ -307,7 +313,7 @@ function ReviewAlfonChanges({ conflictsData,validPeople, invalidPeople, onSubmit
               )}
             <button
                 className='flex flex-col gap-1 text-center items-center justify-center'
-                onClick={() => exportToExcel(filteredPeople,'data')}
+                onClick={handleExportToExcel}
               >
                 <RiFileExcel2Line size={24} className='text-blue-800' />
                 <FaDownload size={16} className='text-blue-800 ' />

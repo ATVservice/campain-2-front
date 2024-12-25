@@ -50,6 +50,12 @@ function ReviewCommitmentsModal({ onUploadCommitment, validCommitments, invalidC
   function handelUpload() {
     onUploadCommitment();
   }
+    const handleExportToExcel = () => {
+      const columns = Array.from(new Set(filteredCommitments.flatMap(item => Object.keys(item))));
+      exportToExcel(filteredCommitments,columns,englishToHebrewCommitmentMapping, "data");
+    };
+  
+  
 
   return (
     <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center rtl z-50">
@@ -83,7 +89,7 @@ function ReviewCommitmentsModal({ onUploadCommitment, validCommitments, invalidC
               )}
               <button
                   className='flex flex-col gap-1 text-center items-center justify-center'
-                  onClick={() => exportToExcel(filteredCommitments,englishToHebrewCommitmentMapping,'data')}
+                  onClick={handleExportToExcel}
                 >
                   <RiFileExcel2Line size={24} className='text-blue-800' />
                   <FaDownload size={16} className='text-blue-800 ' />

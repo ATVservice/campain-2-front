@@ -71,6 +71,12 @@ function ReviewPaymentsModal({ onUploadPayments, validPaymentsWithCommitment, va
       ? 'bg-green-700' // Darker background for active
       : 'bg-green-500'; // Normal background
   };
+      const handleExportToExcel = () => {
+        const columns = Array.from(new Set(filteredPayments.flatMap(item => Object.keys(item)))).filter((item, index) => item !=='CommitmentId');
+        // console.log(columns);
+        exportToExcel(filteredPayments,columns,englishToHebrewPaymentsMapping, "data");
+      };
+  
 
 
 
@@ -109,7 +115,7 @@ function ReviewPaymentsModal({ onUploadPayments, validPaymentsWithCommitment, va
               </button>
               <button
                 className='flex flex-col gap-1 text-center items-center justify-center'
-                onClick={() => exportToExcel(filteredPayments,englishToHebrewPaymentsMapping,'data')}
+                onClick={handleExportToExcel}
               >
                 <RiFileExcel2Line size={24} className='text-blue-800' />
                 <FaDownload size={16} className='text-blue-800 ' />

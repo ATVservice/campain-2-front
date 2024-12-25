@@ -88,37 +88,34 @@ function PettyCashPage() {
 
 
     const getCurrentGridData = () => {
-        console.log(gridRef.current);
         if(!gridRef.current || !gridRef.current.api) return 
     
         const columnOrder = gridRef.current.api
-          .getColumnDefs()
+          .getColumnDefs().filter((colDef) => colDef.cellDataType
+          !== false)
           .map((colDef) => colDef.field);
+          console.log(columnOrder);
+          
         const rowData = [];
+        console.log(gridRef.current.api);
     
-        gridRef.current.api?.forEachNodeAfterFilterAndSort((node) => {
-          const reorderedData = new Map();
-          columnOrder.forEach((field) => {
-            if (field in node.data) {
-              reorderedData.set(field, node.data[field]);
-            }
-          });
-    
+        gridRef.current.api.forEachNodeAfterFilterAndSort((node) => {
+          rowData.push(node.data);
+          
           // Convert Map back to an object with ordered keys
-          rowData.push(Object.fromEntries(reorderedData));
         });
     
-        return rowData;
+        return { rowData, columnOrder };
       };
-        const handelExportToExcel = () => {
+            const handelExportToExcel = () => {
       
           const data = getCurrentGridData();
-          exportToExcel(data,englishToHebrewPPettyCashMapping, 'קופה קטנה');
+          exportToExcel(data.rowData,data.columnOrder,englishToHebrewPPettyCashMapping, 'קופה קטנה');
         }
           
         const handelExportToPdf = () => {
           const data = getCurrentGridData();
-          exportToPDF(data,englishToHebrewPPettyCashMapping, 'קופה קטנה');
+          exportToPDF(data.rowData,data.columnOrder,englishToHebrewPPettyCashMapping, 'קופה קטנה');
         }
       
     

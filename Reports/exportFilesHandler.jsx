@@ -5,7 +5,7 @@ import { useEffect,useState } from 'react';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import ExcelJS from 'exceljs'
-import html2pdf from 'html2pdf.js';
+import html2pdf, { f } from 'html2pdf.js';
 import { format } from 'date-fns';
 
 import { hebrewToEnglisAlfonhMapping,englishToHebrewAlfonhMapping } from '../src/components/Utils';
@@ -16,10 +16,6 @@ import { ceil } from 'lodash';
 
 
 
-  // const headersConvertedToHebrew = Object.fromEntries(
-  //   Object.entries(hebrewToEnglisAlfonhMapping).map(([key, value]) => [value, key])
-  // );
-  // console.log(headersConvertedToHebrew)
 
   const isDate = function(date) {
     return (new Date(date) !== "Invalid Date") && !isNaN(new Date(date));
@@ -31,7 +27,8 @@ import { ceil } from 'lodash';
 
 
 
-export const exportToExcel = async (data,columsMapping, fileName) => {
+export const exportToExcel = async (data,columns,columsMapping, fileName) => {
+  // console.log(columns);
   const dataToExport = [...data];
   data = [];
    
@@ -40,15 +37,17 @@ export const exportToExcel = async (data,columsMapping, fileName) => {
   const worksheet = workbook.addWorksheet('Sheet1');
 
   // Add headers with bold formatting
-  let headers = Object.keys(columsMapping);
+  // let headers = columns;
   
-  headers = headers.filter(header => dataToExport.some(item => item[header]));
+//  headers = [...new Set(headers.filter(header => dataToExport.some(item => header in item)))];
+
   // Set column configuration using Hebrew headers
-  worksheet.columns = headers.map(header => ({
-      header: columsMapping[header],
+  worksheet.columns = columns.map(header => ({
+      header: columsMapping[header]|| header,
       key: header,
       width: 14
   }));
+  // console.log(worksheet.columns);
 
   // Make headers bold
   const headerRow = worksheet.getRow(1);
@@ -61,7 +60,7 @@ export const exportToExcel = async (data,columsMapping, fileName) => {
   // Add data rows with right alignment
   dataToExport.forEach(item => {
       const row = {};
-      headers.forEach(header => {
+      columns.forEach(header => {
           
           if (isDate(item[header]) && (header === 'Date'|| header === 'TransactionDate')) {
               row[header] = format(new Date(item[header]), 'dd/MM/yyyy');
@@ -69,6 +68,7 @@ export const exportToExcel = async (data,columsMapping, fileName) => {
               row[header] = item[header];
           }
       });
+      // console.log(row);
       
       const worksheetRow = worksheet.addRow(row);
 
@@ -80,13 +80,14 @@ export const exportToExcel = async (data,columsMapping, fileName) => {
           };
       });
   });
+  // console.log(workbook);
  
   // Generate the Excel file
   const buffer = await workbook.xlsx.writeBuffer();
   
   // Create and save the file
   const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-  saveAs(blob, `${fileName}.xlsx`);
+  saveAs(blob, fileName + '.xlsx');
 };
  
  
@@ -103,33 +104,16 @@ export const exportToExcel = async (data,columsMapping, fileName) => {
   return reversedStr;
 }
 
+function isEn(str) 
+{
+  return !/[א-ת]/.test(String(str));
+  
+}
 
-const reverseHebrewText = (text) => {
-    // Check if the text contains Hebrew characters
-    const hebrewRegex = /[\u0590-\u05FF]/;
-    
-    // If no Hebrew characters, return the text as is
-    if (!hebrewRegex.test(text)) return text;
-  
-    // Split the text into words
-    const words = text.split(' ');
-    
-    // Process each word
-    const processedWords = words.map(word => {
-      // If the word contains Hebrew characters, reverse its letters
-      if (hebrewRegex.test(word)) {
-        return word.split('').reverse().join('');
-      }
-      // If no Hebrew characters, keep the word as is
-      return word;
-    });
-  
-    // Reverse the order of words
-    return processedWords.reverse().join(' ');
-  };  
- export const exportToPDF = (data,columsMapping, fileName) => {
-  console.log(columsMapping);
+
+ export const exportToPDF = (data,columns,columsMapping, fileName) => {
   try {
+    console.log(data);
     const  dataToExport = [...data];
     data = [];
 
@@ -152,9 +136,6 @@ const reverseHebrewText = (text) => {
     doc.setR2L(true);
     // doc.text(reverseHebrewText(fileName), 280, 10, { align: 'right' }); // Reverse fileName if in Hebrew
   
-    // Define columns for the table
-    let columns = Object.keys(columsMapping);
-    columns = columns.filter(column => dataToExport.some(item => item[column]));
   
     // Prepare rows data (reverse each row and handle Hebrew text)
     let rows = dataToExport.map(item =>
@@ -164,8 +145,7 @@ const reverseHebrewText = (text) => {
       
       }).reverse() // Reverse the row for proper RTL alignment
     );
-    console.log(rows);
-columns= columns.map(column => columsMapping[column]);
+columns= columns.map(column =>  columsMapping[column]);
     
     // Generate the table with RTL support
     doc.autoTable({
@@ -193,20 +173,227 @@ columns= columns.map(column => columsMapping[column]);
     console.error(error);
   }
   };
-  function convertToHebrewKeys(data) {
-    return data.map((item) => {
-      const convertedItem = {};
-      Object.entries(item).forEach(([key, value]) => {
-        const hebrewKey = headersConvertedToHebrew[key];
-        if (hebrewKey) {
-          convertedItem[hebrewKey] = value;
-        }
+  export const exportReportCommitmentsToPDF = (data, columsMapping, fileName, groupByProperty = 'ungrouped',preview=true) => {
+    console.log(groupByProperty);
+    
+    try {
+      const flatData = Object.values(data).flat();
+      const doc = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: 'a4',
       });
-      return convertedItem;
-    });
+
+      doc.addFileToVFS('ARIAL.TTF', '/ARIAL.TTF');
+      doc.addFont('/ARIAL.TTF', 'ArialHebrew', 'normal');
+      doc.setFont('ArialHebrew');
+      doc.setFontSize(40);
+      doc.setR2L(true);
+
+      // let columns = Object.keys(columsMapping);
+      let dynamicColumns = Array.from(
+        new Set(
+          flatData.flatMap((item) => Object.keys(item))
+        )
+    );
+      let columns = [...dynamicColumns];
+      
+      let currentY = 20;
+      let previousGroup = null;
+      // console.log(data);
+
+      Object.entries(data).forEach(([groupKey, groupItems]) => {
+        
+          if (previousGroup !== null) {
+            doc.addPage();
+            currentY = 20;
+          }
+          if(groupKey === 'ungrouped')
+          {
+            groupKey = columsMapping[groupKey];
+          }
+          
+          // doc.setFontSize(16);
+          // doc.text(`${columsMapping[groupByProperty]}: ${groupKey}`, 20, currentY);
+          // currentY += 10;
+        
+
+        const rows = groupItems.map(item =>
+          columns.map(column => {
+            const value = item[column];
+            return value || value === 0 ? fixEn(value, column) : '';
+          }).reverse()
+        );
+        // console.log(rows);
 
 
-  }  
+        doc.autoTable({
+          head: [columns.map(column => isEn(column) ? columsMapping[column] : column).reverse()],
+          body: rows,
+          startY: currentY,
+          styles: {
+            font: 'ArialHebrew',
+            fontSize: 9,
+            cellPadding: 1,
+            halign: 'right',
+            overflow: 'linebreak',
+          },
+          headStyles: {
+            fillColor: [200, 200, 200],
+            textColor: [0, 0, 0],
+          },
+          
+          didDrawPage: function(data) {
+              // Set font for page number
+              doc.setFont('ArialHebrew');
+              doc.setFontSize(12);
+              const pageWidth = doc.internal.pageSize.getWidth();
+
+              doc.text(`בס"ד`, pageWidth - 20, 10, { align: 'right' , dir: 'rtl' });
+              doc.text(`${columsMapping[groupByProperty]||''}: ${groupKey}`, 20, 10);
+
+    
+          
+              // Add page number to all pages
+              doc.text(
+                `דף ${fixEn(data.pageNumber, 'pageCount')}`, 
+                doc.internal.pageSize.getWidth() - 30, 
+                doc.internal.pageSize.getHeight() - 10
+              );
+            
+          }
+          
+        });
+
+        currentY = doc.lastAutoTable.finalY + 10;
+        previousGroup = groupKey;
+      });
+
+      if (preview) {
+        // Generate a Blob and create an object URL for preview
+        const pdfBlob = doc.output('blob');
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+  
+        // Open the preview in a new tab or iframe
+        window.open(pdfUrl, '_blank'); // New tab preview
+      } else {
+        // Save the PDF
+        doc.save(`${fileName}.pdf`);
+      }
+  
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  export const exportReportpaymentsToPDF = (data, columsMapping, fileName,preview=true) => {
+    
+    try {
+      const doc = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: 'a4',
+      });
+
+      doc.addFileToVFS('ARIAL.TTF', '/ARIAL.TTF');
+      doc.addFont('/ARIAL.TTF', 'ArialHebrew', 'normal');
+      doc.setFont('ArialHebrew');
+      doc.setFontSize(40);
+      doc.setR2L(true);
+
+      // let columns = Object.keys(columsMapping);
+      let dynamicColumns = Array.from(
+        new Set(
+          data.flatMap((item) => Object.keys(item))
+        )
+    );
+      let columns = [...dynamicColumns];
+      
+      let currentY = 20;
+      // console.log(data);
+
+        
+        
+
+        const rows = data.map(item =>
+          columns.map(column => {
+            const value = item[column];
+            return value || value === 0 ? fixEn(value, column) : '';
+          }).reverse()
+        );
+
+
+        doc.autoTable({
+          head: [columns.map(column => isEn(column) ? columsMapping[column] : column).reverse()],
+          body: rows,
+          startY: currentY,
+          styles: {
+            font: 'ArialHebrew',
+            fontSize: 9,
+            cellPadding: 1,
+            halign: 'right',
+            overflow: 'linebreak',
+          },
+          headStyles: {
+            fillColor: [200, 200, 200],
+            textColor: [0, 0, 0],
+          },
+          
+          didDrawPage: function(data) {
+              // Set font for page number
+              doc.setFont('ArialHebrew');
+              doc.setFontSize(12);
+              const pageWidth = doc.internal.pageSize.getWidth();
+
+              doc.text(`בס"ד`, pageWidth - 20, 10, { align: 'right' , dir: 'rtl' });
+
+    
+          
+              // Add page number to all pages
+              doc.text(
+                `דף ${fixEn(data.pageNumber, 'pageCount')}`, 
+                doc.internal.pageSize.getWidth() - 30, 
+                doc.internal.pageSize.getHeight() - 10
+              );
+            
+          }
+          
+        });
+
+     
+
+      if (preview) {
+        // Generate a Blob and create an object URL for preview
+        const pdfBlob = doc.output('blob');
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+  
+        // Open the preview in a new tab or iframe
+        window.open(pdfUrl, '_blank'); // New tab preview
+      } else {
+        // Save the PDF
+        doc.save(`${fileName}.pdf`);
+      }
+  
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

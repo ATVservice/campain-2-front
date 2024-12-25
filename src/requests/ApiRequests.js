@@ -525,6 +525,46 @@ export const transferPayment= async (paymentId,campainName) => {
     throw error
   }
 }
+export const processCommitmentReport= async (reportData) => {
+  try {
+    const response = await apiConfig.post(`/api/reports/commitments-report`,reportData);
+    return response;
+  } catch (error) {
+    throw error
+  }
+}
+export const processCampainReport= async (reportData) => {
+  try {
+    const response = await apiConfig.post(`/api/reports/campain-report`,reportData);
+    return response;
+  } catch (error) {
+    throw error
+  }
+}
+export const campainPaymentsReport= async (reportData) => {
+  try {
+    const response = await apiConfig.post(`/api/reports/campain-payments-report`,reportData);
+    return response;
+  } catch (error) {
+    throw error
+  }
+}
+export const dateRangePaymentsReport= async (reportData) => {
+  try {
+    const response = await apiConfig.post(`/api/reports/date-range-payments-report`,reportData);
+    return response;
+  } catch (error) {
+    throw error
+  }
+}
+export const getCampainIncomSummeryByPaymentMethod= async (campainName) => {
+  try {
+    const response = await apiConfig.get(`/api/commitment/get-campain-incom-by-payment-method/${campainName}`);
+    return response;
+  } catch (error) {
+    throw error
+  }
+}
 
 
 
