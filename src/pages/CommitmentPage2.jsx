@@ -167,7 +167,7 @@ function CommitmentPage2() {
       {
         setIsLoading(false);
         console.log(error);
-        toast.error("שגיאה בשליחת התחייבויות");
+        toast.error(error.response.data.message || "שגיאה בהעלאת התחייבויות");
         return;
       }
       try
