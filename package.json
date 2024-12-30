@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "start": "npx http-server dist",
+    "start": "serve -s dist",
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
@@ -53,6 +53,7 @@
     "react-to-pdf": "^1.0.1",
     "react-toastify": "^10.0.5",
     "redux-persist": "^6.0.0",
+    "serve": "^14.2.4",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
