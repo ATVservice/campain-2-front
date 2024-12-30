@@ -9,7 +9,6 @@ function CampainPage() {
   const campainName = queryParams.get('campainName');
   const minimumAmountForMemorialDay = queryParams.get('minimumAmountForMemorialDay');
   const [incomsByPaymentsMethods, setIncomsByPaymentsMethods] = useState({});
-  const [commitmentAmoutByPaymentMethod, setCommitmentAmoutByPaymentMethod] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
   const { campainId } = useParams();
@@ -42,7 +41,6 @@ function CampainPage() {
       const campainRes = await getCampainByName(campainName);
       const incomsByPaymentsMethodsRes = await getCampainIncomSummeryByPaymentMethod(campainName);
       setIncomsByPaymentsMethods(incomsByPaymentsMethodsRes.data.incomsByPaymentsMethods)
-      setCommitmentAmoutByPaymentMethod(incomsByPaymentsMethodsRes.data.commitmentAmoutByPaymentMethod)
       
       console.log(campainRes);
       console.log("Responses received", response, response2);
@@ -130,32 +128,17 @@ function CampainPage() {
         <div className="bg-white shadow-lg p-4 rounded-lg">
           <h2 className="text-xl font-semibold text-gray-700">סך ההתחייבויות</h2>
           <p className="text-3xl font-bold text-blue-600">{runningNumbers.totalCommitted} ₪</p>
-          <select name="commitsByPaymentsMethods" id="commitsByPaymentsMethods" className=" border outline-none p-2 rounded">
-  <option value="" selected disabled hidden>
-    פירוט 
-  </option>
-  {Object.keys(commitmentAmoutByPaymentMethod).map(key => (
-    <option key={key} value={key} disabled>
-      {key}: {commitmentAmoutByPaymentMethod[key]} ₪
-    </option>
-  ))}
-</select>
-
         </div>
         <div className="bg-white shadow-lg p-4 rounded-lg">
           <h2 className="text-xl font-semibold text-gray-700">סך הכל שולם</h2>
           <p className="text-3xl font-bold text-blue-600">{runningNumbers.totalPaid} ₪</p>
           <div>
-          <select name="incomsByPaymentsMethods" id="incomsByPaymentsMethods" className="border outline-none p-2 rounded">
-  <option value="" selected disabled hidden>
-    פירוט 
-  </option>
-  {Object.keys(incomsByPaymentsMethods).map(key => (
-    <option key={key} value={key} disabled>
-      {key}: {incomsByPaymentsMethods[key]} ₪
-    </option>
-  ))}
-</select>
+            {Object.keys(incomsByPaymentsMethods).map(key => (
+              <div key={key}>
+                <p className="text-gray-600">{key}: {incomsByPaymentsMethods[key]} ₪</p>
+              </div>
+              
+            ))}
           </div>
         </div>
         <div className="bg-white shadow-lg p-4 rounded-lg col-span-2 flex justify-center items-center gap-4">

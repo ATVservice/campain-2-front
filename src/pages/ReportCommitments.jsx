@@ -354,7 +354,7 @@ const handleSubmitExcel = async () => {
          
   
       <div className="mb-6 bg-indigo-100 rounded-lg p-4">
-        <h2 className="text-lg font-semibold mb-3"> קמפיינים סכומי התחייבות</h2>
+        <h2 className="text-lg font-semibold mb-3">השוואת קמפיינים</h2>
         <div className="grid grid-cols-3 gap-3">
           {campains.map((campain) => (
             <label key={campain._id} className="flex items-center gap-2">

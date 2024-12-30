@@ -210,17 +210,62 @@ function EditCampaignPage() {
         </div>
       </div>
 
-<div className="mb-4">
-  <p className="mb-1 text-blue-700">סכום מינימלי ליום הנצחה:</p>
-  <input
-    type="number"
-    name="minimumAmountForMemorialDay"
-    className="border-2 p-2 w-full rounded-md bg-gray-200 text-gray-700 focus:outline-none"
-    value={editedCampainData.minimumAmountForMemorialDay || ""}
-    onChange={handleInputChange}
-    readOnly
-  />
-</div>
+      {/* <div className="mb-4">
+        <div className="flex justify-between">
+          <span className="mb-1 text-blue-700">תאריך התחלה:</span>
+          <span className="bg-blue-100 text-blue-800 text-md font-semibold mr-2 px-2.5 py-0.5 rounded">
+            {editedCampainData.hebrewStartDate}
+          </span>
+        </div>
+        <input
+          type="date"
+          name="startDate"
+          className="border-2 p-2 w-full rounded-md focus:outline-none focus:border-blue-500"
+          value={
+            editedCampainData.startDate
+              ? new Date(editedCampainData.startDate)
+                  .toISOString()
+                  .split("T")[0]
+              : ""
+          }
+          onChange={handleInputChange}
+        />
+      </div>
+
+      <div className="mb-4">
+        <div className="flex justify-between">
+          <span className="mb-1 text-blue-700">תאריך סיום:</span>
+          <span className="bg-blue-100 text-blue-800 text-md font-semibold mr-2 px-2.5 py-0.5 rounded">
+            {editedCampainData.hebrewEndDate}
+          </span>
+        </div>
+        <input
+          type="date"
+          name="endDate"
+          className="border-2 p-2 w-full rounded-md focus:outline-none focus:border-blue-500"
+          value={
+            editedCampainData.endDate
+              ? new Date(editedCampainData.endDate)
+                  .toISOString()
+                  .split("T")[0]
+              : ""
+          }
+          onChange={handleInputChange}
+        />
+      </div> */}
+
+      <div className="mb-4">
+        <p className="mb-1 text-blue-700">סכום מינימלי ליום הנצחה:</p>
+        <input
+          type="number"
+          name="minimumAmountForMemorialDay"
+          className="border-2 p-2 w-full rounded-md focus:outline-none focus:border-blue-500"
+          value={editedCampainData.minimumAmountForMemorialDay || ""}
+          onChange={handleInputChange}
+          readOnly
+        />
+      </div>
+
       <div className="flex gap-4 justify-center">
         <button
           onClick={handleSave}
