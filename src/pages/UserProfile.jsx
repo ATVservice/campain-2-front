@@ -1,21 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../components/AuthProvider";
 import { getUsers } from "../requests/ApiRequests";
-import { deleteUserByAdmin } from "../requests/ApiRequests";
 import { MdDelete } from "react-icons/md";
 import { register } from "../requests/ApiRequests";
-import { updateManegerDetails } from "../requests/ApiRequests";
+import {
+  updateManegerDetails,
+  restoreDatabase,
+  deleteUserByAdmin,
+} from "../requests/ApiRequests";
 import { FaEdit } from "react-icons/fa";
 import { MdOutlineCancel } from "react-icons/md";
 import EditManagerForm from "../components/EditManegerForm";
 import { GiConfirmed } from "react-icons/gi";
 import { IoMdAdd } from "react-icons/io";
 import { IoMdRemove } from "react-icons/io";
+import { GiRecycle } from "react-icons/gi";
 
 import { toast } from "react-toastify";
 import ReactModal from "react-modal";
 import ConfirmationModal from "../components/ConfirmationModal ";
 import Spinner from "../components/Spinner";
+import PasswordConfirmationModal from "../components/PasswordConfirmationModal";
 
 function UserProfile() {
   const { user, loginUser } = useAuth();
@@ -32,7 +37,13 @@ function UserProfile() {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [userIdToDelete, setUserIdToDelete] = useState(null);
   const [loading, setLoading] = useState(false);
-  const rolesToHebrewMap = { User: "משתמש עריכה", Admin: "מנהל",Guest:"משתמש קריאה" };
+  const rolesToHebrewMap = {
+    User: "משתמש רגיל",
+    Admin: "מנהל",
+    Guest: "משתמש בסיסי",
+  };
+  const [showrestorModal, setShowrestorModal] = useState(false);
+  const [restorPassword, setRestorPassword] = useState("");
 
   useEffect(() => {
     // setUpdatedUser(user);
@@ -45,8 +56,7 @@ function UserProfile() {
           console.log(res);
         } catch (error) {
           console.error(error);
-        }
-        finally {
+        } finally {
           setLoading(false);
         }
       }
@@ -70,8 +80,7 @@ function UserProfile() {
     } catch (error) {
       console.error("Failed to delete user:", error);
       toast.error("שגיאה במחיקת המשתמש");
-    }
-    finally {
+    } finally {
       setLoading(false);
     }
   };
@@ -79,7 +88,16 @@ function UserProfile() {
   const registerUser = async (e) => {
     e.preventDefault();
 
-    if (!newUser.username || !newUser.password || !newUser.role) return;
+    if (
+      !newUser.username ||
+      !newUser.password ||
+      !newUser.role ||
+      !newUser.email ||
+      !newUser.fullName
+    ) {
+      toast.error("יש למלא את כל השדות");
+      return;
+    }
     try {
       setLoading(true);
       const res = await register(newUser);
@@ -100,24 +118,25 @@ function UserProfile() {
     } catch (error) {
       console.error(error);
       toast.error("המשתמש לא נוצר בהצלחה");
-    }
-    finally {
+    } finally {
       setLoading(false);
     }
   };
 
   function handleNewUserInputChange(event) {
     const { name, value } = event.target;
+
     setNewUser({ ...newUser, [name]: value });
   }
 
   const handelupdateChange = async (e) => {
     const { name, value } = e.target;
-    console.log(name, value);
+
     setUpdatedUser({ ...updatedUser, [name]: value });
   };
   const handelUpdateSubmit = async (e) => {
     e.preventDefault();
+
     try {
       setLoading(true);
       const res = await updateManegerDetails(updatedUser);
@@ -138,13 +157,13 @@ function UserProfile() {
     } catch (error) {
       console.error(error);
       toast.error("המשתמש לא עודכן בהצלחה");
-    }
-    finally {
+    } finally {
       setLoading(false);
     }
   };
 
   const handleEditClick = (user) => {
+    // console.log(user);
     setUpdatedUser({
       ...user,
       Password: "",
@@ -154,27 +173,75 @@ function UserProfile() {
     setUpdatedUser(null);
   };
   if (!user) {
-    return <Spinner/>;
+    return <Spinner />;
   }
 
+  const handleRestorDb = async () => {
+    try {
+      setLoading(true);
+      const res = await restoreDatabase();
+      console.log(res);
+      if (res.status === 200) {
+        toast.success("מצב נתונים שוחזר בהצלחה");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error(" מצב נתונים לא שוחזר בהצלחה  ");
+    } finally {
+      setRestorPassword("");
+      setShowrestorModal(false);
+      setLoading(false);
+    }
+  };
+  if(loading){
+    return <Spinner />;
+  }
 
   return (
     <div>
-      {showConfirmationModal && (
-        <ConfirmationModal
-          isVisible={showConfirmationModal}
-          onCancel={() => setShowConfirmationModal(false)}
-          onConfirm={() => {
-            handleDelete(userIdToDelete); // Call the delete function with the user ID
-            setShowConfirmationModal(false); // Close the modal after confirming
-            setUserIdToDelete(null); // Clear the user ID
-          }}
-          title="Confirmation"
-          message="Are you sure you want to delete this user?"
-        />
-      )}
+
+{user.Role === "Admin" && (
+  <>
+    <div className="flex justify-center items-center gap-2 text-center text-md font-bold mb-4 bg-red-100 text-red-800">
+      שחזור נתוני מערכת ללפני קובץ אחרון
+      <button className="text-black hover:text-red-600"
+        onClick={() => setShowrestorModal(true)}
+      >
+        <GiRecycle />
+      </button>
+    </div>
+    {showrestorModal && (
+      <PasswordConfirmationModal
+      isOpen={showrestorModal}
+      onClose={() => setShowrestorModal(false)}
+      onSubmit={handleRestorDb}
+      password={restorPassword}
+      setPassword={setRestorPassword}
+      massage="האם אתה בטוח שברצונך לשחזר את נתוני מערכת?"
+      />
+    )}
+    {showConfirmationModal && (
+      <ConfirmationModal
+        isVisible={showConfirmationModal}
+        onCancel={() => setShowConfirmationModal(false)}
+        onConfirm={() => {
+          handleDelete(userIdToDelete); // Call the delete function with the user ID
+          setShowConfirmationModal(false); // Close the modal after confirming
+          setUserIdToDelete(null); // Clear the user ID
+        }}
+        title="Confirmation"
+        message="אתה בטוח שברצונך למחוק את המשתמש?"
+      />
+    )}
+  </>
+)}
+
+      
+
       <div className="flex flex-col p-4 mx-auto bg-white rounded-lg shadow-lg items-center">
-        <h2 className="mb-2 border-b border-gray-300" >{user.Role==="Admin"?"פרטי מנהל":"פרטי משתמש"} </h2>
+        <h2 className="mb-2 border-b border-gray-300">
+          {user.Role === "Admin" ? "פרטי מנהל" : "פרטי משתמש"}{" "}
+        </h2>
         {updatedUser?._id === user._id ? (
           <EditManagerForm
             handelSubmit={handelUpdateSubmit}
@@ -182,6 +249,7 @@ function UserProfile() {
             handleCancelEdit={handelCancel}
             handleEditClick={handleEditClick}
             updatedUser={updatedUser}
+            connectedUser={user}
             bgColor="bg-blue-100"
           />
         ) : (
@@ -214,7 +282,10 @@ function UserProfile() {
               </span>
             </div>
             <div className="flex flex-col gap-2">
-              <p className="text-gray-600 font-medium self-start"> הרשאת משתמש:</p>
+              <p className="text-gray-600 font-medium self-start">
+                {" "}
+                הרשאת משתמש:
+              </p>
               <span className="text-gray-800 border border-gray-300 rounded-lg p-2 w-[250px] bg-gray-200">
                 {rolesToHebrewMap[user.Role]}
               </span>
@@ -233,7 +304,6 @@ function UserProfile() {
 
       {user?.Role === "Admin" && (
         <div className="mr-4 mt-4">
-
           <span className="border-b border-gray-300 pb-1 ">הוסף משתמש</span>
           <br />
           {showNewUserForm ? (
@@ -255,7 +325,6 @@ function UserProfile() {
       )}
       {user?.Role === "Admin" && showNewUserForm && (
         <div className="flex flex-col justify-center mt-4 w-3/4 mx-auto">
-
           <form
             onSubmit={registerUser}
             className="p-4 bg-white rounded shadow-md	 space-y-4"
@@ -328,9 +397,9 @@ function UserProfile() {
                 onChange={handleNewUserInputChange}
                 required
               >
-                <option value="Admin">אדמין</option>
-                <option value="User">משתמש בסיסי</option>
-                <option value="Guest">אורח</option>
+                <option value="User">משתמש רגיל</option>
+                <option value="Admin">מנהל</option>
+                <option value="Guest">משתמש בסיסי</option>
               </select>
             </div>
             <button
@@ -342,82 +411,95 @@ function UserProfile() {
           </form>
         </div>
       )}
-<div className="flex flex-col p-4 mx-auto bg-white rounded-lg shadow-lg items-center">
-  {user?.Role === "Admin" && (
-    <>
-      <h2 className="mb-2 border-b border-gray-300 pb-1">פרטי משתמשים</h2>
-      {users?.length > 0 &&
-        users.map((mappedUser) => (
-          <div
-            key={mappedUser._id}
-            className="inline-flex gap-4 p-2 rounded-lg shadow-md bg-white max-w-fit mb-4"
-          >
-            {updatedUser && updatedUser._id === mappedUser._id ? (
-              <EditManagerForm
-                handelSubmit={handelUpdateSubmit}
-                handleUpdateChange={handelupdateChange}
-                handleCancelEdit={handelCancel}
-                handleEditClick={handleEditClick}
-                updatedUser={updatedUser}
-                bgColor="bg-white"
-              />
-            ) : (
-              <div className="inline-flex gap-4 p-2 rounded-lg shadow-md bg-white max-w-fit">
-                <div className="flex flex-col gap-2">
-                  <p className="text-gray-600 font-medium self-start">
-                    שם משתמש:
-                  </p>
-                  <span className="text-gray-800 border border-gray-300 rounded-lg p-2 min-w-[250px] bg-gray-200">
-                    {mappedUser.Username}
-                  </span>
+      <div className="flex flex-col p-4 mx-auto bg-white rounded-lg shadow-lg items-center">
+        {user?.Role === "Admin" && (
+          <>
+            <h2 className="mb-2 border-b border-gray-300 pb-1">פרטי משתמשים</h2>
+            {users?.length > 0 &&
+              users.map((mappedUser) => (
+                <div
+                  key={mappedUser._id}
+                  className="inline-flex gap-4 p-2 rounded-lg shadow-md bg-white max-w-fit mb-4"
+                >
+                  {updatedUser && updatedUser._id === mappedUser._id ? (
+                    <EditManagerForm
+                      handelSubmit={handelUpdateSubmit}
+                      handleUpdateChange={handelupdateChange}
+                      handleCancelEdit={handelCancel}
+                      updatedUser={updatedUser}
+                      connectedUser={user}
+                      bgColor="bg-white"
+                    />
+                  ) : (
+                    <div className="inline-flex gap-4 p-2 rounded-lg shadow-md bg-white max-w-fit">
+                      <div className="flex flex-col gap-2">
+                        <p className="text-gray-600 font-medium self-start">
+                          שם משתמש:
+                        </p>
+                        <span className="text-gray-800 border border-gray-300 rounded-lg p-2 min-w-[250px] bg-gray-200">
+                          {mappedUser.Username}
+                        </span>
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <p className="text-gray-600 font-medium self-start">
+                          אימייל:
+                        </p>
+                        <span className="text-gray-800 border border-gray-300 rounded-lg p-2 w-[250px] bg-gray-200">
+                          {mappedUser.Email}
+                        </span>
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <p className="text-gray-600 font-medium self-start">
+                          שם מלא:
+                        </p>
+                        <span className="text-gray-800 border border-gray-300 rounded-lg p-2 w-[250px] bg-gray-200">
+                          {mappedUser.FullName}
+                        </span>
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <p className="text-gray-600 font-medium self-start">
+                          סיסמה נוכחית:
+                        </p>
+                        <span className="text-gray-800 border border-gray-300 rounded-lg p-2 w-[250px] bg-gray-200">
+                          <p className="text-gray-500 italic">סיסמה מוסתרת</p>
+                        </span>
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <p className="text-gray-600 font-medium self-start">
+                          {" "}
+                          הרשאת משתמש:
+                        </p>
+                        <span className="text-gray-800 border border-gray-300 rounded-lg p-2 w-[250px] bg-gray-200">
+                          {rolesToHebrewMap[mappedUser.Role]}
+                        </span>
+                      </div>
+
+                      <div className="flex items-end gap-2">
+                        <button
+                          onClick={() => handleEditClick(mappedUser)}
+                          className="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold text-sm shadow-lg flex items-center justify-center gap-2 transition duration-200"
+                        >
+                          <FaEdit className="text-base" />
+                        </button>
+                      </div>
+                      <div className="flex items-end gap-2">
+                        <button
+                          onClick={() => {
+                            setUserIdToDelete(mappedUser._id);
+                            setShowConfirmationModal(true);
+                          }}
+                          className="p-2 bg-red-500 hover:bg-blue-600 text-white rounded-lg font-semibold text-sm shadow-lg flex items-center justify-center gap-2 transition duration-200"
+                        >
+                          <MdDelete className="text-base" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <div className="flex flex-col gap-2">
-                  <p className="text-gray-600 font-medium self-start">אימייל:</p>
-                  <span className="text-gray-800 border border-gray-300 rounded-lg p-2 w-[250px] bg-gray-200">
-                    {mappedUser.Email}
-                  </span>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <p className="text-gray-600 font-medium self-start">שם מלא:</p>
-                  <span className="text-gray-800 border border-gray-300 rounded-lg p-2 w-[250px] bg-gray-200">
-                    {mappedUser.FullName}
-                  </span>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <p className="text-gray-600 font-medium self-start">
-                    סיסמה נוכחית:
-                  </p>
-                  <span className="text-gray-800 border border-gray-300 rounded-lg p-2 w-[250px] bg-gray-200">
-                    <p className="text-gray-500 italic">סיסמה מוסתרת</p>
-                  </span>
-                </div>
-                <div className="flex items-end gap-2">
-                  <button
-                    onClick={() => handleEditClick(mappedUser)}
-                    className="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold text-sm shadow-lg flex items-center justify-center gap-2 transition duration-200"
-                  >
-                    <FaEdit className="text-base" />
-                  </button>
-                </div>
-                <div className="flex items-end gap-2">
-                  <button
-                    onClick={() => {
-                      setUserIdToDelete(mappedUser._id);
-                      setShowConfirmationModal(true);
-                    }}
-                    className="p-2 bg-red-500 hover:bg-blue-600 text-white rounded-lg font-semibold text-sm shadow-lg flex items-center justify-center gap-2 transition duration-200"
-                  >
-                    <MdDelete className="text-base" />
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        ))}
-    </>
-  )}
-</div>
-          
+              ))}
+          </>
+        )}
+      </div>
     </div>
   );
 }

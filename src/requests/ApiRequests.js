@@ -369,7 +369,7 @@ export const addExpense = async (newExpense) => {
 
 export const login = async (data) => {
   console.log(import.meta.env.VITE_API_BASE_URL)
-  console.log(import.meta.env.ABC)
+  // console.log(import.meta.env.ABC)
   try {
     const response = await apiConfig.post('/api/auth/login', data); 
     return response;
@@ -560,6 +560,14 @@ export const dateRangePaymentsReport= async (reportData) => {
 export const getCampainIncomSummeryByPaymentMethod= async (campainName) => {
   try {
     const response = await apiConfig.get(`/api/commitment/get-campain-incom-by-payment-method/${campainName}`);
+    return response;
+  } catch (error) {
+    throw error
+  }
+}
+export const restoreDatabase = async () => {
+  try {
+    const response = await apiConfig.get(`/api/auth/restore-database`);
     return response;
   } catch (error) {
     throw error
