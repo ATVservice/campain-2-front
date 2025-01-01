@@ -7,6 +7,7 @@ import {
   updateManegerDetails,
   restoreDatabase,
   deleteUserByAdmin,
+  validateUserPassword,
 } from "../requests/ApiRequests";
 import { FaEdit } from "react-icons/fa";
 import { MdOutlineCancel } from "react-icons/md";
@@ -179,6 +180,11 @@ function UserProfile() {
   const handleRestorDb = async () => {
     try {
       setLoading(true);
+      const validateRes = await validateUserPassword(restorPassword);
+
+      if (validateRes.status !== 200) {
+        toast.error(validateRes.data.message||"סיסמה לא תקינה");
+      }
       const res = await restoreDatabase();
       console.log(res);
       if (res.status === 200) {
@@ -186,7 +192,7 @@ function UserProfile() {
       }
     } catch (error) {
       console.error(error);
-      toast.error(" מצב נתונים לא שוחזר בהצלחה  ");
+      toast.error(error.response.data?.message || " מצב נתונים לא שוחזר בהצלחה  ");
     } finally {
       setRestorPassword("");
       setShowrestorModal(false);
