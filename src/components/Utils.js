@@ -122,6 +122,7 @@ export const hebrewToEnglisAlfonhMapping = {
   'מזהה אנש': 'AnashIdentifier',
   'שם': 'FirstName',
   'משפחה': 'LastName',
+  'שם מלא': 'FullNameForLists',
   'כתובת': 'Address',
   'עיר': 'City',
   'מספר': 'AddressNumber',
@@ -167,6 +168,7 @@ export const hebrewToEnglishCommitmentMapping = {
   'מזהה אנש': 'AnashIdentifier',
   'שם': 'FirstName',
   'משפחה': 'LastName',
+
   'מספר זהות': 'PersonID',
   
   'אופן התרמה': 'DonationMethod',
@@ -211,6 +213,9 @@ export const hebrewToEnglishCommitmentMapping = {
     AnashIdentifier: 'מזהה אנש',
     FirstName: 'שם',
     LastName: 'משפחה',
+
+    
+    FullNameForLists: 'שם מלא',
     Address: 'כתובת',
     City: 'עיר',
     AddressNumber: 'מספר',
