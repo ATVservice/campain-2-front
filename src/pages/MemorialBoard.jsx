@@ -276,7 +276,7 @@ function getHebrewMonths(year) {
 
   }
   if(isCampainsLoading || isCommitmentLoading){
-      return <div>Loading...</div>;
+      return <div><Spinner/></div>;
     
   }
 
