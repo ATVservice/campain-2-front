@@ -9,6 +9,7 @@ import PaymentForm from "./PaymentForm";
 import Spinner from "./Spinner";
 import { readFileContent } from "./Utils";
 import {englishToHebrewPaymentsMapping,hebrewToEnglishPaymentsMapping} from './Utils'
+import { format ,parse} from 'date-fns';
 
 
 
@@ -113,7 +114,17 @@ function Payments() {
           const englishKey = hebrewToEnglishMapping[header];
           if (englishKey) {
             if (englishKey == "Date") {
-              mappedRow[englishKey] = parseExcelDate(row[index]);
+              if(typeof row[index] === 'number')
+              {
+                mappedRow[englishKey] = parseExcelDate(row[index]);
+              }
+              else if(typeof row[index] === 'string')
+              {
+                mappedRow[englishKey] = parse(row[index],'dd/MM/yyyy',new Date());
+
+                
+              }
+
               // console.log(mappedRow[englishKey]);
 
             }
