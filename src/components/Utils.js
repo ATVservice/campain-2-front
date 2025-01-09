@@ -95,7 +95,7 @@ const hebrewToEnglishMapping = {
 
 
 
-
+  'קיבל מתנה': 'ReceivedGift',
   "סכום התחייבות": "CommitmentAmount",
   "סכום שולם": "AmountPaid",
   "סכום שנותר": "AmountRemaining",
@@ -168,6 +168,8 @@ export const hebrewToEnglishCommitmentMapping = {
   'מזהה אנש': 'AnashIdentifier',
   'שם': 'FirstName',
   'משפחה': 'LastName',
+  'קיבל מתנה': 'ReceivedGift',
+
 
   'מספר זהות': 'PersonID',
   
@@ -199,12 +201,15 @@ export const hebrewToEnglishCommitmentMapping = {
   'מזהה אנש': 'AnashIdentifier',
   'סכום': "Amount",
   'תאריך': "Date",
+  'שם': "FirstName",
+  'משפחה': "LastName",
 
   
   
     "אופן תשלום": "PaymentMethod",
     'שם קמפיין': "CampainName",
     'סיבה': "reason"
+
   };
 
 
@@ -271,6 +276,8 @@ export const hebrewToEnglishCommitmentMapping = {
     Notes: 'הערות',
     ResponseToFundraiser: 'תשובה למתרים',
     CampainName: ['קמפיין', 'קטגוריה', 'קטגורייה'],
+    ReceivedGift: 'קיבל מתנה',
+
     reason: 'סיבה'
   };
   
@@ -280,7 +287,10 @@ export const hebrewToEnglishCommitmentMapping = {
     Date: 'תאריך',
     PaymentMethod: 'אופן תשלום',
     CampainName: 'שם קמפיין',
-    reason: 'סיבה'
+    reason: 'סיבה',
+    FirstName: 'שם',
+    LastName: 'משפחה',
+
   };
   export const englishToHebrewPPettyCashMapping = {
     FullNameOrReasonForIssue: 'סיבת הוצאה/שם',
@@ -305,7 +315,7 @@ export const hebrewToEnglishCommitmentMapping = {
     PaymentMethod: 'אופן תשלום',
     Notes: 'הערות',
     ResponseToFundraiser: 'תשובה למתרים',
-    CampainName: 'שם הקמפיין',
+    CampainName: 'קמפיין',
     City: 'עיר',
     MobilePhone: 'טל נייד',
     MobileHomePhone: 'נייד בבית 1',
@@ -316,7 +326,6 @@ export const hebrewToEnglishCommitmentMapping = {
     DonationMethod: 'אופן התרמה',
     Fundraiser: 'מתרים',
     City: 'עיר',
-    CampainName: 'שם הקמפיין',
     StudiedInYeshivaYears: 'למד בישיבה בשנים',
     yashagYear: 'שנה יש"ג',
     CommitteeResponsibility: 'אחראי ועד',
@@ -326,6 +335,8 @@ export const hebrewToEnglishCommitmentMapping = {
     FreeFieldsToFillAlone: 'שדה חופשי',
     AnotherFreeFieldToFillAlone: 'שדה חופשי 2',
     Notes: 'הערות',
+    ReceivedGift: 'קיבל מתנה',
+
     ungrouped: 'ללא ערך בשדה הממיין דפים',
   
 
@@ -334,17 +345,17 @@ export const hebrewToEnglishCommitmentMapping = {
 
     export const englishToHebrewPaymentsReportMapping = {
       AnashIdentifier: 'מזהה אנש',
-      FirstName: 'שם',
       Amount: 'סכום',
       Date: 'תאריך',
       PaymentMethod: 'אופן תשלום',
       CampainName: 'שם קמפיין',
-  
+      
+      FirstName: 'שם',
       LastName: 'משפחה',
       PersonID: 'מספר זהות',
       Fundraiser: 'מתרים',
       PaymentMethod: 'אופן תשלום',
-      CampainName: 'שם הקמפיין',
+      CampainName: 'שם קמפיין',
       City: 'עיר',
       MobilePhone: 'טל נייד',
       MobileHomePhone: 'נייד בבית 1',
@@ -352,7 +363,6 @@ export const hebrewToEnglishCommitmentMapping = {
       BeitMidrash: 'בית מדרש',
       Classification: 'סיווג',
       City: 'עיר',
-      CampainName: 'שם הקמפיין',
       StudiedInYeshivaYears: 'למד בישיבה בשנים',
       yashagYear: 'שנה יש"ג',
       CommitteeResponsibility: 'אחראי ועד',

@@ -4,12 +4,13 @@ import AnashCommitmentDetails from '../components/AnashCommitmentDetails'
 import {getCommitmentDetails,getCampainByName,getAllMemorialDates,updateCommitmentDetails,uploadCommitmentPayment,deletePayment,deleteCommitment,validateUserPassword} from '../requests/ApiRequests'
 import AnashPaymentsDetails from '../components/AnashPaymentsDetails'
 import PaymentForm from '../components/PaymentForm'
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import PasswordConfirmationModal from '../components/PasswordConfirmationModal'
 import Spinner from '../components/Spinner'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function CommitmentDetailsPage2() {
+
 
     const { commitmentId } = useParams();
     const [isLoading, setIsLoading] = useState(true);
@@ -89,6 +90,7 @@ function CommitmentDetailsPage2() {
   };
 
   const UploadCommitmentPayment = async (paymentData) => {
+    toast.success( 'התשלום נוסף בהצלחה');
     try {
       setIsLoading(true);
       const response = await uploadCommitmentPayment(paymentData);
@@ -98,7 +100,7 @@ function CommitmentDetailsPage2() {
         setCommitmentForm(response.data.updatedCommitment);
         
         setCommitmentPayments([...commitmentPayments, response.data.newPayment]);
-        toast.success( 'התשלום נוסף בהצלחה');
+        console.log('eeeeeee');
 
       } else {
         console.error("Commitment update failed.");

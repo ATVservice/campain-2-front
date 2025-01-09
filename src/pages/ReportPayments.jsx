@@ -14,7 +14,7 @@ const englishToHebrewPaymentsFieldsMapping = {
     Amount: 'סכום',
     Date: 'תאריך',
     PaymentMethod: 'אופן תשלום',
-    CampainName: 'שם הקמפיין',
+    CampainName: 'קמפיין',
     
 };
 
@@ -25,6 +25,7 @@ const englishToHebrewAlfonFieldsMapping = {
     MobileHomePhone: 'נייד בבית 1',
     HomePhone: 'טל בית',
     LastName: 'משפחה',
+    FirstName: 'שם',
     
   };
 
