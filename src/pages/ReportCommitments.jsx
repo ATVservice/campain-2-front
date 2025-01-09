@@ -24,7 +24,8 @@ import { set } from 'lodash';
   PaymentMethod: 'אופן תשלום',
   Notes: 'הערות',
   ResponseToFundraiser: 'תשובה למתרים',
-  CampainName: 'שם הקמפיין',
+  CampainName: 'קמפיין',
+  ReceivedGift:'קיבל מתנה',
   
 };
 const englishToHebrewAlfonFieldsMapping = {
@@ -41,7 +42,7 @@ const sortPageOptions = {
   DonationMethod: 'אופן התרמה',
   Fundraiser: 'מתרים',
   City: 'עיר',
-  CampainName: 'שם הקמפיין',
+  CampainName: 'קמפיין',
   StudiedInYeshivaYears: 'למד בישיבה בשנים',
   yashagYear: 'שנה יש"ג',
   CommitteeResponsibility: 'אחראי ועד',

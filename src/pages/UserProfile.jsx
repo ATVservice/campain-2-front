@@ -259,44 +259,44 @@ function UserProfile() {
             bgColor="bg-blue-100"
           />
         ) : (
-          <div className="inline-flex gap-4 p-2 rounded-lg shadow-md  max-w-fit bg-blue-100 w-full">
-            <div className="flex flex-col gap-2">
+          <div className="flex justify-between gap-4 p-2 rounded-lg shadow-md  bg-blue-100 w-[90%]">
+            <div className="flex flex-col gap-2 flex-1">
               <p className="text-gray-600 font-medium self-start">שם משתמש:</p>
-              <span className="text-gray-800 border border-gray-300 rounded-lg p-2 min-w-[250px] bg-gray-200">
+              <span className="text-gray-800 border border-gray-300 rounded-lg p-2 bg-gray-200 ">
                 {user.Username}
               </span>
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 flex-1">
               <p className="text-gray-600 font-medium self-start">אימייל:</p>
-              <span className="text-gray-800 border border-gray-300 rounded-lg p-2 w-[250px] bg-gray-200">
+              <span className="text-gray-800 border border-gray-300 rounded-lg p-2 bg-gray-200 ">
                 {user.Email}
               </span>
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 flex-1">
               <p className="text-gray-600 font-medium self-start">שם מלא:</p>
-              <span className="text-gray-800 border border-gray-300 rounded-lg p-2 w-[250px] bg-gray-200">
+              <span className="text-gray-800 border border-gray-300 rounded-lg p-2 bg-gray-200 ">
                 {user.FullName}
               </span>
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 flex-1">
               <p className="text-gray-600 font-medium self-start">
                 {" "}
                 סיסמה נוכחית:
               </p>
-              <span className="text-gray-800 border border-gray-300 rounded-lg p-2 w-[250px] bg-gray-200">
+              <span className="text-gray-800 border border-gray-300 rounded-lg p-2  bg-gray-200 ">
                 <p className="text-gray-500 italic">סיסמה מוסתרת</p>
               </span>
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 flex-1">
               <p className="text-gray-600 font-medium self-start">
                 {" "}
                 הרשאת משתמש:
               </p>
-              <span className="text-gray-800 border border-gray-300 rounded-lg p-2 w-[250px] bg-gray-200">
+              <span className="text-gray-800 border border-gray-300 rounded-lg p-2 bg-gray-200">
                 {rolesToHebrewMap[user.Role]}
               </span>
             </div>
-            <div className="flex items-end gap-2">
+            <div className="flex items-end gap-2 flex-1">
               <button
                 onClick={() => handleEditClick(user)}
                 className="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold text-sm shadow-lg flex items-center justify-center gap-2 transition duration-200"
