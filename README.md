@@ -1,8 +1,16 @@
-# React + Vite
+# Description
+The project is a private system for managing campaigns and donations for a specific community. The system enables community administrators to manage and synchronize payments, commitments, and other data, including 
+file uploads, donation tracking,reports and more.\
+system highlight here:\
+https://shorturl.at/QWYnU
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# Libraries and Tools Used
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+react\
+Node.js\
+Express\
+Nodemailer\
+ag-grid\
+excel-js\
+excelpdf\
+and more..
