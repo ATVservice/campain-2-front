@@ -41,8 +41,8 @@ function CampainPage() {
       const response2 = await getCommitmentInCampain(campainName);
       const campainRes = await getCampainByName(campainName);
       const incomsByPaymentsMethodsRes = await getCampainIncomSummeryByPaymentMethod(campainName);
-      setIncomsByPaymentsMethods(incomsByPaymentsMethodsRes.data.incomsByPaymentsMethods)
-      setCommitmentAmoutByPaymentMethod(incomsByPaymentsMethodsRes.data.commitmentAmoutByPaymentMethod)
+      setIncomsByPaymentsMethods(incomsByPaymentsMethodsRes.data?.incomsByPaymentsMethods)
+      setCommitmentAmoutByPaymentMethod(incomsByPaymentsMethodsRes.data?.commitmentAmoutByPaymentMethod)
       
       console.log(campainRes);
       console.log("Responses received", response, response2);
@@ -115,7 +115,8 @@ function CampainPage() {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      <h1 className="text-2xl font-semibold text-center mb-6 border-button ">ניהול {campainName} <span className='text-gray-600'>טווח תאריכים</span>: {campainHebrewDatesRange.startDate} - {campainHebrewDatesRange.endDate}</h1>
+      <h1 className="text-2xl font-semibold text-center mb-6 border-button ">ניהול {campainName}</h1>
+        <span className='text-gray-600'>טווח תאריכים</span>: {campainHebrewDatesRange.startDate} - {campainHebrewDatesRange.endDate}
 
       {/* הצגת מספרים רצים */}
       <div className="grid grid-cols-2 gap-8 text-center mb-6">
@@ -158,10 +159,10 @@ function CampainPage() {
 </select>
           </div>
         </div>
-        <div className="bg-white shadow-lg p-4 rounded-lg col-span-2 flex justify-center items-center gap-4">
+        {/* <div className="bg-white shadow-lg p-4 rounded-lg col-span-2 flex justify-center items-center gap-4">
           <h2 className="text-xl font-semibold text-gray-700">סכום מינימום עבור יום הנצחה בקמפיין</h2>
           <p className="text-3xl font-bold text-blue-600">{minimumAmountForMemorialDay} ₪</p>
-        </div>
+        </div> */}
 
       </div>
 
@@ -173,6 +174,7 @@ function CampainPage() {
         >
           עריכת קמפיין
         </button>
+      
         <button
           onClick={() => navigate(`/peopleincampain/${campainName}`)}
           className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all w-1/4"

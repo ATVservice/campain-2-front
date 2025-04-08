@@ -573,6 +573,56 @@ export const restoreDatabase = async () => {
     throw error
   }
 }
+export const getMemorialDayByDate = async (date) => {
+  try {
+    const response = await apiConfig.get(`/api/commitment/get-memorial-day-by-date/${date}`);
+    return response;
+  } catch (error) {
+    throw error
+  }
+}
+export const getPeopleWithCommitment = async () => {
+  try {
+    const response = await apiConfig.get(`/api/commitment/get-people-with-commitment`);
+    return response;
+  } catch (error) {
+    throw error
+  }
+}
+export const updateMemorialDay = async (memorialDay) => {
+  try {
+    const response = await apiConfig.post(`/api/commitment/update-memorial-day`, memorialDay);
+    return response;
+  } catch (error) {
+    throw error
+  }
+}
+export const getMemorialDaysByRangeDates = async (startDate,endDate) => {
+  try {
+    const response = await apiConfig.get(`/api/commitment/get-memorial-days-by-range-dates?startDate=${startDate}&endDate=${endDate}`);
+    return response;
+  } catch (error) {
+    throw error
+  }
+}
+export const getMemorialDaysByCommitment = async (AnashIdentifier,CampainName) => {
+  try {
+    const response = await apiConfig.get(`/api/commitment/get-memorial-days-by-commitment?AnashIdentifier=${AnashIdentifier}&CampainName=${CampainName}`);
+    return response;
+  } catch (error) {
+    throw error
+  }
+}
+
+export const deleteCampain = async (campainId) => {
+  try {
+    const response = await apiConfig.delete(`/api/campain/delete-campain/${campainId}`);
+    return response;
+  } catch (error) {
+    throw error
+  }
+}
+
 
 
 

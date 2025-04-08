@@ -13,6 +13,10 @@
     --ag-odd-row-background-color: rgb(233, 241, 243);
 
 }
+.my-grid .ag-header-cell {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
 
 
 @tailwind base;

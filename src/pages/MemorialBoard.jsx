@@ -1,11 +1,12 @@
-import React, { useState, useEffect,useMemo  } from 'react';
+import React, { useState, useEffect,useMemo,useRef  } from 'react';
 import { BiChevronLeft, BiChevronRight } from 'react-icons/bi';
 import { HDate, gematriya, months } from '@hebcal/hdate';
-import { getCampains,getCommitment } from "../requests/ApiRequests";
-import { useNavigate,useSearchParams  } from 'react-router-dom';
+import { getCampains,getCommitment,getMemorialDaysByRangeDates } from "../requests/ApiRequests";
+import { useNavigate,useSearchParams ,useLocation } from 'react-router-dom';
 import MemorialDayDetails from './MemorialDayDetails';
 import AddMemorialDayToPerson from './AddMemorialDayToPerson';
 import Spinner from '../components/Spinner';
+import { typedArrayFor } from 'pdf-lib';
 
 
 function MemorialBoard() {
@@ -27,16 +28,28 @@ function MemorialBoard() {
   };
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  let campainStartDate = queryParams.get("startDate")||"";
+  
   const [campains, setCampains] = useState([]);
-  const [commitments, setCommitments] = useState([]);
   const [isCommitmentLoading, setCommitmentIsLoading] = useState(true);
   const [isCampainsLoading, setCampainsIsLoading] = useState(true);
-  const [searchParams] = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
+  const memorialDaysMapRef = useRef(new Map());
 
   const CALENDAE_STATE = 'calendarState';
   
   function getInitialState() {
+    if(campainStartDate)
+    {
+      campainStartDate= new HDate(new Date(campainStartDate));
+      const currentDate = new HDate(1, campainStartDate.mm, campainStartDate.yy);
+      localStorage.setItem(CALENDAE_STATE, JSON.stringify({ mm: currentDate.mm, yy: currentDate.yy }));
+      return currentDate;
+
+    }
+
     const storedState = localStorage.getItem(CALENDAE_STATE);
     if (storedState) {
     const { mm, yy } = JSON.parse(storedState);
@@ -54,8 +67,9 @@ const [currentDate, setCurrentDate] = useState(getInitialState());
         setCampainsIsLoading(true);
         const response = await getCampains();
         setCampains(response.data.data.campains||[]);
+        if(campainStartDate) swichCampain(campainStartDate);
+
       } catch (error) {
-        console.error(error);
       }
       finally {
         setCampainsIsLoading(false);
@@ -73,10 +87,16 @@ const [currentDate, setCurrentDate] = useState(getInitialState());
         setIsLoading(true);
         setCommitmentIsLoading(true);
         const response = await getCommitment();
-        console.log(response);
-        setCommitments(response.data.data.commitments||[]);
+
+
+        const gregStartDate = currentDate.greg();
+        const daysInMonth = currentDate.daysInMonth();
+        const gregEndDate = new HDate(1+daysInMonth, currentDate.mm, currentDate.yy).greg();
+        const response2 = await getMemorialDaysByRangeDates(gregStartDate, gregEndDate);
+        populateMemorialDaysMap(response2.data||[]);
+
+        
       } catch (error) {
-        console.error(error);
       }
       finally {
         setCommitmentIsLoading(false);
@@ -87,6 +107,14 @@ const [currentDate, setCurrentDate] = useState(getInitialState());
     fetchData();
 
   }, [currentDate]);
+
+  function populateMemorialDaysMap(days) {
+    // console.log(days);
+    days.forEach(day => {
+      memorialDaysMapRef.current.set(new Date(day.date).toLocaleDateString('he-IL'), day);
+    });
+    console.log(memorialDaysMapRef.current);
+  }
   
 
 
@@ -152,7 +180,7 @@ function getHebrewMonths(year) {
       }
       if(hdate.deltaDays(campainStartDate) >= 0 && hdate.deltaDays(campainEndDate) <= 0){
         
-        return {CampainName: campaign.CampainName};
+        return campaign
       }
       return false;
       
@@ -160,35 +188,6 @@ function getHebrewMonths(year) {
   
     return false;
   }
-  function IsMemorialDay(hdate,CampainName) {
-
-    if ( !commitments){
-      return false;
-    }
-    for (const commitment of commitments) {
-      if(!commitment.MemorialDays || commitment.MemorialDays.length === 0|| commitment.CampainName != CampainName){
-        
-        continue;
-      }
-      
-      console.log('e');
-      for (const memorialDay of commitment.MemorialDays) {
-        
-        if(hdate.deltaDays(new HDate(new Date(memorialDay.date))) == 0){
-          return {
-            memorialDay: memorialDay,
-            anashidentifier: commitment.AnashIdentifier,
-            
-          };
-        }
-      }
-    }
-        return false;
-
-
-
-  }
-
   
   // Render the days of the month
     function renderDays(monthDaysLength, hdate) {
@@ -199,35 +198,36 @@ function getHebrewMonths(year) {
       // Create a new HDate instance for the current day
       
       // Check if the current day is a campaign day
+      let backgroundColor = null
+      let addOrShowMemorialMemorialDay= null
       const isCampaignDay = isCampainDay(new HDate(i, hdate.mm, hdate.yy));
-      let isMemorialDay = false
       if(isCampaignDay)
       {
-         isMemorialDay = IsMemorialDay(new HDate(i, hdate.mm, hdate.yy),isCampaignDay.CampainName);
 
+        // let backgroundColor = 'hover:bg-blue-200';
+          const gerdDate  = new HDate(i, hdate.mm, hdate.yy).greg()
+         
+          if(isCampaignDay.types.length > 0){
+            
+            addOrShowMemorialMemorialDay = ()=>{navigate(`/add-memorial-day-to-person?CampainName=${isCampaignDay.CampainName}&campainId=${isCampaignDay._id}&date=${gerdDate}&campainId`)}
+          }
+            
+          backgroundColor = 'bg-green-400 text-black';
+          if(memorialDaysMapRef.current.has(gerdDate.toLocaleDateString('he-IL'))){
+            const memoDay = memorialDaysMapRef.current.get(gerdDate.toLocaleDateString('he-IL'));
+            if(memoDay.types.length === isCampaignDay.types.length){
+              backgroundColor = 'bg-red-400 text-black';
+            }
+              else{
+                backgroundColor = 'bg-orange-400 text-black';
+              }
+              
+            }
+          
+          
       }
       
-      // Set the background color based on whether it's a campaign day
-      let backgroundColor = 'hover:bg-blue-200';
-      let addOrShowMemorialMemorialDay= null
-      if(isMemorialDay){
-        const gerdDate  = new HDate(i, hdate.mm, hdate.yy).greg()
-        // console.log(isMemorialDay.memorialDay.Commeration);
-        
-        
-        addOrShowMemorialMemorialDay = ()=>{navigate(`/memorial-day-details?CampainName=${isCampaignDay.CampainName}&date=${gerdDate}
-          &anashidentifier=${isMemorialDay.anashidentifier}&commartion=${isMemorialDay.memorialDay?.Commeration||""}`)}
-          
-          backgroundColor = 'bg-green-400 text-black';
-          
-        }
-        else if(isCampaignDay){
-        const gerdDate  = new HDate(i, hdate.mm, hdate.yy).greg()
-        
-        addOrShowMemorialMemorialDay = ()=>{navigate(`/add-memorial-day-to-person?CampainName=${isCampaignDay.CampainName}&date=${gerdDate}`)}
 
-        backgroundColor = 'bg-blue-200 text-black';
-      }
       
       elements.push(
         <div
@@ -280,8 +280,8 @@ function getHebrewMonths(year) {
     
   }
 
-  function swichCampain(campain){
-    const campainStartDate= new HDate(new Date(campain.startDate));
+  function swichCampain(campainStartDate){
+    campainStartDate= new HDate(new Date(campainStartDate));
     const currentDate = new HDate(1, campainStartDate.mm, campainStartDate.yy);
     localStorage.setItem(CALENDAE_STATE, JSON.stringify({ mm: currentDate.mm, yy: currentDate.yy }));
 
@@ -298,7 +298,7 @@ function getHebrewMonths(year) {
       <button
         key={index}
         className='bg-blue-200 text-blue-900 text-center px-[40px] py-[20px] rounded-lg shadow-md hover:bg-blue-300 whitespace-nowrap text-overflow-ellipsis overflow-hidden'
-        onClick={() => swichCampain(campain)}
+        onClick={() => swichCampain(campain.startDate)}
       >
         {campain.CampainName}
       </button>

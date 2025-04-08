@@ -1,7 +1,7 @@
 import React ,{ useState,useEffect,useRef} from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import AnashCommitmentDetails from '../components/AnashCommitmentDetails'
-import {getCommitmentDetails,getCampainByName,getAllMemorialDates,updateCommitmentDetails,uploadCommitmentPayment,deletePayment,deleteCommitment,validateUserPassword} from '../requests/ApiRequests'
+import {getCommitmentDetails,getCampainByName,getAllMemorialDates,updateCommitmentDetails,uploadCommitmentPayment,deletePayment,deleteCommitment,validateUserPassword,getMemorialDaysByCommitment} from '../requests/ApiRequests'
 import AnashPaymentsDetails from '../components/AnashPaymentsDetails'
 import PaymentForm from '../components/PaymentForm'
 import PasswordConfirmationModal from '../components/PasswordConfirmationModal'
@@ -41,16 +41,18 @@ function CommitmentDetailsPage2() {
               setCommitmentForm(commitmentData);
               setCommitmentPayments(commitmentPayments);
               setCommitmentAmountBefourChange(commitmentData.CommitmentAmount);
-  
+              
               // Fetch campaign details
               const campainRes = await getCampainByName(commitmentData.CampainName);
               console.log(campainRes);
               setCampain(campainRes.data.data.campain);
-  
+              
               // Fetch memorial dates
-              const memorialDatesRes = await getAllMemorialDates(commitmentData.CampainName);
-              console.log(memorialDatesRes);
-              setAllCampainMemorialDates(memorialDatesRes.data.data.memorialDates);
+              const memoDaysRes = await getMemorialDaysByCommitment(commitmentData.AnashIdentifier,commitmentData.CampainName);
+              console.log(memoDaysRes);
+              setAllCampainMemorialDates(memoDaysRes.data?.length > 0 ? memoDaysRes.data : []);
+              // const memorialDatesRes = await getAllMemorialDates(commitmentData.CampainName);
+              // console.log(memorialDatesRes);
               
   
           } catch (error) {
@@ -206,7 +208,7 @@ if(isLoading) {
         )}
 
         <AnashCommitmentDetails commitmentForm={commitmentForm} setCommitmentForm={setCommitmentForm}
-         campain={campain} allCampainMemorialDates={allCampainMemorialDates} commitmentAmountBefourChange={commitmentAmountBefourChange}/>
+         campain={campain}  memorialDates = {allCampainMemorialDates}/> 
         <AnashPaymentsDetails commitmentPayments={commitmentPayments} 
         setCommitmentPayments={setCommitmentPayments} setCommitmentForm={setCommitmentForm}/>
 

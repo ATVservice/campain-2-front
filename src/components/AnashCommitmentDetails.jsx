@@ -1,4 +1,5 @@
 import React, { useState, useEffect,forwardRef } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { ReactJewishDatePicker } from "react-jewish-datepicker";
 import "react-jewish-datepicker/dist/index.css";
 import { BiShekel } from "react-icons/bi";
@@ -9,12 +10,13 @@ function AnashCommitmentDetails({
   commitmentForm = {},
   setCommitmentForm = () => {},
   campain = {},
-  allCampainMemorialDates = [],
+  memorialDates = [],
   commitmentAmountBefourChange = 0
 }) {
-  const [memorialDaysToDisplay, setMemorialDaysToDisplay] = useState([
-    ...(commitmentForm?.MemorialDays ?? []),
-  ]);
+  // const [memorialDaysToDisplay, setMemorialDaysToDisplay] = useState([
+  //   ...(commitmentForm?.MemorialDays ?? []),
+  // ]);
+  const navigate = useNavigate();
   console.log(commitmentForm);
   const calculateUpdatedForm = (prevCommitmentForm, name, value) => {
     const updatedForm = {
@@ -58,97 +60,97 @@ function AnashCommitmentDetails({
   
   
   
-  const handleDateChange = (displayIndex, selectedDay) => {
+  // const handleDateChange = (displayIndex, selectedDay) => {
 
-    const newMemorialDay = {
-      ...memorialDaysToDisplay[displayIndex],
-      date: selectedDay.date,
-      hebrewDate: selectedDay.jewishDateStrHebrew,
-    };
+  //   const newMemorialDay = {
+  //     ...memorialDaysToDisplay[displayIndex],
+  //     date: selectedDay.date,
+  //     hebrewDate: selectedDay.jewishDateStrHebrew,
+  //   };
 
-    // Update only the display array
-    setMemorialDaysToDisplay((prevMemorialDaysToDisplay) => {
-      const updatedDisplayDays = [...prevMemorialDaysToDisplay];
-      updatedDisplayDays[displayIndex] = newMemorialDay;
-      return updatedDisplayDays;
-    });
+  //   // Update only the display array
+  //   setMemorialDaysToDisplay((prevMemorialDaysToDisplay) => {
+  //     const updatedDisplayDays = [...prevMemorialDaysToDisplay];
+  //     updatedDisplayDays[displayIndex] = newMemorialDay;
+  //     return updatedDisplayDays;
+  //   });
 
-    // Commit to actual state only if valid
-    setCommitmentForm((prevCommitmentForm) => {
-      const existingIndex = prevCommitmentForm.MemorialDays.findIndex((day) =>
-        isTheSameDate(
-          new Date(day.date),
-          new Date(memorialDaysToDisplay[displayIndex].date)
-        )
-      );
+  //   // Commit to actual state only if valid
+  //   setCommitmentForm((prevCommitmentForm) => {
+  //     const existingIndex = prevCommitmentForm.MemorialDays.findIndex((day) =>
+  //       isTheSameDate(
+  //         new Date(day.date),
+  //         new Date(memorialDaysToDisplay[displayIndex].date)
+  //       )
+  //     );
 
-      if (existingIndex !== -1) {
-        const updatedMemorialDays = [...prevCommitmentForm.MemorialDays];
-        updatedMemorialDays[existingIndex] = newMemorialDay;
-        return {
-          ...prevCommitmentForm,
-          MemorialDays: updatedMemorialDays,
-        };
-      } else {
-        return {
-          ...prevCommitmentForm,
-          MemorialDays: [...prevCommitmentForm.MemorialDays, newMemorialDay],
-        };
-      }
-    });
-  };
-  const removeMemorialDay = (displayIndex) => {
-    const memorialDayToRemove = memorialDaysToDisplay[displayIndex];
+  //     if (existingIndex !== -1) {
+  //       const updatedMemorialDays = [...prevCommitmentForm.MemorialDays];
+  //       updatedMemorialDays[existingIndex] = newMemorialDay;
+  //       return {
+  //         ...prevCommitmentForm,
+  //         MemorialDays: updatedMemorialDays,
+  //       };
+  //     } else {
+  //       return {
+  //         ...prevCommitmentForm,
+  //         MemorialDays: [...prevCommitmentForm.MemorialDays, newMemorialDay],
+  //       };
+  //     }
+  //   });
+  // };
+  // const removeMemorialDay = (displayIndex) => {
+  //   const memorialDayToRemove = memorialDaysToDisplay[displayIndex];
 
-    setMemorialDaysToDisplay((prevMemorialDaysToDisplay) =>
-      prevMemorialDaysToDisplay.filter((_, index) => index !== displayIndex)
-    );
+  //   setMemorialDaysToDisplay((prevMemorialDaysToDisplay) =>
+  //     prevMemorialDaysToDisplay.filter((_, index) => index !== displayIndex)
+  //   );
 
-    setCommitmentForm((prevCommitmentForm) => {
-      const updatedMemorialDays = prevCommitmentForm.MemorialDays.filter(
-        (day) =>
-          !isTheSameDate(new Date(day.date), new Date(memorialDayToRemove.date))
-      );
-      return {
-        ...prevCommitmentForm,
-        MemorialDays: updatedMemorialDays,
-      };
-    });
-  };
+  //   setCommitmentForm((prevCommitmentForm) => {
+  //     const updatedMemorialDays = prevCommitmentForm.MemorialDays.filter(
+  //       (day) =>
+  //         !isTheSameDate(new Date(day.date), new Date(memorialDayToRemove.date))
+  //     );
+  //     return {
+  //       ...prevCommitmentForm,
+  //       MemorialDays: updatedMemorialDays,
+  //     };
+  //   });
+  // };
   function normalizeDate(date) {
     return new Date(date.getFullYear(), date.getMonth(), date.getDate());
   }
 
-  const allowedSelectionRange = (day) => {
-    const normalizedDay = normalizeDate(day.date);
-    const normalizedStartDate = normalizeDate(new Date(campain?.startDate));
-    const normalizedEndDate = normalizeDate(new Date(campain?.endDate));
-    if (
-      normalizedDay < normalizedStartDate ||
-      normalizedDay > normalizedEndDate
-    ) {
-      return false;
-    }
-    for (let i = 0; i < allCampainMemorialDates?.length; i++) {
-      if (
-        isTheSameDate(new Date(day.date), new Date(allCampainMemorialDates[i]))
-      ) {
-        return false;
-      }
-      }
-      for (let i = 0; i < commitmentForm.MemorialDays.length; i++) {
-        if (
-          isTheSameDate(
-            new Date(commitmentForm.MemorialDays[i].date),
-            new Date(day.date)
-          )
-        ) {
-          return false;
-        }
-      }
+  // const allowedSelectionRange = (day) => {
+  //   const normalizedDay = normalizeDate(day.date);
+  //   const normalizedStartDate = normalizeDate(new Date(campain?.startDate));
+  //   const normalizedEndDate = normalizeDate(new Date(campain?.endDate));
+  //   if (
+  //     normalizedDay < normalizedStartDate ||
+  //     normalizedDay > normalizedEndDate
+  //   ) {
+  //     return false;
+  //   }
+  //   for (let i = 0; i < allCampainMemorialDates?.length; i++) {
+  //     if (
+  //       isTheSameDate(new Date(day.date), new Date(allCampainMemorialDates[i]))
+  //     ) {
+  //       return false;
+  //     }
+  //     }
+  //     for (let i = 0; i < commitmentForm.MemorialDays.length; i++) {
+  //       if (
+  //         isTheSameDate(
+  //           new Date(commitmentForm.MemorialDays[i].date),
+  //           new Date(day.date)
+  //         )
+  //       ) {
+  //         return false;
+  //       }
+  //     }
 
-    return true;
-  };
+  //   return true;
+  // };
   function isTheSameDate(date1, date2) {
     return (
       date1.getFullYear() === date2.getFullYear() &&
@@ -198,24 +200,24 @@ function AnashCommitmentDetails({
     });
   }
 
-  const AddMemorialDay = () => {
-    console.log(commitmentForm.MemorialDays);
+  // const AddMemorialDay = () => {
+  //   console.log(commitmentForm.MemorialDays);
 
-    const remainingMemorialDays =
-      Math.floor(
-        commitmentAmountBefourChange / campain.minimumAmountForMemorialDay
-      ) - memorialDaysToDisplay.length;
+  //   const remainingMemorialDays =
+  //     Math.floor(
+  //       commitmentAmountBefourChange / campain.minimumAmountForMemorialDay
+  //     ) - memorialDaysToDisplay.length;
 
-    if (remainingMemorialDays <= 0) {
-      toast.error("התחייבות אינה מספיקה להוספת עוד ימי הנצחה");
-      return;
-    }
+  //   if (remainingMemorialDays <= 0) {
+  //     toast.error("התחייבות אינה מספיקה להוספת עוד ימי הנצחה");
+  //     return;
+  //   }
 
-    setMemorialDaysToDisplay((prevMemorialDaysToDisplay) => [
-      ...prevMemorialDaysToDisplay,
-      { date: "", hebrewDate: "" },
-    ]);
-  };
+  //   setMemorialDaysToDisplay((prevMemorialDaysToDisplay) => [
+  //     ...prevMemorialDaysToDisplay,
+  //     { date: "", hebrewDate: "" },
+  //   ]);
+  // };
 
   return (
     <div>
@@ -411,8 +413,49 @@ function AnashCommitmentDetails({
               className="mt-1 block w-full p-2 border border-gray-300 bg-gray-200  rounded focus:outline-none"
             />
           </label>
+        </div >
+        <div className="mt-8">
+        <button 
+              onClick={() => navigate(`/memorial-Board?startDate=${campain.startDate}`)} 
+              className="p-2 bg-green-500 text-white rounded hover:bg-green-600"
+            >
+              הוסף הנצחה
+            </button>
         </div>
-        <div className="flex items-center justify-center gap-4 mt-4 bg-sky-100 p-4 rounded">
+        <div className="flex flex-wrap gap-x-8 gap-y-2 max-w-[100vw] mt-4">
+          {memorialDates.map((item, index) => (
+            <div key={index} className="flex flex-col"> {/* Hebrew date + types in a vertical column */}
+              <p>{item.hebrewDate}</p>
+
+              <div className="flex flex-wrap gap-2 shrink-0"> {/* <-- horizontal row of types, with wrap if needed */}
+                {item.types?.map((type, typeIndex) => (
+                  <div
+                    key={typeIndex}
+                    className="flex flex-col justify-center border p-2 gap-2"
+                  >
+                    <p>{type.name}</p>
+                    <textarea name="Commeration" placeholder="הנצחה" className="border border-gray-300 bg-gray-100 rounded" readOnly>{type.Commeration}</textarea>
+                    {/* <p>{type.Commeration}</p> */}
+                    <button
+                      className="bg-blue-500 text-white rounded hover:bg-blue-600 w-[40px] flex items-center justify-center"
+                      onClick={() => {
+                        navigate(
+                          `/add-memorial-day-to-person?CampainName=${commitmentForm.CampainName}&campainId=${campain._id}&date=${item.date}`
+                        );
+                      }}
+                    >
+                      עריכה
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+          </div>
+
+
+
+        {/* <div className="flex items-center justify-center gap-4 mt-4 bg-sky-100 p-4 rounded">
           <button
             type="button"
             onClick={() => AddMemorialDay()}
@@ -436,8 +479,8 @@ function AnashCommitmentDetails({
               ) - commitmentForm.MemorialDays.length}
             </span>
           </p>
-        </div>
-
+        </div> */}
+{/* 
         <div className="col-span-1 md:col-span-5 grid grid-cols-1 md:grid-cols-5 border border-sky-200 p-2 py-0 border-t-0 rounded-b-md">
           {memorialDaysToDisplay?.length > 0 &&
             memorialDaysToDisplay.map((memorialDay, index) => (
@@ -495,7 +538,7 @@ function AnashCommitmentDetails({
                 </label>
               </div>
             ))}
-        </div>
+        </div> */}
 
       </form>
     </div>

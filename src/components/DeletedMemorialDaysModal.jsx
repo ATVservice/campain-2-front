@@ -31,23 +31,23 @@ function DeletedMemorialDaysModal({
                     </thead>
 
                     <tbody>
-                        {deletedMemorialDays.map((memorialDayAnash) =>
-                            memorialDayAnash.removedDates.map((memorialDay) => (
-                                <tr key={`${memorialDayAnash.date}`}>
+                        {deletedMemorialDays.map((memoDay) =>
+                            memoDay.types.map((type) => (
+                                <tr key={`${type._id}`}>
                                     <td className="px-4 py-2 border-b">
-                                        {memorialDayAnash.AnashIdentifier}
+                                        {type.person.AnashIdentifier}
                                     </td>
                                     <td className="px-4 py-2 border-b">
-                                        {memorialDayAnash.FirstName}
+                                        {type.person.FirstName}
                                     </td>
                                     <td className="px-4 py-2 border-b">
-                                        {memorialDayAnash.LastName}
+                                        {type.person.LastName}
                                     </td>
                                     <td className="px-4 py-2 border-b">
-                                        {new Date (memorialDay.date).toLocaleDateString('he-IL')}
+                                        {new Date (memoDay.date).toLocaleDateString('he-IL')}
                                     </td>
                                     <td className="px-4 py-2 border-b">
-                                        {memorialDay.hebrewDate}
+                                        {memoDay.hebrewDate}
                                     </td>
                                 </tr>
                             ))

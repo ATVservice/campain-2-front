@@ -4,7 +4,7 @@ import { Outlet, Navigate } from 'react-router-dom';
 
 function ProtectedRoute() {
   const { user } = useAuth();
-  console.log('user', user);
+  // console.log('user', user);
 
   // If the user is not logged in, navigate to the login page
   if (!user) {

@@ -14,15 +14,15 @@ import { toast } from "react-toastify";
 import Spinner from "../components/Spinner";
 
 function MemorialDayDetails() {
-  const location = useLocation();
   const navigate = useNavigate();
-
+  
+  const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const campainName = queryParams.get("CampainName");
+  //const campainName = queryParams.get("CampainName");
   const date = queryParams.get("date");
-  const anashidentifier = queryParams.get("anashidentifier");
-  const [newAnash, setNewAnash] = useState(anashidentifier);
-  const commartion = queryParams.get("commartion")||"";
+  //const anashidentifier = queryParams.get("anashidentifier");
+  //const [newAnash, setNewAnash] = useState(anashidentifier);
+  //const commartion = queryParams.get("commartion")||"";
   const [rowData, setRowData] = useState([]);
   const hebrewDateGematria = new HDate(new Date(date)).renderGematriya()
   const [isLoading, setIsLoading] = useState(false);

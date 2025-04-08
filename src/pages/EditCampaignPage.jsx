@@ -5,6 +5,8 @@ import {
   getCampainByName,
   editCampainDetails,
   reviewDeletedMemorialDays,
+  deleteCampain,
+  validateUserPassword,
 } from "../requests/ApiRequests"; // Ensure updateCampaign is implemented
 import DeletedMemorialDaysModal from "../components/DeletedMemorialDaysModal";
 import { HDate, gematriya, months } from "@hebcal/core";
@@ -12,6 +14,7 @@ import { ReactJewishDatePicker } from "react-jewish-datepicker";
 import "react-jewish-datepicker/dist/index.css";
 import HebrewDatePicker from "../components/HebrewDatePicker";
 import Spinner from "../components/Spinner";
+import PasswordConfirmationModal from "../components/PasswordConfirmationModal";
 function EditCampaignPage() {
   let { campainName } = useParams();
   const [campainData, setCampainData] = useState(null); // Original data
@@ -21,6 +24,8 @@ function EditCampaignPage() {
   const [deletedMemorialDays, setDeletedMemorialDays] = useState([]);
   const navigate = useNavigate();
   
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [password, setPassword] = useState("");
   // Fetch campaign details on mount
   useEffect(() => {
     const fetchCampaignDetails = async () => {
@@ -28,7 +33,7 @@ function EditCampaignPage() {
         setIsLoading(true);
         const response = await getCampainByName(campainName);
         console.log(response);
-        const campaign = response.data.data.campain;
+        const campaign = response.data?.data?.campain;
         setCampainData(campaign);
         setEditedCampainData(campaign);
       } catch (error) {
@@ -55,7 +60,7 @@ function EditCampaignPage() {
         ...prevData,
         hebrewStartDate: startHebrewDate.renderGematriya(),
       }));
-    } else if (name === "endDate") {
+    } else if (key === "endDate") {
       const endHebrewDate = new HDate(new Date(day.date));
       setEditedCampainData((prevData) => ({
         ...prevData,
@@ -87,7 +92,7 @@ function EditCampaignPage() {
     // Identify changed fields
     const updatedFields = {};
     for (const key in editedCampainData) {
-      if (editedCampainData[key] !== campainData[key]) {
+      if (!isArray(editedCampainData[key]) &&editedCampainData[key] !== campainData[key]) {
         updatedFields[key] = editedCampainData[key];
       }
     }
@@ -104,8 +109,8 @@ function EditCampaignPage() {
         campainData._id
       ); // Backend request
       console.log(response);
-      if (response.data.deletedMemorialDays?.length > 0) {
-        setDeletedMemorialDays(response.data.deletedMemorialDays);
+      if (response.data?.deletedMemorialDays?.length > 0) {
+        setDeletedMemorialDays(response.data?.deletedMemorialDays);
         setShowDeletedModal(true);
       } else {
         console.log("e");
@@ -119,7 +124,7 @@ function EditCampaignPage() {
         setCampainData(updatedCampain);
         setEditedCampainData();
         
-        navigate(`/campain/${updatedCampain._id}?campainName=${encodeURIComponent(updatedCampain.CampainName)}&minimumAmountForMemorialDay=${updatedCampain.minimumAmountForMemorialDay}`);
+        navigate(`/campain/${updatedCampain._id}?campainName=${encodeURIComponent(updatedCampain.CampainName)}`);
 
         toast.success("השינויים נשמרו בהצלחה");
         console.log(res2);
@@ -164,12 +169,34 @@ function EditCampaignPage() {
     }
   };
 
+
+
+  const handleDeleteCampain = async () => {
+    try {
+      setIsLoading(true);
+      const validateUser = await validateUserPassword(password);
+      console.log(validateUser.data);
+      
+      const response = await deleteCampain(campainData._id); // Backend request
+      console.log(response);
+      
+      toast.success("הקמפיין נמחק בהצלחה");
+      navigate("/campains");
+    } catch (error) {
+      console.error(error);
+      toast.error(error?.response?.data?.message||"שגיאה במחיקת הקמפיין");
+    }
+    finally {
+      setIsLoading(false);
+    }
+  };
+
   if (isLoading) {
     return <Spinner />;
   }
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-lg max-w-md mx-auto mt-6">
+    <div className="p-6 bg-white rounded-lg shadow-lg max-w-[100vw] mx-auto mt-6 min-w-[600px] ">
       <h2 className="text-xl font-semibold mb-4 text-blue-700">
         עריכת קמפיין {campainName}
       </h2>
@@ -210,29 +237,24 @@ function EditCampaignPage() {
         </div>
       </div>
 
-<div className="mb-4">
-  <p className="mb-1 text-blue-700">סכום מינימלי ליום הנצחה:</p>
-  <input
-    type="number"
-    name="minimumAmountForMemorialDay"
-    className="border-2 p-2 w-full rounded-md bg-gray-200 text-gray-700 focus:outline-none"
-    value={editedCampainData.minimumAmountForMemorialDay || ""}
-    onChange={handleInputChange}
-    readOnly
-  />
-</div>
-      <div className="flex gap-4 justify-center">
+      <div className="flex gap-2 justify-evenly">
         <button
           onClick={handleSave}
-          className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-all"
+          className="bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 flex-1 transition-all"
         >
           שמור שינויים
         </button>
         <button
           onClick={handleCancel}
-          className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-all"
+          className="bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600 flex-1 transition-all"
         >
           בטל
+        </button>
+        <button
+          onClick={() => setShowPasswordModal(true)}
+          className="bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 flex-1 transition-all"
+        >
+          מחיקת התחייבות
         </button>
       </div>
       {showDeletedModal && (
@@ -241,6 +263,16 @@ function EditCampaignPage() {
           onClose={() => setShowDeletedModal(false)}
           onSubmit={handelEditCampainDetailsWithMDays}
           deletedMemorialDays={deletedMemorialDays}
+        />
+      )}
+      {showPasswordModal && (
+        <PasswordConfirmationModal
+          isOpen={showPasswordModal}
+          onClose={() => setShowPasswordModal(false)}
+          onSubmit={handleDeleteCampain}
+          password={password}
+          setPassword={setPassword}
+          massage="אנא הקלד סיסמת משתמש"
         />
       )}
     </div>

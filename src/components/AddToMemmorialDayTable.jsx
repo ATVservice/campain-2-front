@@ -5,8 +5,9 @@ import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import AddMemorialDayToPerson from "../pages/AddMemorialDayToPerson";
+import { MdFileDownloadDone } from "react-icons/md";
 
-function AddToMemmorialDayTable({ rowData, onAddMemorialDayToPerson }) {
+function AddToMemmorialDayTable({typeKey, rowData, handelSelectPerson }) {
   const hebrewToEnglishMapping = {
     "מזהה אנש": "AnashIdentifier",
     שם: "FirstName",
@@ -56,18 +57,17 @@ function AddToMemmorialDayTable({ rowData, onAddMemorialDayToPerson }) {
     return (
       <div style={{ display: "flex", gap: "15px" }}>
         <button
-          className="action-button update border-2 p-1 w-[100px]"
+          className="action-button update border-2 p-1 w-[100%]"
           onClick={() => addMemorialDay(props.api, props.node)}
         >
-          הוסף
+            <MdFileDownloadDone className="text-2xl"/>
         </button>
       </div>
     );
   };
 
   const addMemorialDay = async (api, node) => {
-    const { AnashIdentifier } = node.data;
-    onAddMemorialDayToPerson(AnashIdentifier);
+    handelSelectPerson(node.data, typeKey);
 
   };
 
@@ -75,36 +75,38 @@ function AddToMemmorialDayTable({ rowData, onAddMemorialDayToPerson }) {
     {
       headerName: "מזהה אנש",
       field: "AnashIdentifier",
-      editable: false,
-      sortable: true,
-      filter: true,
-      width: 120,
-      sort: 'asc'  // This will sort the column from lowest to highest by default
+  
+      sort: 'asc',  // This will sort the column from lowest to highest by default
+      width: 100,
 
     },
     {
       headerName: "שם",
       field: "FirstName",
-      editable: true,
-      sortable: true,
-      filter: true,
+      minWidth: 70,
+      width: 120,
+      flex:1
+
+    
     },
     {
       headerName: "משפחה",
       field: "LastName",
-      editable: true,
-      sortable: true,
-      filter: true,
+      minWidth: 70,
+      width: 120,
+      flex:1
     },
+  
     {
-      headerName: "הוסף יום הנצחה",
+      headerName: "הוסף",
       cellRenderer: ActionCellRenderer,
-      editable: false,
       colId: "action",
+      width: 80,
     },
   ];
 
   const pageSizeOptions = [2, 4];
+
 
   return (
     <div>
@@ -113,22 +115,26 @@ function AddToMemmorialDayTable({ rowData, onAddMemorialDayToPerson }) {
         placeholder="חיפוש..."
         value={searchText}
         onChange={onSearch}
-        className="block mb-6 p-2 m-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200"
+        className="block mb-1 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
       />
 
-      <div className="ag-theme-alpine custom-theme p-2 w-[50vw]">
+      <div className="ag-theme-alpine custom-theme max-w-[100%] h-[100px]">
         {
           <AgGridReact
+         
             columnDefs={columns}
             rowData={rowData}
-            pagination={true}
-            paginationPageSize={2} // Increase the pagination page size as needed
-            paginationPageSizeSelector={pageSizeOptions} // this property is not a valid AG Grid property
-            domLayout="autoHeight" // Use autoHeight layout to adjust grid height automatically
+           // pagination={true}
+           // paginationPageSize={2} // Increase the pagination page size as needed
+           // paginationPageSizeSelector={pageSizeOptions} // this property is not a valid AG Grid property
+            //domLayout="autoHeight" // Use autoHeight layout to adjust grid height automatically
+            domLayout="normal"
             enableRtl={true}
               quickFilterText={searchText} // Applying the search text to filter the grid
             suppressClickEdit={true}
-            defaultColDef={{
+            defaultColDef={
+              {
+                // flex: 1,
               filterParams: {
                 filterOptions: hebrewFilterOptions,
               },
@@ -136,6 +142,7 @@ function AddToMemmorialDayTable({ rowData, onAddMemorialDayToPerson }) {
             gridOptions={{
               enableCellTextSelection: true,
             }}
+            suppressNoRowsOverlay={true}
 
           />
         }
