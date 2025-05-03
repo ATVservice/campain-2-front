@@ -43,10 +43,10 @@ function CampainTable({ rowData, onDeletePersonFromCampain ,searchInText}) {
     
       if (isConfirmed) {
         try {
-          const result = await deletePersonFromCampain(AnashIdentifier, campainName);
+          const result =  onDeletePersonFromCampain(AnashIdentifier);
     
-          toast.success(`האנ"ש ${personName} (${AnashIdentifier}) נמחק בהצלחה מ${campainName}`);
-          onDeletePersonFromCampain(AnashIdentifier);
+          // toast.success(`האנ"ש ${personName} (${AnashIdentifier}) נמחק בהצלחה מ${campainName}`);
+          // onDeletePersonFromCampain(AnashIdentifier);
         } catch (error) {
           console.error(error);
           toast.error(error.response.data?.message||'שגיאה במחיקת אנשי קמפיין');

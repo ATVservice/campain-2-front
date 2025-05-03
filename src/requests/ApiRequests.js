@@ -242,9 +242,13 @@ export const addPersonToCampain= async (data) => {
 }
 
 export const deletePersonFromCampain= async (AnashIdentifier, campainName) => {
+  console.log(AnashIdentifier,campainName);
+  console.log(`1`);
   try {
-    const response = await apiConfig.delete(`/api/campain/delete-person-from-campain/${AnashIdentifier}/${campainName}`);
-    return response;
+    const response = await apiConfig.delete(
+      `/api/campain/delete-person-from-campain/${encodeURIComponent(AnashIdentifier)}/${encodeURIComponent(campainName)}`
+    );
+        return response;
   } catch (error) {
 throw error
   }
