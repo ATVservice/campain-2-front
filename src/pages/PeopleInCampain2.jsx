@@ -36,6 +36,7 @@ function PeopleInCampain2() {
     try {
       setLoading(true);
       const response = await getCampainPeople(campainName);
+      console.log(response);
       setPeopleInCampain(response.data);
     } catch (error) {
       console.error("Error fetching campaign people:", error);
@@ -57,6 +58,7 @@ function PeopleInCampain2() {
   };
   
   useEffect(() => {
+    console.log('e');
     const fetchData = async () => {
       try
       {
@@ -126,8 +128,8 @@ function PeopleInCampain2() {
       const response = await addPeopleToCampain(campainName, validPeople);
       if (response.status === 200) {
         console.log(response.data);
-        fetchPeopleNotInCampain()
-        fetchCampainPeople();
+        await fetchPeopleNotInCampain()
+        await fetchCampainPeople();
         toast.success("נוספו אנשים לקמפיין בהצלחה");
       } else {
         throw new Error("Failed to add people to the campaign");
@@ -146,8 +148,8 @@ function PeopleInCampain2() {
     try {
       setLoading(true);
       await addPersonToCampain({ campainName, AnashIdentifier });
-       fetchCampainPeople();
-       fetchPeopleNotInCampain();
+      await fetchCampainPeople();
+       await fetchPeopleNotInCampain();
       toast.success("תורם נוסף לקמפיין בהצלחה");
     } catch (error) {
       console.error("Error adding person to campaign:", error);
@@ -157,13 +159,17 @@ function PeopleInCampain2() {
     }
   }
   async function onDeletePersonFromCampain(AnashIdentifier) {
+    console.log(AnashIdentifier,campainName);
     try {
       setLoading(true);
-      await deletePersonFromCampain({ campainName, AnashIdentifier });
+      console.log('1');
+      await deletePersonFromCampain(AnashIdentifier, campainName );
       await fetchCampainPeople();
       await fetchPeopleNotInCampain();
       toast.success("תורם הוסר מהקמפיין בהצלחה");
     } catch (error) {
+      console.log(error);
+      toast.error(error.response?.data?.message||"שגיאה בהסרה מהקמפיין");
       console.error("Error deleting person from campaign:", error);
     } finally {
       setLoading(false);

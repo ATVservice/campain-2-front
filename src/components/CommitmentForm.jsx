@@ -168,8 +168,8 @@ function CommitmentForm({ onSubmit, onClose }) {
     
 
   return (
-    <div className="w-full fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center rtl z-50">
-      <div className="bg-white rounded-lg p-6 shadow-lg max-h-[98vh] z-50">
+    <div className="w-full fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center rtl z-50 ">
+      <div className="bg-white rounded-lg p-6 shadow-lg z-50 ">
         <input
           type="text"
           placeholder="חיפוש..."
@@ -185,165 +185,163 @@ function CommitmentForm({ onSubmit, onClose }) {
           onUnselectRow={onUnselectRow}
         />
         <form className="flex flex-col gap-1 my-4" onSubmit={handleSubmit}>
-          <div className="flex justify-between">
-            <label>אופן התשלום:</label>
-            <select
-              className="border border-gray-300 rounded-md outline-none"
-              name="PaymentMethod"
-              value={formData.PaymentMethod}
-              onChange={handleChange}
-              required
-            >
-              <option  value="">בחר אופן תשלום</option>
-              {validPaymentMethods.map((method) => (
-                <option key={method} value={method}>
-                  {method}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="flex justify-between">
-            <label>קמפיין:</label>
-            <select
-              className="border border-gray-300 rounded-md outline-none"
-              name="CampainName"
-              value={formData.CampainName}
-              onChange={handleChange}
-              required
-            >
-              <option value="">בחר קמפיין</option>
-              {campaigns.map((campaign) => (
-                <option key={campaign._id} value={campaign.CampainName}>
-                  {campaign.CampainName}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex justify-between gap-1">
-            <label>מזהה אנש:</label>
-            <input
-              className="border border-gray-300 rounded-md outline-none"
-              type="text"
-              name="AnashIdentifier"
-              value={formData.AnashIdentifier}
-              onChange={(e) =>
-                setFormData({ ...formData, AnashIdentifier: e.target.value })
-              }
-              required
-              readOnly
-            />
-          </div>
-
-          {/* <div className='flex justify-between'>
-                        <label>מספר זהות:</label>
-                        <input className="bg-gray-200 outline-none cursor-auto border border-gray-300 rounded-md" type="text" name="PersonID" value={formData.PersonID} onChange={handleChange} readOnly />
-                    </div>
-                    <div className='flex justify-between'>
-                        <label>שם:</label>
-                        <input className="bg-gray-200 outline-none cursor-auto border border-gray-300 rounded-md" type="text" name="FirstName" value={formData.FirstName} onChange={handleChange} readOnly />
-                    </div>
-                    <div className='flex justify-between'>
-                        <label>משפחה:</label>
-                        <input className="bg-gray-200 outline-none cursor-auto border border-gray-300 rounded-md" type="text" name="LastName" value={formData.LastName} onChange={handleChange} readOnly />
-                    </div> */}
-
-          <div className="flex justify-between">
-            <label>סכום התחייבות:</label>
-            <input
-              className="border border-gray-300 rounded-md outline-none"
-              type="Number"
-              name="CommitmentAmount"
-              value={formData.CommitmentAmount || ""}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="flex justify-between">
-            <label>מספר תשלומים:</label>
-            <input
-              className="border border-gray-300 rounded-md outline-none"
-              type="Number"
-              name="NumberOfPayments"
-              value={formData.NumberOfPayments || ""}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="flex justify-between">
-            <label>סכום שולם:</label>
-            <input
-              className="border border-gray-300 bg-gray-200 rounded-md outline-none"
-              type="Number"
-              name="AmountPaid"
-              value={formData.AmountPaid || 0}
-              onChange={handleChange}
-              readOnly
-            />
-          </div>
-          <div className="flex justify-between">
-            <label>סכום שנותר:</label>
-            <input
-              className="border border-gray-300 bg-gray-200 rounded-md outline-none"
-              type="Number"
-              name="AmountRemaining"
-              value={formData.AmountRemaining || 0}
-              onChange={handleChange}
-              readOnly
-            />
-          </div>
-          <div className="flex justify-between">
-            <label>תשלומים שבוצעו:</label>
-            <input
-              className="border border-gray-300 bg-gray-200 rounded-md outline-none"
-              type="Number"
-              name="PaymentsMade"
-              value={formData.PaymentsMade || 0}
-              onChange={handleChange}
-              readOnly
-            />
-          </div>
-          <div className="flex justify-between">
-            <label>תשלומים שנותרו:</label>
-            <input
-              className="border border-gray-300 bg-gray-200 rounded-md outline-none"
-              type="Number"
-              name="PaymentsRemaining"
-              value={formData.PaymentsRemaining || 0}
-              onChange={handleChange}
-              readOnly
-            />
-          </div>
-          <div className="flex justify-between">
-            <label>מתרים:</label>
-            <input
-              className="border border-gray-300 rounded-md outline-none"
-              type="text"
-              name="Fundraiser"
-              value={formData.Fundraiser}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="flex justify-between">
-            <label>הערות:</label>
-            <textarea
-              className="border border-gray-300 rounded-md outline-none"
-              name="Notes"
-              value={formData.Notes}
-              onChange={handleChange}
-              rows="2"
-              id=""
-            ></textarea>
-          </div>
-          <div className="flex justify-between">
-            <label>תשובה למתרים:</label>
-            <textarea
-              className="border border-gray-300 rounded-md outline-none"
-              name="ResponseToFundraiser"
-              value={formData.ResponseToFundraiser}
-              onChange={handleChange}
-              rows="2"
-              id=""
-            ></textarea>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex justify-between">
+              <label>אופן התשלום:</label>
+              <select
+                className="border border-gray-300 rounded-md outline-none"
+                name="PaymentMethod"
+                value={formData.PaymentMethod}
+                onChange={handleChange}
+                required
+              >
+                <option  value="">בחר אופן תשלום</option>
+                {validPaymentMethods.map((method) => (
+                  <option key={method} value={method}>
+                    {method}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex justify-between">
+              <label>קמפיין:</label>
+              <select
+                className="border border-gray-300 rounded-md outline-none"
+                name="CampainName"
+                value={formData.CampainName}
+                onChange={handleChange}
+                required
+              >
+                <option value="">בחר קמפיין</option>
+                {campaigns.map((campaign) => (
+                  <option key={campaign._id} value={campaign.CampainName}>
+                    {campaign.CampainName}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex justify-between gap-1">
+              <label>מזהה אנש:</label>
+              <input
+                className="border border-gray-300 rounded-md outline-none"
+                type="text"
+                name="AnashIdentifier"
+                value={formData.AnashIdentifier}
+                onChange={(e) =>
+                  setFormData({ ...formData, AnashIdentifier: e.target.value })
+                }
+                required
+                readOnly
+              />
+            </div>
+            {/* <div className='flex justify-between'>
+                          <label>מספר זהות:</label>
+                          <input className="bg-gray-200 outline-none cursor-auto border border-gray-300 rounded-md" type="text" name="PersonID" value={formData.PersonID} onChange={handleChange} readOnly />
+                      </div>
+                      <div className='flex justify-between'>
+                          <label>שם:</label>
+                          <input className="bg-gray-200 outline-none cursor-auto border border-gray-300 rounded-md" type="text" name="FirstName" value={formData.FirstName} onChange={handleChange} readOnly />
+                      </div>
+                      <div className='flex justify-between'>
+                          <label>משפחה:</label>
+                          <input className="bg-gray-200 outline-none cursor-auto border border-gray-300 rounded-md" type="text" name="LastName" value={formData.LastName} onChange={handleChange} readOnly />
+                      </div> */}
+            <div className="flex justify-between">
+              <label>סכום התחייבות:</label>
+              <input
+                className="border border-gray-300 rounded-md outline-none"
+                type="Number"
+                name="CommitmentAmount"
+                value={formData.CommitmentAmount || ""}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="flex justify-between">
+              <label>מספר תשלומים:</label>
+              <input
+                className="border border-gray-300 rounded-md outline-none"
+                type="Number"
+                name="NumberOfPayments"
+                value={formData.NumberOfPayments || ""}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="flex justify-between">
+              <label>סכום שולם:</label>
+              <input
+                className="border border-gray-300 bg-gray-200 rounded-md outline-none"
+                type="Number"
+                name="AmountPaid"
+                value={formData.AmountPaid || 0}
+                onChange={handleChange}
+                readOnly
+              />
+            </div>
+            <div className="flex justify-between">
+              <label>סכום שנותר:</label>
+              <input
+                className="border border-gray-300 bg-gray-200 rounded-md outline-none"
+                type="Number"
+                name="AmountRemaining"
+                value={formData.AmountRemaining || 0}
+                onChange={handleChange}
+                readOnly
+              />
+            </div>
+            <div className="flex justify-between">
+              <label>תשלומים שבוצעו:</label>
+              <input
+                className="border border-gray-300 bg-gray-200 rounded-md outline-none"
+                type="Number"
+                name="PaymentsMade"
+                value={formData.PaymentsMade || 0}
+                onChange={handleChange}
+                readOnly
+              />
+            </div>
+            <div className="flex justify-between">
+              <label>תשלומים שנותרו:</label>
+              <input
+                className="border border-gray-300 bg-gray-200 rounded-md outline-none"
+                type="Number"
+                name="PaymentsRemaining"
+                value={formData.PaymentsRemaining || 0}
+                onChange={handleChange}
+                readOnly
+              />
+            </div>
+            <div className="flex justify-between">
+              <label>מתרים:</label>
+              <input
+                className="border border-gray-300 rounded-md outline-none"
+                type="text"
+                name="Fundraiser"
+                value={formData.Fundraiser}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="flex justify-between">
+              <label>הערות:</label>
+              <textarea
+                className="border border-gray-300 rounded-md outline-none"
+                name="Notes"
+                value={formData.Notes}
+                onChange={handleChange}
+                rows="2"
+                id=""
+              ></textarea>
+            </div>
+            <div className="flex justify-between">
+              <label>תשובה למתרים:</label>
+              <textarea
+                className="border border-gray-300 rounded-md outline-none"
+                name="ResponseToFundraiser"
+                value={formData.ResponseToFundraiser}
+                onChange={handleChange}
+                rows="2"
+                id=""
+              ></textarea>
+            </div>
           </div>
           <div className="flex justify-end gap-4">
             <button
