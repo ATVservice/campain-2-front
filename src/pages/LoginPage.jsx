@@ -1,15 +1,14 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
-import dollarsBackground from "../images/Dollars.jpg";
-import menuImage from '../images/menuImage.jpg'
+import { useNavigate } from "react-router-dom";
+import menuImage from '../images/menuImage.jpg';
 
-import { login } from "../requests/ApiRequests";
 import { useAuth } from '../components/AuthProvider';
 import Spinner from "../components/Spinner";
+import { login } from "../requests/ApiRequests";
 
 const Login = () => {
-  const { user, loginUser, logoutUser } = useAuth();
+  const {  loginUser } = useAuth();
   const [message, setMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false); // מצב הצגת סיסמה
   const [formData, setFormData] = useState({

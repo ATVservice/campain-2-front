@@ -1,12 +1,7 @@
-import { CgDetailsMore } from "react-icons/cg";
-import { useNavigate,useParams } from "react-router-dom";
-import React, { useState, useEffect,useRef } from 'react';
-import * as XLSX from 'xlsx';
-import { uploadPeople, getPeople,upadateUserDetails ,deleteUser} from '../requests/ApiRequests';
-import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-import { max } from "date-fns";
+import { AgGridReact } from 'ag-grid-react';
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -147,6 +142,11 @@ import { max } from "date-fns";
           }}
           gridOptions={{
             enableCellTextSelection: true,
+                            localeText:{
+                      noRowsToShow: 'אין שורות להצגה'
+
+                }
+
           }}
 
         />

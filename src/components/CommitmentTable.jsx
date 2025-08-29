@@ -1,9 +1,9 @@
-import { CgDetailsMore } from "react-icons/cg";
-import { useNavigate } from "react-router-dom";
-import React, { useState, useEffect,useRef} from 'react';
-import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
+import { AgGridReact } from 'ag-grid-react';
+import { useState } from 'react';
+import { CgDetailsMore } from "react-icons/cg";
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -241,7 +241,7 @@ function CommitmentTable({rowsData,setShowCommitmentsOfActivePeople,showCommitme
       };
     
       const gridStyle = {
-        height: '80vh',
+        height: '70vh',
         overflow: 'auto',
         overflowX: 'hidden',
         margin: '0 auto',
@@ -293,6 +293,11 @@ function CommitmentTable({rowsData,setShowCommitmentsOfActivePeople,showCommitme
               }}
               gridOptions={{
                 enableCellTextSelection: true,
+                                localeText:{
+                      noRowsToShow: 'אין שורות להצגה'
+
+                }
+
               }}
               suppressRowTransform={true}
               ref={gridRef}

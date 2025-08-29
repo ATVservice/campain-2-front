@@ -1,9 +1,7 @@
-import React, { useState, useEffect,useRef } from 'react';
-import * as XLSX from 'xlsx';
-import { uploadPeople, getPeople,upadateUserDetails ,deleteUser} from '../requests/ApiRequests';
-import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
+import { AgGridReact } from 'ag-grid-react';
+import { useState } from 'react';
 import { MdDownloadDone } from "react-icons/md";
 import { TiDeleteOutline } from "react-icons/ti";
 
@@ -134,6 +132,11 @@ return (
       }}
       gridOptions={{
         enableCellTextSelection: true,
+                        localeText:{
+                      noRowsToShow: 'אין שורות להצגה'
+
+                }
+
       }}
       getRowClass={(params) => {
         // Return Tailwind classes based on your condition

@@ -1,18 +1,17 @@
-import { CgDetailsMore } from "react-icons/cg";
-import { useNavigate, useParams } from "react-router-dom";
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import * as XLSX from 'xlsx';
-import { uploadPeople, getPeople, reviewUploadedPeople } from '../requests/ApiRequests';
 import { motion } from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from "react-router-dom";
+import * as XLSX from 'xlsx';
+import { getPeople, reviewUploadedPeople, uploadPeople } from '../requests/ApiRequests';
 
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-import Table from "../components/Table";
-import Spinner from "../components/Spinner";
-import ReviewAlfonChanges from "../components/ReviewAlfonChanges";
 import { toast } from "react-toastify";
 import { exportToExcel, exportToPDF } from "../../Reports/exportFilesHandler.jsx";
-import {hebrewToEnglisAlfonhMapping,englishToHebrewAlfonhMapping} from '../components/Utils'
+import ReviewAlfonChanges from "../components/ReviewAlfonChanges";
+import Spinner from "../components/Spinner";
+import Table from "../components/Table";
+import { englishToHebrewAlfonhMapping, hebrewToEnglisAlfonhMapping } from '../components/Utils';
 
 
 
@@ -205,10 +204,10 @@ function AlfonPage2() {
 
   if (loading) return <Spinner />
   return (
-    <div className="relative min-h-screen pt-4 pb-2"> {/* Added padding at the top and reduced at the bottom */}
+    <div className="relative"> {/* Added padding at the top and reduced at the bottom */}
 
       <>
-        <div className="flex items-center mb-2 w-full justify-start gap-4"> {/* Space between buttons */}
+        <div className="flex items-center mb-2 w-full justify-start gap-4 pt-4"> {/* Space between buttons */}
           <input
             type="file"
             onChange={handleFileUpload}

@@ -1,19 +1,13 @@
-import React, { useState, useEffect, useRef } from "react";
-import * as XLSX from "xlsx";
+import { useState } from "react";
 
-import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
+import { AgGridReact } from "ag-grid-react";
 import { AiOutlineDelete } from "react-icons/ai";
-import { GiConfirmed } from "react-icons/gi";
-import { ToastContainer, toast } from "react-toastify";
-import { ceil, min } from "lodash";
+import { toast } from "react-toastify";
 import {
-  deletePayment,
-  transferPayment,
-  getUserDetails,
+  deletePayment
 } from "../requests/ApiRequests";
-import { FaExchangeAlt } from "react-icons/fa";
 
 function PaymentsWithoutCommitmentTable({ rowsData = [] ,onSelectCampain}) {
 
@@ -112,6 +106,7 @@ function PaymentsWithoutCommitmentTable({ rowsData = [] ,onSelectCampain}) {
       editable: false,
       sortable: true,
       filter: true,
+      flex: 1,
     },
     {
       headerName: "משפחה",
@@ -178,8 +173,14 @@ function PaymentsWithoutCommitmentTable({ rowsData = [] ,onSelectCampain}) {
       editable: false,
       colId: "action",
       width: 150,
-      flex: 1,
+      flex: 0,
       minWidth: 100,
+            cellStyle: {
+    display: "flex",
+    justifyContent: "center", // Horizontal center
+    alignItems: "center"      // Vertical center
+  }
+
     },
   ];
 
@@ -247,6 +248,10 @@ function PaymentsWithoutCommitmentTable({ rowsData = [] ,onSelectCampain}) {
           gridOptions={{
             enableCellTextSelection: true,
             suppressCellFocus: true, // This prevents cell focus
+                                      localeText: {
+    noRowsToShow: 'אין שורות להצגה'
+  }
+
 
           }}
         />
