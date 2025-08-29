@@ -1,11 +1,9 @@
-import { CgDetailsMore } from "react-icons/cg";
-import { useNavigate, useParams } from "react-router-dom";
-import React, { useState, useEffect, useRef } from "react";
-import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
-import AddMemorialDayToPerson from "../pages/AddMemorialDayToPerson";
+import { AgGridReact } from "ag-grid-react";
+import { useState } from "react";
 import { MdFileDownloadDone } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
 
 function AddToMemmorialDayTable({typeKey, rowData, handelSelectPerson }) {
   const hebrewToEnglishMapping = {
@@ -141,6 +139,11 @@ function AddToMemmorialDayTable({typeKey, rowData, handelSelectPerson }) {
             }}
             gridOptions={{
               enableCellTextSelection: true,
+                              localeText:{
+                      noRowsToShow: 'אין שורות להצגה'
+
+                }
+
             }}
             suppressNoRowsOverlay={true}
 

@@ -1,27 +1,16 @@
-import React, { useEffect, useState } from "react";
-import { useAuth } from "../components/AuthProvider";
-import { getUsers } from "../requests/ApiRequests";
-import { MdDelete } from "react-icons/md";
-import { register } from "../requests/ApiRequests";
-import {
-  updateManegerDetails,
-  restoreDatabase,
-  deleteUserByAdmin,
-  validateUserPassword,
-} from "../requests/ApiRequests";
+import { useEffect, useState } from "react";
 import { FaEdit } from "react-icons/fa";
-import { MdOutlineCancel } from "react-icons/md";
-import EditManagerForm from "../components/EditManegerForm";
-import { GiConfirmed } from "react-icons/gi";
-import { IoMdAdd } from "react-icons/io";
-import { IoMdRemove } from "react-icons/io";
 import { GiRecycle } from "react-icons/gi";
+import { IoMdAdd, IoMdRemove } from "react-icons/io";
+import { MdDelete } from "react-icons/md";
+import { useAuth } from "../components/AuthProvider";
+import EditManagerForm from "../components/EditManegerForm";
+import { deleteUserByAdmin, getUsers, register, restoreDatabase, updateManegerDetails, validateUserPassword } from "../requests/ApiRequests";
 
 import { toast } from "react-toastify";
-import ReactModal from "react-modal";
 import ConfirmationModal from "../components/ConfirmationModal ";
-import Spinner from "../components/Spinner";
 import PasswordConfirmationModal from "../components/PasswordConfirmationModal";
+import Spinner from "../components/Spinner";
 
 function UserProfile() {
   const { user, loginUser } = useAuth();
@@ -248,7 +237,7 @@ function UserProfile() {
         <h2 className="mb-2 border-b border-gray-300">
           {user.Role === "Admin" ? "פרטי מנהל" : "פרטי משתמש"}{" "}
         </h2>
-        {updatedUser?._id === user._id ? (
+        {updatedUser&& updatedUser._id === user._id ? (
           <EditManagerForm
             handelSubmit={handelUpdateSubmit}
             handleUpdateChange={handelupdateChange}

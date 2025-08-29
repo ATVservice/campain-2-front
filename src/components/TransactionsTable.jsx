@@ -1,12 +1,9 @@
-import React, { useState } from 'react';
-import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
+import { AgGridReact } from 'ag-grid-react';
+import { useState } from 'react';
 import { FaTrash } from 'react-icons/fa'; // ייבוא האייקון
-import {deleteTransaction} from '../requests/ApiRequests';
-import { set } from 'date-fns';
-import {AG_GRID_LOCALE_IL} from '../components/ag-grid-localization';
-import { format } from 'date-fns';
+import { deleteTransaction } from '../requests/ApiRequests';
 function TransactionsTable({ rowsData, fetchTransactions,gridRef}) {
     const [searchText, setSearchText] = useState("");
   
@@ -18,6 +15,8 @@ function TransactionsTable({ rowsData, fetchTransactions,gridRef}) {
       editable: false,
       sortable: true,
       filter: true,
+            flex: 1,
+
     },
     {
       headerName: 'סוג תנועה',
@@ -106,7 +105,7 @@ function TransactionsTable({ rowsData, fetchTransactions,gridRef}) {
     },
     {
       headerName: 'מחיקה',
-      flex: 1,
+      flex: 0,
       cellRenderer: (params) => {
         if (params.data.TransactionType === 'הוצאה') {
           return (
@@ -120,6 +119,12 @@ function TransactionsTable({ rowsData, fetchTransactions,gridRef}) {
         }
         return null;
       },
+             cellStyle: {
+    display: "flex",
+    justifyContent: "center", // Horizontal center
+    alignItems: "center"      // Vertical center
+  }
+
     },
   ];
 
@@ -167,9 +172,8 @@ function TransactionsTable({ rowsData, fetchTransactions,gridRef}) {
         />
       </div>
 
-      <div className="ag-theme-alpine"       style={{
+         <div className="ag-theme-alpine h-[70vh] max-h-[65vh]"       style={{
         width: '100%', // Ensure the container is full width
-        height: '400px'
       }}
       >
         <AgGridReact
@@ -177,17 +181,22 @@ function TransactionsTable({ rowsData, fetchTransactions,gridRef}) {
           rowData={rowsData}
           pagination={true}
           paginationPageSize={20}
-          domLayout="autoHeight"
+          domLayout="normal"
           enableRtl={true}
           ref={gridRef}
           getRowStyle={getRowStyle}
           quickFilterText={searchText}
 
 
-          gridOptions={{
+                    gridOptions={{
             enableCellTextSelection: true,
-            localeText: AG_GRID_LOCALE_IL
+                           localeText:{
+                      noRowsToShow: 'אין שורות להצגה'
+
+                }
+
           }}
+
       
         />
       </div>

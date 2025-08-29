@@ -1,11 +1,10 @@
-import { CgDetailsMore } from "react-icons/cg";
-import { useNavigate, useParams } from "react-router-dom";
-import React, { useState, useEffect, useRef } from 'react';
-import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-import { deletePersonFromCampain } from '../requests/ApiRequests';
+import { AgGridReact } from 'ag-grid-react';
+import { useState } from 'react';
 import { AiOutlineDelete } from 'react-icons/ai';
+import { CgDetailsMore } from "react-icons/cg";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from 'react-toastify';
 
 
@@ -164,6 +163,8 @@ function CampainTable({ rowData, onDeletePersonFromCampain ,searchInText}) {
     overflow: 'auto', // Ensure scrolling within the grid
     margin: '0 auto', // Center the grid
     width: '90vw', // Adjust based on your layout needs
+    maxHeight: '50vh',
+    height: '50vh',
   };
   const pageSizeOptions = [20, 50];
 
@@ -197,7 +198,7 @@ function CampainTable({ rowData, onDeletePersonFromCampain ,searchInText}) {
           pagination={true}
           paginationPageSize={20} // Increase the pagination page size as needed
           paginationPageSizeSelector={pageSizeOptions} // this property is not a valid AG Grid property
-          domLayout="autoHeight" // Use autoHeight layout to adjust grid height automatically
+          domLayout="normal" // Use autoHeight layout to adjust grid height automatically
           enableRtl={true}
           context={{ campainName: useParams().campainName }}
           quickFilterText={searchInText}
@@ -209,6 +210,11 @@ function CampainTable({ rowData, onDeletePersonFromCampain ,searchInText}) {
           }}
           gridOptions={{
             enableCellTextSelection: true,
+                            localeText:{
+                      noRowsToShow: 'אין שורות להצגה'
+
+                }
+
           }}
 
         />

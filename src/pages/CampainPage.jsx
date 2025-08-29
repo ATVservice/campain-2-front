@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useLocation } from 'react-router-dom';
-import { getCampainPeople, getCommitmentInCampain ,getCampainByName,getCampainIncomSummeryByPaymentMethod} from '../requests/ApiRequests';
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import Spinner from '../components/Spinner';
+import { getCampainByName, getCampainIncomSummeryByPaymentMethod, getCampainPeople, getCommitmentInCampain } from '../requests/ApiRequests';
 function CampainPage() {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -114,7 +113,7 @@ function CampainPage() {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-6 bg-gray-50">
       <h1 className="text-2xl font-semibold text-center mb-6 border-button ">ניהול {campainName}</h1>
         <span className='text-gray-600'>טווח תאריכים</span>: {campainHebrewDatesRange.startDate} - {campainHebrewDatesRange.endDate}
 

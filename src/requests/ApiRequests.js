@@ -1,7 +1,6 @@
 
 
 import axios from 'axios';
-import { useNavigate ,useLocation} from 'react-router-dom';
 
 // Create an axios instance with default configurations 
 const apiConfig = axios.create({
@@ -12,20 +11,20 @@ const apiConfig = axios.create({
     withCredentials: true // Set this globally if you need it for all requests
   });
   
-  apiConfig.interceptors.request.use(
-    (config) =>  {
-      const token = sessionStorage.getItem('token');
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-      return config;
-    }
-    ,
-    (error) => {
-      return Promise.reject(error);
-    }
+  // apiConfig.interceptors.request.use(
+  //   (config) =>  {
+  //     const token = sessionStorage.getItem('token');
+  //     if (token) {
+  //       config.headers.Authorization = `Bearer ${token}`;
+  //     }
+  //     return config;
+  //   }
+  //   ,
+  //   (error) => {
+  //     return Promise.reject(error);
+  //   }
     
-  )
+  // )
 export const uploadPeople = async (data) => {
   try {
     const response = await apiConfig.post('/api/alfon/upload', data);
@@ -626,6 +625,17 @@ export const deleteCampain = async (campainId) => {
     throw error
   }
 }
+
+
+export const protect = async () => {
+  try {
+    const response = await apiConfig.get(`/api/auth/protect`);
+    return response;
+  } catch (error) {
+    throw error
+  }
+}
+
 
 
 

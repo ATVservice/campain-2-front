@@ -1,23 +1,20 @@
-import { CgDetailsMore } from "react-icons/cg";
-import { useNavigate, useParams } from "react-router-dom";
-import React, { useState, useEffect, useRef } from "react";
-import * as XLSX from "xlsx";
-import {
-  uploadPeople,
-  getPeople,
-  upadateUserDetails,
-  deleteUser,
-  recoverUserActivity,
-} from "../requests/ApiRequests";
-import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
-import { FaRegEdit } from "react-icons/fa";
+import { AgGridReact } from "ag-grid-react";
+import { useState } from "react";
 import { AiOutlineDelete } from "react-icons/ai";
+import { CgDetailsMore } from "react-icons/cg";
+import { FaRegEdit } from "react-icons/fa";
+import { GiConfirmed } from "react-icons/gi";
 import { GrUpdate } from "react-icons/gr";
 import { MdOutlineCancel } from "react-icons/md";
-import { GiConfirmed } from "react-icons/gi";
-import { ToastContainer, toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import {
+  deleteUser,
+  recoverUserActivity,
+  upadateUserDetails
+} from "../requests/ApiRequests";
 
 function Table({
   rowsData,
@@ -254,6 +251,8 @@ function Table({
       editable: true,
       sortable: true,
       filter: true,
+      flex: 1,
+
     },
     {
       headerName: "משפחה",
@@ -261,6 +260,7 @@ function Table({
       editable: true,
       sortable: true,
       filter: true,
+      flex: 1,
     },
     {
       headerName: "כתובת",
@@ -333,13 +333,18 @@ function Table({
     //     );
     //       },
     // },
-    {
+       {
       headerName: "עריכה/שחזור/מחיקה",
       cellRenderer: ActionCellRenderer,
       editable: false,
       colId: "action",
       width: 150,
-      flex:1,
+      flex:0,
+      cellStyle: {
+    display: "flex",
+    justifyContent: "center", // Horizontal center
+    alignItems: "center"      // Vertical center
+  }
     },
   ];
   const onRowEditingStarted = (params) => {
@@ -361,7 +366,7 @@ function Table({
     });
   };
   const gridStyle = {
-    height: "78vh", // Adjust based on your layout needs
+    height: "75vh", // Adjust based on your layout needs
     overflow: "auto", // Ensure scrolling within the grid
     margin: "0 auto", // Center the grid
     width: "98vw", // Adjust based on your layout needs

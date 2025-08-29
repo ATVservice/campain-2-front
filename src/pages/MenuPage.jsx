@@ -1,7 +1,6 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import menuImage from '../images/menuImage.jpg'
+import menuImage from '../images/menuImage.jpg';
 
 const MenuPage = () => {
   // Define the animation variant
@@ -17,10 +16,10 @@ const MenuPage = () => {
   };
 
   return (
-    <motion.div
-      className="flex flex-1 flex-col justify-center items-center max-h-[100vh] w-full text-white font-bold text-2xl relative"
-    >
-      <img src={menuImage} alt="" className="absolute top-0 left-0 w-full h-full object-cover opacity-50" />
+        <motion.div
+          className="flex flex-col justify-center items-center w-full h-full text-white font-bold text-2xl relative min-h-screen"
+        >
+          <img src={menuImage} alt="" className="absolute top-0 left-0 w-full h-full object-cover opacity-50" />
       
       {/* First Group of Links */}
       <motion.div className="flex justify-center items-center" animate="animate">
