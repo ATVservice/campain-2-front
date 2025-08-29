@@ -5,7 +5,6 @@ import menuImage from '../images/menuImage.jpg';
 
 import { useAuth } from '../components/AuthProvider';
 import Spinner from "../components/Spinner";
-import { login } from "../requests/ApiRequests";
 
 const Login = () => {
   const {  loginUser } = useAuth();
@@ -32,10 +31,11 @@ const Login = () => {
     try {
       setLoading(true);
       
-      const res = await login(formData);
+      const res = await loginUser(formData);
+      console.log('rr');
+      console.log(res);
 
       if(res.status === 201||res.status === 200){
-        loginUser( res.data.token, res.data.user);
         navigate("/menu");
       }
       console.log(res);

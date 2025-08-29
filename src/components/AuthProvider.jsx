@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { logOut, protect } from '../requests/ApiRequests';
+import { login, logOut, protect } from '../requests/ApiRequests';
 
 import Spinner from './Spinner';
 
@@ -22,6 +22,7 @@ export function AuthProvider({ children }) {
         return
       }
       try {
+        console.log('e');
         setLoading(true);
         const res = await protect();
         console.log(res.data.user);
@@ -34,6 +35,25 @@ export function AuthProvider({ children }) {
     };
     checkLogin();
   }, []);
+
+    const loginUser = async (credentials) => {
+      // console.log(credentials);
+
+     try
+     {
+      const res = await login(credentials);
+      console.log(res);
+      setUser(res.data.user);
+      return res;
+     }
+     catch(err)
+     {
+      setUser(null);
+      throw err
+     }
+  };
+
+
 
   // ✅ Secure logout: backend clears cookie
   const logoutUser = async () => {
