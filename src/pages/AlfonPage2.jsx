@@ -27,8 +27,6 @@ function AlfonPage2() {
   const [validPeople, setValidPeople] = useState([]);
   const [invalidPeople, setInvalidPeople] = useState([]);
   const gridRef = useRef(null);
-
-
   const navigate = useNavigate();
 
 
