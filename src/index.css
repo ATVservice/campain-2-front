@@ -1,0 +1,24 @@
+*
+{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  direction: rtl;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.custom-theme
+ {
+   --ag-header-background-color: rgb(181, 227, 245);
+    --ag-background-color:rgb(233, 241, 243);
+    --ag-odd-row-background-color: rgb(233, 241, 243);
+
+}
+.my-grid .ag-header-cell {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
