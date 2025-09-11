@@ -17,7 +17,7 @@ const MenuPage = () => {
 
   return (
         <motion.div
-          className="flex flex-col justify-center items-center w-full h-full text-white font-bold text-2xl relative min-h-screen"
+          className="flex flex-col justify-center items-center w-full h-[calc(100dvh-4rem)] text-white font-bold text-2xl relative"
         >
           <img src={menuImage} alt="" className="absolute top-0 left-0 w-full h-full object-cover opacity-50" />
       

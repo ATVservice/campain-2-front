@@ -1,5 +1,4 @@
-import { useState } from "react";
-
+import { useState, useEffect } from "react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import { AgGridReact } from "ag-grid-react";
@@ -9,7 +8,7 @@ import {
   deletePayment
 } from "../requests/ApiRequests";
 
-function PaymentsWithoutCommitmentTable({ rowsData = [] ,onSelectCampain}) {
+function PaymentsWithoutCommitmentTable({ rowsData = [], onSelectCampain }) {
 
   const hebrewToEnglishMapping = {
     "מזהה אנש": "AnashIdentifier",
@@ -22,8 +21,63 @@ function PaymentsWithoutCommitmentTable({ rowsData = [] ,onSelectCampain}) {
   };
 
   const [searchText, setSearchText] = useState("");
-  
 
+  const heLocaleText = {
+    page: "עמוד",
+    more: "עוד",
+    to: "עד",
+    of: "מתוך",
+    next: "הבא",
+    last: "אחרון",
+    first: "ראשון",
+    previous: "הקודם",
+    loadingOoo: "טוען...",
+    noRowsToShow: "אין נתונים להצגה",
+  };
+
+  const replaceTextNodes = (rootEl, regex, replacement) => {
+    const walker = document.createTreeWalker(rootEl, NodeFilter.SHOW_TEXT, null, false);
+    const toChange = [];
+    while (walker.nextNode()) {
+      const node = walker.currentNode;
+      if (regex.test(node.nodeValue)) {
+        toChange.push(node);
+      }
+    }
+    toChange.forEach((node) => {
+      node.nodeValue = node.nodeValue.replace(regex, replacement);
+    });
+  };
+
+  const replacePageSizeEverywhere = () => {
+    const containers = document.querySelectorAll(`
+    .ag-paging-panel,
+    .ag-paging-page-size-panel,
+    .ag-paging-page-size,
+    .ag-status-bar,
+    .ag-root-wrapper
+  `);
+    containers.forEach((el) => {
+      replaceTextNodes(el, /\bpage\s*size\b/gi, "רשומות בעמוד");
+    });
+  };
+
+  useEffect(() => {
+    const t1 = setTimeout(replacePageSizeEverywhere, 0);
+    const t2 = setTimeout(replacePageSizeEverywhere, 100);
+    const t3 = setTimeout(replacePageSizeEverywhere, 500);
+
+    const root = document.querySelector(".ag-root-wrapper") || document.body;
+    const mo = new MutationObserver(() => {
+      replacePageSizeEverywhere();
+    });
+    mo.observe(root, { subtree: true, childList: true, characterData: true });
+
+    return () => {
+      [t1, t2, t3].forEach(clearTimeout);
+      mo.disconnect();
+    };
+  }, []);
 
   const deleteActionCellRenderer = (props) => {
     return (
@@ -56,40 +110,41 @@ function PaymentsWithoutCommitmentTable({ rowsData = [] ,onSelectCampain}) {
 
   const transferActionCellRenderer = (props) => {
     // const isDropDownVisible = selectedPaymentId === props.node.data._id;
-    const payment  = props.node.data;
+    const payment = props.node.data;
     const paymentId = payment._id;
     const campainsNames = props.node.data.AnashDetails.Campaigns;
 
-    
-    
 
-  
+
+
+
     return (
-      
-          <div className="w-full h-full flex items-center justify-center">
-            {/* <label className="block mb-2">בחר קמפיין</label> */}
-            <select 
-              className="w-full border rounded outline-none p-1"
-              onChange={(e) => {
-                e.preventDefault();
-                
-                onSelectCampain(payment,paymentId, e.target.value);
-                
-              }}
-              key={paymentId}
-            >
-              <option value="">בחר קמפיין  </option>
-              {campainsNames.map((campainName) => (
-                <option key={campainName} value={campainName}>
-                  {campainName}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
-   
-  
-  
+
+      <div className="w-full h-full flex items-center justify-center">
+        {/* <label className="block mb-2">בחר קמפיין</label> */}
+        <select
+          className="w-full border rounded outline-none p-1"
+          onChange={(e) => {
+            e.preventDefault();
+
+            onSelectCampain(payment, paymentId, e.target.value);
+
+          }}
+          key={paymentId}
+        >
+          <option value="">בחר קמפיין  </option>
+          {campainsNames.map((campainName) => (
+            <option key={campainName} value={campainName}>
+              {campainName}
+            </option>
+          ))}
+        </select>
+      </div>
+    )
+  }
+
+
+
 
   const columns = [
     {
@@ -175,11 +230,11 @@ function PaymentsWithoutCommitmentTable({ rowsData = [] ,onSelectCampain}) {
       width: 150,
       flex: 0,
       minWidth: 100,
-            cellStyle: {
-    display: "flex",
-    justifyContent: "center", // Horizontal center
-    alignItems: "center"      // Vertical center
-  }
+      cellStyle: {
+        display: "flex",
+        justifyContent: "center", // Horizontal center
+        alignItems: "center"      // Vertical center
+      }
 
     },
   ];
@@ -240,6 +295,7 @@ function PaymentsWithoutCommitmentTable({ rowsData = [] ,onSelectCampain}) {
           paginationPageSize={50} // Increase the pagination page size as needed
           domLayout="normal" // Use normal layout to keep grid within the container height
           enableRtl={true}
+          localeText={heLocaleText}
           quickFilterText={searchText}
           //   ref={gridRef}
           defaultColDef={{
@@ -248,9 +304,9 @@ function PaymentsWithoutCommitmentTable({ rowsData = [] ,onSelectCampain}) {
           gridOptions={{
             enableCellTextSelection: true,
             suppressCellFocus: true, // This prevents cell focus
-                                      localeText: {
-    noRowsToShow: 'אין שורות להצגה'
-  }
+            localeText: {
+              noRowsToShow: 'אין שורות להצגה'
+            }
 
 
           }}
