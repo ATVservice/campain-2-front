@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 function ReportNavigation() {
     const navigate = useNavigate();
   return (
-    <motion.div className='flex flex-col grow justify-center items-center h-[100vh]'>
+    <motion.div className='flex flex-col grow justify-center items-center h-[80vh]'>
 
         <section className='flex justify-center items-center gap-4 h-[100%]'>
             <button className='bg-indigo-500 p-2 w-[100px] h-[100px]  rounded-sm text-white text-center align-middle'

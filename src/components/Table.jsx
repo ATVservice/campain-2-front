@@ -1,7 +1,7 @@
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import { AgGridReact } from "ag-grid-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AiOutlineDelete } from "react-icons/ai";
 import { CgDetailsMore } from "react-icons/cg";
 import { FaRegEdit } from "react-icons/fa";
@@ -15,6 +15,7 @@ import {
   recoverUserActivity,
   upadateUserDetails
 } from "../requests/ApiRequests";
+
 
 function Table({
   rowsData,
@@ -43,6 +44,63 @@ function Table({
     פעיל: "isActive",
     מתרים: "fundRaiser",
   };
+
+  const heLocaleText = {
+    page: "עמוד",
+    more: "עוד",
+    to: "עד",
+    of: "מתוך",
+    next: "הבא",
+    last: "אחרון",
+    first: "ראשון",
+    previous: "הקודם",
+    loadingOoo: "טוען...",
+    noRowsToShow: "אין נתונים להצגה",
+  };
+
+  const replaceTextNodes = (rootEl, regex, replacement) => {
+    const walker = document.createTreeWalker(rootEl, NodeFilter.SHOW_TEXT, null, false);
+    const toChange = [];
+    while (walker.nextNode()) {
+      const node = walker.currentNode;
+      if (regex.test(node.nodeValue)) {
+        toChange.push(node);
+      }
+    }
+    toChange.forEach((node) => {
+      node.nodeValue = node.nodeValue.replace(regex, replacement);
+    });
+  };
+
+  const replacePageSizeEverywhere = () => {
+    const containers = document.querySelectorAll(`
+    .ag-paging-panel,
+    .ag-paging-page-size-panel,
+    .ag-paging-page-size,
+    .ag-status-bar,
+    .ag-root-wrapper
+  `);
+    containers.forEach((el) => {
+      replaceTextNodes(el, /\bpage\s*size\b/gi, "רשומות בעמוד");
+    });
+  };
+
+  useEffect(() => {
+    const t1 = setTimeout(replacePageSizeEverywhere, 0);
+    const t2 = setTimeout(replacePageSizeEverywhere, 100);
+    const t3 = setTimeout(replacePageSizeEverywhere, 500);
+
+    const root = document.querySelector(".ag-root-wrapper") || document.body;
+    const mo = new MutationObserver(() => {
+      replacePageSizeEverywhere();
+    });
+    mo.observe(root, { subtree: true, childList: true, characterData: true });
+
+    return () => {
+      [t1, t2, t3].forEach(clearTimeout);
+      mo.disconnect();
+    };
+  }, []);
 
   const ActionCellRenderer = (props) => {
     const isCurrentRowEditing = props.api
@@ -252,7 +310,8 @@ function Table({
       sortable: true,
       filter: true,
       flex: 1,
-
+      minWidth: 120,
+      maxWidth: 200,
     },
     {
       headerName: "משפחה",
@@ -261,6 +320,8 @@ function Table({
       sortable: true,
       filter: true,
       flex: 1,
+      minWidth: 120,
+      maxWidth: 250,
     },
     {
       headerName: "כתובת",
@@ -284,6 +345,8 @@ function Table({
       sortable: true,
       filter: true,
       width: 100,
+      minWidth: 120,
+      maxWidth: 300,
     },
     {
       headerName: "טל בית",
@@ -333,18 +396,18 @@ function Table({
     //     );
     //       },
     // },
-       {
+    {
       headerName: "עריכה/שחזור/מחיקה",
       cellRenderer: ActionCellRenderer,
       editable: false,
       colId: "action",
       width: 150,
-      flex:0,
+      flex: 0,
       cellStyle: {
-    display: "flex",
-    justifyContent: "center", // Horizontal center
-    alignItems: "center"      // Vertical center
-  }
+        display: "flex",
+        justifyContent: "center", // Horizontal center
+        alignItems: "center"      // Vertical center
+      }
     },
   ];
   const onRowEditingStarted = (params) => {
@@ -411,6 +474,7 @@ function Table({
           paginationPageSize={50} // Increase the pagination page size as needed
           domLayout="normal" // Use normal layout to keep grid within the container height
           enableRtl={true}
+          localeText={heLocaleText}
           onRowEditingStarted={onRowEditingStarted}
           onRowEditingStopped={onRowEditingStopped}
           quickFilterText={searchText} // Applying the search text to filter the grid
@@ -424,6 +488,7 @@ function Table({
           gridOptions={{
             enableCellTextSelection: true,
           }}
+
         />
       </div>
     </div>

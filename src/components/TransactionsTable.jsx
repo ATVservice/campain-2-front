@@ -1,12 +1,67 @@
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { AgGridReact } from 'ag-grid-react';
-import { useState } from 'react';
+import { useState, useEffect } from "react";
 import { FaTrash } from 'react-icons/fa'; // ייבוא האייקון
 import { deleteTransaction } from '../requests/ApiRequests';
-function TransactionsTable({ rowsData, fetchTransactions,gridRef}) {
-    const [searchText, setSearchText] = useState("");
-  
+function TransactionsTable({ rowsData, fetchTransactions, gridRef }) {
+  const [searchText, setSearchText] = useState("");
+  const heLocaleText = {
+    page: "עמוד",
+    more: "עוד",
+    to: "עד",
+    of: "מתוך",
+    next: "הבא",
+    last: "אחרון",
+    first: "ראשון",
+    previous: "הקודם",
+    loadingOoo: "טוען...",
+    noRowsToShow: "אין נתונים להצגה",
+  };
+
+  const replaceTextNodes = (rootEl, regex, replacement) => {
+    const walker = document.createTreeWalker(rootEl, NodeFilter.SHOW_TEXT, null, false);
+    const toChange = [];
+    while (walker.nextNode()) {
+      const node = walker.currentNode;
+      if (regex.test(node.nodeValue)) {
+        toChange.push(node);
+      }
+    }
+    toChange.forEach((node) => {
+      node.nodeValue = node.nodeValue.replace(regex, replacement);
+    });
+  };
+
+  const replacePageSizeEverywhere = () => {
+    const containers = document.querySelectorAll(`
+    .ag-paging-panel,
+    .ag-paging-page-size-panel,
+    .ag-paging-page-size,
+    .ag-status-bar,
+    .ag-root-wrapper
+  `);
+    containers.forEach((el) => {
+      replaceTextNodes(el, /\bpage\s*size\b/gi, "רשומות בעמוד");
+    });
+  };
+
+  useEffect(() => {
+    const t1 = setTimeout(replacePageSizeEverywhere, 0);
+    const t2 = setTimeout(replacePageSizeEverywhere, 100);
+    const t3 = setTimeout(replacePageSizeEverywhere, 500);
+
+    const root = document.querySelector(".ag-root-wrapper") || document.body;
+    const mo = new MutationObserver(() => {
+      replacePageSizeEverywhere();
+    });
+    mo.observe(root, { subtree: true, childList: true, characterData: true });
+
+    return () => {
+      [t1, t2, t3].forEach(clearTimeout);
+      mo.disconnect();
+    };
+  }, []);
 
   const columns = [
     {
@@ -15,7 +70,7 @@ function TransactionsTable({ rowsData, fetchTransactions,gridRef}) {
       editable: false,
       sortable: true,
       filter: true,
-            flex: 1,
+      flex: 1,
 
     },
     {
@@ -57,12 +112,12 @@ function TransactionsTable({ rowsData, fetchTransactions,gridRef}) {
         }
         return "";
       },
-    
-          
+
+
       filterParams: {
         comparator: (filterLocalDateAtMidnight, cellValue) => {
           const date = new Date(cellValue);
-          
+
           if (date < filterLocalDateAtMidnight) return -1;
           if (date > filterLocalDateAtMidnight) return 1;
           return 0;
@@ -86,8 +141,8 @@ function TransactionsTable({ rowsData, fetchTransactions,gridRef}) {
       },
 
     }
-    
-    
+
+
     ,
     {
       headerName: 'יתרה נוכחית',
@@ -119,11 +174,11 @@ function TransactionsTable({ rowsData, fetchTransactions,gridRef}) {
         }
         return null;
       },
-             cellStyle: {
-    display: "flex",
-    justifyContent: "center", // Horizontal center
-    alignItems: "center"      // Vertical center
-  }
+      cellStyle: {
+        display: "flex",
+        justifyContent: "center", // Horizontal center
+        alignItems: "center"      // Vertical center
+      }
 
     },
   ];
@@ -131,37 +186,37 @@ function TransactionsTable({ rowsData, fetchTransactions,gridRef}) {
   const gridStyle = {
     width: '100%',
     height: '400px',
-    
+
   };
 
   const getRowStyle = (params) => {
     if (params.data.TransactionType === 'הוצאה') {
       return { backgroundColor: '#ffe6e6' }; // רקע אדום בהיר להוצאה
     } else if (params.data.TransactionType === 'הכנסה') {
-      return { backgroundColor: '#e6ffe6'}; // רקע ירוק בהיר להכנסה
+      return { backgroundColor: '#e6ffe6' }; // רקע ירוק בהיר להכנסה
     }
     return null;
   };
 
   const deleteTransactionProcess = async (node) => {
     console.log(node);
-  
+
     const isConfirmed = window.confirm('האם את/ה בטוח שאת/ה רוצה למחוק?');
-            if (isConfirmed) {
-              const transaction = node.data;
-              const transactionId = transaction._id;             
-              try {
-                const res = await deleteTransaction(transactionId);
-                fetchTransactions();
-              } catch (error) {
-                console.error(error);
-              }
-            }
-};
+    if (isConfirmed) {
+      const transaction = node.data;
+      const transactionId = transaction._id;
+      try {
+        const res = await deleteTransaction(transactionId);
+        fetchTransactions();
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  };
 
   return (
     <div>
-            <div className="w-[80vw] flex justify-start">
+      <div className="w-[80vw] flex justify-start">
         <input
           id="search"
           type="text"
@@ -172,7 +227,7 @@ function TransactionsTable({ rowsData, fetchTransactions,gridRef}) {
         />
       </div>
 
-         <div className="ag-theme-alpine h-[70vh] max-h-[65vh]"       style={{
+      <div className="ag-theme-alpine h-[70vh] max-h-[65vh]" style={{
         width: '100%', // Ensure the container is full width
       }}
       >
@@ -183,21 +238,22 @@ function TransactionsTable({ rowsData, fetchTransactions,gridRef}) {
           paginationPageSize={20}
           domLayout="normal"
           enableRtl={true}
+          localeText={heLocaleText}
           ref={gridRef}
           getRowStyle={getRowStyle}
           quickFilterText={searchText}
 
 
-                    gridOptions={{
+          gridOptions={{
             enableCellTextSelection: true,
-                           localeText:{
-                      noRowsToShow: 'אין שורות להצגה'
+            localeText: {
+              noRowsToShow: 'אין שורות להצגה'
 
-                }
+            }
 
           }}
 
-      
+
         />
       </div>
     </div>
